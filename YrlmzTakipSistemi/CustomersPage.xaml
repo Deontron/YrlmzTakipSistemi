@@ -13,8 +13,12 @@
 
         <DataGrid Name="CustomersDataGrid" Width="Auto" Height="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="50,70,50,0"
                   AutoGenerateColumns="True" SelectionMode="Single" CanUserAddRows="False" Background="#FFFFFF"
-                  BorderBrush="#DDD" BorderThickness="1" RowBackground="#F9F9F9" AlternatingRowBackground="#F1F1F1">
+                  SelectionChanged="CustomersDataGrid_SelectionChanged" BorderBrush="#DDD" BorderThickness="1" RowBackground="#F9F9F9" AlternatingRowBackground="#F1F1F1">
         </DataGrid>
+
+        <DataGrid Name="TransactionsDataGrid" Width="Auto" Height="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Center"
+         Margin="10" AutoGenerateColumns="True" CanUserAddRows="False" />
+
 
         <Button Content="Yeni Müşteri Ekle" Width="200" Height="40" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="10,0,10,70"
                 Background="#4CAF50" Foreground="White" FontWeight="Bold" BorderBrush="#388E3C" BorderThickness="1" Click="AddCustomerButton_Click">

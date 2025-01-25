@@ -43,12 +43,14 @@ namespace YrlmzTakipSistemi
                 )";
 
                 string createTransactionsTable = @"
-                CREATE TABLE IF NOT EXISTS Transactions (
+                CREATE TABLE Transactions (
                     Id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    CustomerId INTEGER,
-                    Amount REAL,
-                    Date TEXT,
-                    FOREIGN KEY(CustomerId) REFERENCES Customers(Id)
+                    CustomerId INTEGER NOT NULL,
+                    Date TEXT NOT NULL,
+                    ProductName TEXT NOT NULL,
+                    Quantity INTEGER NOT NULL,
+                    Price REAL NOT NULL,
+                    FOREIGN KEY (CustomerId) REFERENCES Customers(Id)
                 )";
 
                 var command = new SQLiteCommand(createCustomersTable, connection);

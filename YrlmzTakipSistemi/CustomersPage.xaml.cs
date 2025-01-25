@@ -63,6 +63,46 @@ namespace YrlmzTakipSistemi
             return customers;
         }
 
+        private void LoadCustomerTransactions(int customerId)
+        {
+            using (var connection = _databaseHelper.GetConnection())
+            {
+                connection.Open();
+                string query = "SELECT * FROM Transactions WHERE CustomerId = @CustomerId";
+                SQLiteCommand command = new SQLiteCommand(query, connection);
+                command.Parameters.AddWithValue("@CustomerId", customerId);
+
+                List<Transaction> transactions = new List<Transaction>();
+
+                using (SQLiteDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        transactions.Add(new Transaction
+                        {
+                            Id = reader.GetInt32(0),
+                            CustomerId = reader.GetInt32(1),
+                            Date = reader.GetString(2),
+                            ProductName = reader.GetString(3),
+                            Quantity = reader.GetInt32(4),
+                            Price = reader.GetDouble(5)
+                        });
+                    }
+                }
+
+                TransactionsDataGrid.ItemsSource = transactions;
+            }
+        }
+
+        private void CustomersDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (CustomersDataGrid.SelectedItem != null)
+            {
+                var selectedCustomer = (Customer)CustomersDataGrid.SelectedItem;
+                LoadCustomerTransactions(selectedCustomer.Id);
+            }
+        }
+
         private void AddCustomerButton_Click(object sender, RoutedEventArgs e)
         {
             var mainWindow = (MainWindow)Application.Current.MainWindow;
@@ -113,5 +153,15 @@ namespace YrlmzTakipSistemi
         public int Id { get; set; }
         public string Name { get; set; }
         public string Email { get; set; }
+    }
+
+    public class Transaction
+    {
+        public int Id { get; set; }
+        public int CustomerId { get; set; }
+        public string Date { get; set; }
+        public String ProductName { get; set; }
+        public float Quantity { get; set; }
+        public double Price { get; set; }
     }
 }

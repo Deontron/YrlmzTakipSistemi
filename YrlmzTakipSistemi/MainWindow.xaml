@@ -7,7 +7,6 @@
         mc:Ignorable="d"
         Title="Takip Sistemi" Height="450" Width="800">
     <Grid>
-        <!-- Menü Çubuğu -->
         <Menu VerticalAlignment="Top">
             <MenuItem Header="Dosya">
                 <MenuItem Header="Yedekle" />
@@ -18,9 +17,7 @@
             <MenuItem Header="Faturalar" />
         </Menu>
 
-        <!-- Ana İçerik Alanı -->
         <DockPanel Margin="10,30,10,10">
-            <!-- Sol Menü Butonları -->
             <StackPanel DockPanel.Dock="Left" Width="200" Background="#F0F0F0" Margin="0,0,10,0">
                 <TextBlock Text="Menü" FontSize="16" FontWeight="Bold" Margin="10" />
                 <Button Content="Müşteriler" Margin="10" Height="40" Click="CustomersButton_Click" />
@@ -28,9 +25,7 @@
                 <Button Content="Faturalar" Margin="10" Height="40" Click="InvoiceButton_Click" />
             </StackPanel>
 
-            <!-- İçerik Alanı: Frame -->
             <Frame Name="MainFrame" Background="#FFFFFF" />
-            <TextBlock Text="Hoşgeldiniz!" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="24"/>
 
         </DockPanel>
     </Grid>

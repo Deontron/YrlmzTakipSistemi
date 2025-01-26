@@ -23,16 +23,17 @@ namespace YrlmzTakipSistemi
     {
 
         private DatabaseHelper dbHelper;
-        int currentCustomerId;
+        Customer currentCustomer;
+
         public TransactionAddPage()
         {
             InitializeComponent();
             dbHelper = new DatabaseHelper();
         }
 
-        public void GetCustomerId(int id)
+        public void GetCustomer(Customer customer)
         {
-            currentCustomerId = id;
+            currentCustomer = customer;
         }
 
         private void SaveTransactionButton_Click(object sender, RoutedEventArgs e)
@@ -59,9 +60,9 @@ namespace YrlmzTakipSistemi
                 var command = new SQLiteCommand(insertQuery, connection);
                 command.Parameters.AddWithValue("@Name", name);
                 command.Parameters.AddWithValue("@Email", email);
-                command.Parameters.AddWithValue("@CustomerId", currentCustomerId);
-                command.Parameters.AddWithValue("@Quantity", currentCustomerId);
-                command.Parameters.AddWithValue("@Price", currentCustomerId);
+                command.Parameters.AddWithValue("@CustomerId", currentCustomer.Id);
+                command.Parameters.AddWithValue("@Quantity", currentCustomer.Id);
+                command.Parameters.AddWithValue("@Price", currentCustomer.Id);
 
                 command.ExecuteNonQuery();
             }
@@ -69,7 +70,9 @@ namespace YrlmzTakipSistemi
             ClearForm();
 
             var mainWindow = (MainWindow)Application.Current.MainWindow;
-            mainWindow.MainFrame.Navigate(new CustomersPage());
+            TransactionsPage transactionsPage = new TransactionsPage();
+            transactionsPage.LoadCustomerTransactions(currentCustomer);
+            mainWindow.MainFrame.Navigate(transactionsPage);
         }
 
         private void ClearForm()

@@ -22,7 +22,7 @@ namespace YrlmzTakipSistemi
     public partial class TransactionsPage : Page
     {
         private DatabaseHelper _databaseHelper;
-        private int currentCustomerId;
+        private Customer currentCustomer;
 
         public TransactionsPage()
         {
@@ -30,15 +30,17 @@ namespace YrlmzTakipSistemi
             _databaseHelper = new DatabaseHelper();
         }
 
-        public void LoadCustomerTransactions(int customerId)
+        public void LoadCustomerTransactions(Customer customer)
         {
-            currentCustomerId = customerId;
+            currentCustomer = customer;
+
+            TitleTextBlock.Text = $"{customer.Name} - İşlemler"; 
             using (var connection = _databaseHelper.GetConnection())
             {
                 connection.Open();
                 string query = "SELECT * FROM Transactions WHERE CustomerId = @CustomerId";
                 SQLiteCommand command = new SQLiteCommand(query, connection);
-                command.Parameters.AddWithValue("@CustomerId", customerId);
+                command.Parameters.AddWithValue("@CustomerId", customer.Id);
 
                 List<Transaction> transactions = new List<Transaction>();
 
@@ -66,7 +68,7 @@ namespace YrlmzTakipSistemi
         {
             var mainWindow = (MainWindow)Application.Current.MainWindow;
             TransactionAddPage transactionAddPage = new TransactionAddPage();
-            transactionAddPage.GetCustomerId(currentCustomerId);
+            transactionAddPage.GetCustomer(currentCustomer);
             mainWindow.MainFrame.Navigate(transactionAddPage);
         }
 
@@ -81,7 +83,7 @@ namespace YrlmzTakipSistemi
                 if (success)
                 {
                     MessageBox.Show("İşlem başarıyla silindi.");
-                    LoadCustomerTransactions(currentCustomerId);
+                    LoadCustomerTransactions(currentCustomer);
                 }
                 else
                 {

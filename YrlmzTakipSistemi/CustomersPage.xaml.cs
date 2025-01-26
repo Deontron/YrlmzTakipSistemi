@@ -73,7 +73,7 @@ namespace YrlmzTakipSistemi
                 mainWindow.MainFrame.Navigate(transactionsPage);
             
                 var selectedCustomer = (Customer)CustomersDataGrid.SelectedItem;
-                transactionsPage.LoadCustomerTransactions(selectedCustomer.Id);
+                transactionsPage.LoadCustomerTransactions(selectedCustomer);
             }
             else
             {

@@ -17,12 +17,10 @@ namespace YrlmzTakipSistemi
     public partial class MainWindow : Window
     {
         private DatabaseHelper dbHelper;
-        public Frame MyFrame { get; set; }
 
         public MainWindow()
         {
             InitializeComponent();
-            MyFrame = this.MainFrame;
             dbHelper = new DatabaseHelper();
             dbHelper.CheckDatabaseExists(); // Veritabanı kontrolü ve oluşturma
         }

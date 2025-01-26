@@ -65,7 +65,9 @@ namespace YrlmzTakipSistemi
         private void AddTransactionButton_Click(object sender, RoutedEventArgs e)
         {
             var mainWindow = (MainWindow)Application.Current.MainWindow;
-            mainWindow.MainFrame.Navigate(new CustomerAddPage());
+            TransactionAddPage transactionAddPage = new TransactionAddPage();
+            transactionAddPage.GetCustomerId(currentCustomerId);
+            mainWindow.MainFrame.Navigate(transactionAddPage);
         }
 
         private void DeleteTransactionButton_Click(object sender, RoutedEventArgs e)
@@ -106,7 +108,7 @@ namespace YrlmzTakipSistemi
                         using (var deleteTransactionsCommand = new SQLiteCommand(deleteTransactionsQuery, connection, transaction))
                         {
                             deleteTransactionsCommand.Parameters.AddWithValue("@Id", transactionId);
-                            
+
                             int rowsAffected = deleteTransactionsCommand.ExecuteNonQuery();
 
                             transaction.Commit();

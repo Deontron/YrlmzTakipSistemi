@@ -75,6 +75,10 @@ namespace YrlmzTakipSistemi
                 var selectedCustomer = (Customer)CustomersDataGrid.SelectedItem;
                 transactionsPage.LoadCustomerTransactions(selectedCustomer.Id);
             }
+            else
+            {
+                MessageBox.Show("Lütfen bir müşteri seçin.","Hop!");
+            }
         }
 
         private void AddCustomerButton_Click(object sender, RoutedEventArgs e)
@@ -93,17 +97,17 @@ namespace YrlmzTakipSistemi
 
                 if (success)
                 {
-                    MessageBox.Show("Müşteri başarıyla silindi.");
+                    MessageBox.Show("Müşteri başarıyla silindi.", "Hop!");
                     LoadCustomers();  
                 }
                 else
                 {
-                    MessageBox.Show("Silme işlemi başarısız oldu.");
+                    MessageBox.Show("Silme işlemi başarısız oldu.", "Hop!");
                 }
             }
             else
             {
-                MessageBox.Show("Lütfen silmek için bir müşteri seçin.");
+                MessageBox.Show("Lütfen silmek için bir müşteri seçin.", "Hop!");
             }
         }
 

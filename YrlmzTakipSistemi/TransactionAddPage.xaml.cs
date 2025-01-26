@@ -17,18 +17,25 @@ using System.Data.SQLite;
 namespace YrlmzTakipSistemi
 {
     /// <summary>
-    /// Interaction logic for CustomerAddPage.xaml
+    /// Interaction logic for TransactionAddPage.xaml
     /// </summary>
-    public partial class CustomerAddPage : Page
+    public partial class TransactionAddPage : Page
     {
+
         private DatabaseHelper dbHelper;
-        public CustomerAddPage()
+        int currentCustomerId;
+        public TransactionAddPage()
         {
             InitializeComponent();
             dbHelper = new DatabaseHelper();
         }
 
-        private void SaveCustomerButton_Click(object sender, RoutedEventArgs e)
+        public void GetCustomerId(int id)
+        {
+            currentCustomerId = id;
+        }
+
+        private void SaveTransactionButton_Click(object sender, RoutedEventArgs e)
         {
             string name = NameTextBox.Text;
             string phone = PhoneTextBox.Text;
@@ -38,20 +45,23 @@ namespace YrlmzTakipSistemi
 
             if (string.IsNullOrEmpty(name))
             {
-                MessageBox.Show("Müşteri adı boş olamaz.", "Hata", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("İşlem adı boş olamaz.", "Hata", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
-            MessageBox.Show($"Müşteri {name} başarıyla eklendi!", "Hop!");
+            MessageBox.Show($"İşlem {name} başarıyla eklendi!", "Hop!");
 
             using (var connection = dbHelper.GetConnection())
             {
                 connection.Open();
 
-                string insertQuery = "INSERT INTO Customers (Name, Email) VALUES (@Name, @Email)";
+                string insertQuery = "INSERT INTO Transactions (CustomerId, ProductName, Date, Quantity, Price) VALUES (@CustomerId, @Name, @Email, @Quantity, @Price)";
                 var command = new SQLiteCommand(insertQuery, connection);
                 command.Parameters.AddWithValue("@Name", name);
                 command.Parameters.AddWithValue("@Email", email);
+                command.Parameters.AddWithValue("@CustomerId", currentCustomerId);
+                command.Parameters.AddWithValue("@Quantity", currentCustomerId);
+                command.Parameters.AddWithValue("@Price", currentCustomerId);
 
                 command.ExecuteNonQuery();
             }

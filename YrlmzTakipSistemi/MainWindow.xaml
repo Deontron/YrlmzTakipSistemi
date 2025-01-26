@@ -26,7 +26,7 @@
             </StackPanel>
 
             <Frame Name="MainFrame" Background="#FFFFFF" />
-
+            
         </DockPanel>
     </Grid>
 </Window>

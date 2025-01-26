@@ -3,32 +3,41 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-      xmlns:local="clr-namespace:YrlmzTakipSistemi"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
       Title="Müşteriler Sayfası">
 
     <Grid Background="#F4F4F4">
-        <TextBlock Text="Müşteriler" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="28" FontWeight="Bold" Foreground="#333" Margin="10" />
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
 
-        <DataGrid Name="CustomersDataGrid" Width="Auto" Height="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="50,70,50,0"
-                  AutoGenerateColumns="True" SelectionMode="Single" CanUserAddRows="False" Background="#FFFFFF"
-                  SelectionChanged="CustomersDataGrid_SelectionChanged" BorderBrush="#DDD" BorderThickness="1" RowBackground="#F9F9F9" AlternatingRowBackground="#F1F1F1">
+        <TextBlock Text="Müşteriler" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="28" FontWeight="Bold" Foreground="#333" Margin="10" Grid.Row="0" />
+
+        <DataGrid Name="CustomersDataGrid" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="10"
+                  AutoGenerateColumns="True" SelectionMode="Single" CanUserAddRows="False" Background="#FFFFFF" ColumnWidth="*"
+                   BorderBrush="#DDD" BorderThickness="1"
+                  RowBackground="#F9F9F9" AlternatingRowBackground="#F1F1F1" Grid.Row="1">
         </DataGrid>
 
-        <DataGrid Name="TransactionsDataGrid" Width="Auto" Height="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Center"
-         Margin="10" AutoGenerateColumns="True" CanUserAddRows="False" />
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="2" Margin="10">
 
+            <Button Content="Seçili Müşteriyi Sil" Width="200" Height="40" Margin="5"
+                    Background="DarkRed" Foreground="White" FontWeight="Bold" BorderBrush="DarkRed" BorderThickness="1"
+                    Click="DeleteCustomerButton_Click">
+            </Button>
+            <Button Content="Yeni Müşteri Ekle" Width="200" Height="40" Margin="5"
+                    Background="#4CAF50" Foreground="White" FontWeight="Bold" BorderBrush="#388E3C" BorderThickness="1"
+                    Click="AddCustomerButton_Click">
+            </Button>
 
-        <Button Content="Yeni Müşteri Ekle" Width="200" Height="40" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="10,0,10,70"
-                Background="#4CAF50" Foreground="White" FontWeight="Bold" BorderBrush="#388E3C" BorderThickness="1" Click="AddCustomerButton_Click">
-        </Button>
-
-        <Button Content="Seçili Müşteriyi Sil" Width="200" Height="40" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="10,0,10,20"
-        Background="#4CAF50" Foreground="White" FontWeight="Bold" BorderBrush="#388E3C" BorderThickness="1" Click="DeleteCustomerButton_Click">
-        </Button>
-
-        <Border VerticalAlignment="Top" HorizontalAlignment="Stretch" Height="1" Background="#DDD" Margin="10,60,10,0"/>
-
+            <Button Content="Seçili Müşteriye Git" Width="200" Height="40" Margin="5"
+                    Background="DarkBlue" Foreground="White" FontWeight="Bold" BorderBrush="DarkBlue" BorderThickness="1"
+                    Click="ShowTransactionsButton_Click">
+            </Button>
+        </StackPanel>
     </Grid>
 </Page>

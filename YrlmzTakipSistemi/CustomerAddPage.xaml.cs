@@ -36,14 +36,14 @@ namespace YrlmzTakipSistemi
             string email = EmailTextBox.Text;
             string address = AddressTextBox.Text;
 
-            // Burada veritabanına kaydetme işlemi yapılabilir.
-            MessageBox.Show($"Müşteri {name} başarıyla eklendi!");
 
             if (string.IsNullOrEmpty(name))
             {
                 MessageBox.Show("Müşteri adı boş olamaz.", "Hata", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
+
+            MessageBox.Show($"Müşteri {name} başarıyla eklendi!");
 
             using (var connection = dbHelper.GetConnection())
             {
@@ -58,9 +58,11 @@ namespace YrlmzTakipSistemi
             }
 
             ClearForm();
+
+            var mainWindow = (MainWindow)Application.Current.MainWindow;
+            mainWindow.MainFrame.Navigate(new CustomersPage());
         }
 
-        // Formu Temizleme
         private void ClearForm()
         {
             NameTextBox.Clear();

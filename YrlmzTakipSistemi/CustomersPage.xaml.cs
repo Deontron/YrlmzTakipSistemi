@@ -63,43 +63,17 @@ namespace YrlmzTakipSistemi
             return customers;
         }
 
-        private void LoadCustomerTransactions(int customerId)
-        {
-            using (var connection = _databaseHelper.GetConnection())
-            {
-                connection.Open();
-                string query = "SELECT * FROM Transactions WHERE CustomerId = @CustomerId";
-                SQLiteCommand command = new SQLiteCommand(query, connection);
-                command.Parameters.AddWithValue("@CustomerId", customerId);
 
-                List<Transaction> transactions = new List<Transaction>();
-
-                using (SQLiteDataReader reader = command.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        transactions.Add(new Transaction
-                        {
-                            Id = reader.GetInt32(0),
-                            CustomerId = reader.GetInt32(1),
-                            Date = reader.GetString(2),
-                            ProductName = reader.GetString(3),
-                            Quantity = reader.GetInt32(4),
-                            Price = reader.GetDouble(5)
-                        });
-                    }
-                }
-
-                TransactionsDataGrid.ItemsSource = transactions;
-            }
-        }
-
-        private void CustomersDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void ShowTransactionsButton_Click(object sender, RoutedEventArgs e)
         {
             if (CustomersDataGrid.SelectedItem != null)
             {
+                var mainWindow = (MainWindow)Application.Current.MainWindow;
+                TransactionsPage transactionsPage = new TransactionsPage();
+                mainWindow.MainFrame.Navigate(transactionsPage);
+            
                 var selectedCustomer = (Customer)CustomersDataGrid.SelectedItem;
-                LoadCustomerTransactions(selectedCustomer.Id);
+                transactionsPage.LoadCustomerTransactions(selectedCustomer.Id);
             }
         }
 
@@ -138,12 +112,34 @@ namespace YrlmzTakipSistemi
             using (var connection = _databaseHelper.GetConnection())
             {
                 connection.Open();
-                string query = "DELETE FROM Customers WHERE Id = @Id";
-                SQLiteCommand command = new SQLiteCommand(query, connection);
-                command.Parameters.AddWithValue("@Id", customerId);
 
-                int rowsAffected = command.ExecuteNonQuery();
-                return rowsAffected > 0;  
+                using (var transaction = connection.BeginTransaction())
+                {
+                    try
+                    {
+                        string deleteTransactionsQuery = "DELETE FROM Transactions WHERE CustomerId = @CustomerId";
+                        using (var deleteTransactionsCommand = new SQLiteCommand(deleteTransactionsQuery, connection, transaction))
+                        {
+                            deleteTransactionsCommand.Parameters.AddWithValue("@CustomerId", customerId);
+                            deleteTransactionsCommand.ExecuteNonQuery();
+                        }
+
+                        string deleteCustomerQuery = "DELETE FROM Customers WHERE Id = @Id";
+                        using (var deleteCustomerCommand = new SQLiteCommand(deleteCustomerQuery, connection, transaction))
+                        {
+                            deleteCustomerCommand.Parameters.AddWithValue("@Id", customerId);
+                            int rowsAffected = deleteCustomerCommand.ExecuteNonQuery();
+
+                            transaction.Commit();
+                            return rowsAffected > 0; 
+                        }
+                    }
+                    catch
+                    {
+                        transaction.Rollback();
+                        return false;
+                    }
+                }
             }
         }
     }

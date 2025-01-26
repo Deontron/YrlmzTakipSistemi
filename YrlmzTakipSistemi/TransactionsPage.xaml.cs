@@ -78,21 +78,29 @@ namespace YrlmzTakipSistemi
             {
                 var selectedTransaction = (Transaction)TransactionsDataGrid.SelectedItem;
 
-                bool success = DeleteTransactionFromDatabase(selectedTransaction.Id);
+                var result = MessageBox.Show(selectedTransaction.ProductName + " Silmek istediğinize emin misiniz?",
+                                 "Silme Onayı",
+                                 MessageBoxButton.YesNo,
+                                 MessageBoxImage.Question);
 
-                if (success)
+                if (result == MessageBoxResult.Yes)
                 {
-                    MessageBox.Show("İşlem başarıyla silindi.");
-                    LoadCustomerTransactions(currentCustomer);
-                }
-                else
-                {
-                    MessageBox.Show("Silme işlemi başarısız oldu.");
+                    bool success = DeleteTransactionFromDatabase(selectedTransaction.Id);
+
+                    if (success)
+                    {
+                        MessageBox.Show("İşlem başarıyla silindi.", "Hop!");
+                        LoadCustomerTransactions(currentCustomer);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Silme işlemi başarısız oldu.", "Hop!");
+                    }
                 }
             }
             else
             {
-                MessageBox.Show("Lütfen silmek için bir İşlem seçin.");
+                MessageBox.Show("Lütfen silmek için bir işlem seçin.", "Hop!");
             }
         }
 

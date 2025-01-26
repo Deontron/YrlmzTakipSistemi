@@ -71,13 +71,13 @@ namespace YrlmzTakipSistemi
                 var mainWindow = (MainWindow)Application.Current.MainWindow;
                 TransactionsPage transactionsPage = new TransactionsPage();
                 mainWindow.MainFrame.Navigate(transactionsPage);
-            
+
                 var selectedCustomer = (Customer)CustomersDataGrid.SelectedItem;
                 transactionsPage.LoadCustomerTransactions(selectedCustomer);
             }
             else
             {
-                MessageBox.Show("Lütfen bir müşteri seçin.","Hop!");
+                MessageBox.Show("Lütfen bir müşteri seçin.", "Hop!");
             }
         }
 
@@ -93,16 +93,24 @@ namespace YrlmzTakipSistemi
             {
                 var selectedCustomer = (Customer)CustomersDataGrid.SelectedItem;
 
-                bool success = DeleteCustomerFromDatabase(selectedCustomer.Id);
+                var result = MessageBox.Show(selectedCustomer.Name + " Silmek istediğinize emin misiniz?",
+                                 "Silme Onayı",
+                                 MessageBoxButton.YesNo,
+                                 MessageBoxImage.Question);
 
-                if (success)
+                if (result == MessageBoxResult.Yes)
                 {
-                    MessageBox.Show("Müşteri başarıyla silindi.", "Hop!");
-                    LoadCustomers();  
-                }
-                else
-                {
-                    MessageBox.Show("Silme işlemi başarısız oldu.", "Hop!");
+                    bool success = DeleteCustomerFromDatabase(selectedCustomer.Id);
+
+                    if (success)
+                    {
+                        MessageBox.Show("Müşteri başarıyla silindi.", "Hop!");
+                        LoadCustomers();
+                    }
+                    else
+                    {
+                        MessageBox.Show("Silme işlemi başarısız oldu.", "Hop!");
+                    }
                 }
             }
             else
@@ -135,7 +143,7 @@ namespace YrlmzTakipSistemi
                             int rowsAffected = deleteCustomerCommand.ExecuteNonQuery();
 
                             transaction.Commit();
-                            return rowsAffected > 0; 
+                            return rowsAffected > 0;
                         }
                     }
                     catch

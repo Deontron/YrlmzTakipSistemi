@@ -42,5 +42,18 @@ namespace YrlmzTakipSistemi
         {
             MainFrame.Navigate(new InvoicePage());
         }
+
+        private void ExitButton_Click(object sender, RoutedEventArgs e)
+        {
+            var result = MessageBox.Show("Uygulamadan çıkmak istediğinize emin misiniz?",
+                                 "Çıkış Onayı",
+                                 MessageBoxButton.YesNo,
+                                 MessageBoxImage.Question);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                Application.Current.Shutdown();
+            }
+        }
     }
 }

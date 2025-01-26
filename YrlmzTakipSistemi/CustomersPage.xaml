@@ -6,38 +6,56 @@
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
       Title="Müşteriler Sayfası">
-
-    <Grid Background="#F4F4F4">
+    <Grid Background="#2B2B2B" >
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <TextBlock Text="Müşteriler" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="28" FontWeight="Bold" Foreground="#333" Margin="10" Grid.Row="0" />
+        <!-- Başlık -->
+        <TextBlock Text="Müşteriler" 
+                   HorizontalAlignment="Center" 
+                   VerticalAlignment="Center" 
+                   FontSize="28" 
+                   FontWeight="Bold" 
+                   Foreground="#FFFFFF" 
+                   Margin="0,0,0,20" 
+                   Grid.Row="0" />
 
-        <DataGrid Name="CustomersDataGrid" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="10"
-                  AutoGenerateColumns="True" SelectionMode="Single" CanUserAddRows="False" Background="#FFFFFF" ColumnWidth="*"
-                   BorderBrush="#DDD" BorderThickness="1"
-                  RowBackground="#F9F9F9" AlternatingRowBackground="#F1F1F1" Grid.Row="1">
-        </DataGrid>
+        <!-- DataGrid -->
+        <Border Grid.Row="1" Background="#1E1E1E" CornerRadius="10" BorderBrush="#444444" BorderThickness="1">
+            <DataGrid Name="CustomersDataGrid" 
+                      HorizontalAlignment="Stretch" 
+                      VerticalAlignment="Stretch" 
+                      AutoGenerateColumns="True" 
+                      SelectionMode="Single" 
+                      CanUserAddRows="False" 
+                      Background="#1E1E1E" 
+                      Foreground="#E0E0E0" 
+                      BorderThickness="0" 
+                      ColumnWidth="*" 
+                      RowBackground="#2E2E2E" 
+                      AlternatingRowBackground="#3B3B3B">
+                <DataGrid.ColumnHeaderStyle>
+                    <Style TargetType="DataGridColumnHeader">
+                        <Setter Property="Background" Value="#333333" />
+                        <Setter Property="Foreground" Value="#FFFFFF" />
+                        <Setter Property="FontWeight" Value="Bold" />
+                        <Setter Property="Padding" Value="10,5" />
+                        <Setter Property="BorderBrush" Value="#444444" />
+                        <Setter Property="BorderThickness" Value="0,0,0,1" />
+                        <Setter Property="HorizontalContentAlignment" Value="Center" />
+                    </Style>
+                </DataGrid.ColumnHeaderStyle>
+            </DataGrid>
+        </Border>
 
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="2" Margin="10">
-
-            <Button Content="Seçili Müşteriyi Sil" Width="200" Height="40" Margin="5"
-                    Background="DarkRed" Foreground="White" FontWeight="Bold" BorderBrush="DarkRed" BorderThickness="1"
-                    Click="DeleteCustomerButton_Click">
-            </Button>
-            <Button Content="Yeni Müşteri Ekle" Width="200" Height="40" Margin="5"
-                    Background="#4CAF50" Foreground="White" FontWeight="Bold" BorderBrush="#388E3C" BorderThickness="1"
-                    Click="AddCustomerButton_Click">
-            </Button>
-
-            <Button Content="Seçili Müşteriye Git" Width="200" Height="40" Margin="5"
-                    Background="DarkBlue" Foreground="White" FontWeight="Bold" BorderBrush="DarkBlue" BorderThickness="1"
-                    Click="ShowTransactionsButton_Click">
-            </Button>
+        <!-- Butonlar -->
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="2" Margin="0,20,0,0">
+            <Button Content="Seçili Müşteriyi Sil" Style="{StaticResource ModernButtonStyle}" Background="#D32F2F" Click="DeleteCustomerButton_Click"/>
+            <Button Content="Yeni Müşteri Ekle" Style="{StaticResource ModernButtonStyle}" Background="#388E3C" Click="AddCustomerButton_Click"/>
+            <Button Content="Seçili Müşteriye Git" Style="{StaticResource ModernButtonStyle}" Background="#1976D2" Click="ShowTransactionsButton_Click"/>
         </StackPanel>
     </Grid>
 </Page>

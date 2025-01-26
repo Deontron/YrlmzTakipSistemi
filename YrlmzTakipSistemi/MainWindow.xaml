@@ -3,30 +3,38 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:YrlmzTakipSistemi"
         mc:Ignorable="d"
-        Title="Takip Sistemi" Height="450" Width="800">
+        Title="Takip Sistemi" Height="600" Width="1000"
+        WindowStartupLocation="CenterScreen"
+        Background="#1E1E1E">
     <Grid>
-        <Menu VerticalAlignment="Top">
-            <MenuItem Header="Dosya">
-                <MenuItem Header="Yedekle" />
-                <MenuItem Header="Çıkış" />
-            </MenuItem>
-            <MenuItem Header="Müşteriler" />
-            <MenuItem Header="Gelir/Gider" />
-            <MenuItem Header="Faturalar" />
-        </Menu>
+        <!-- Üst Menü -->
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="200" />
+                <!-- Yan Menü -->
+                <ColumnDefinition />
+                <!-- Ana İçerik -->
+            </Grid.ColumnDefinitions>
 
-        <DockPanel Margin="10,30,10,10">
-            <StackPanel DockPanel.Dock="Left" Width="200" Background="#F0F0F0" Margin="0,0,10,0">
-                <TextBlock Text="Menü" FontSize="16" FontWeight="Bold" Margin="10" />
-                <Button Content="Müşteriler" Margin="10" Height="40" Click="CustomersButton_Click" />
-                <Button Content="Gelir/Gider" Margin="10" Height="40" Click="IncomeExpenseButton_Click" />
-                <Button Content="Faturalar" Margin="10" Height="40" Click="InvoiceButton_Click" />
+            <!-- Yan Menü -->
+            <StackPanel Background="#2D3E50" Grid.Column="0" Width="200" VerticalAlignment="Stretch">
+                <TextBlock Text="Yrlmz Takip Sistemi" 
+                           FontSize="18" 
+                           FontWeight="Bold" 
+                           Foreground="White" 
+                           Margin="10,20,10,20" 
+                           HorizontalAlignment="Center" />
+                <Button Content="Müşteriler" Style="{StaticResource ModernMenuButton}" Click="CustomersButton_Click" />
+                <Button Content="Gelir/Gider" Style="{StaticResource ModernMenuButton}" Click="IncomeExpenseButton_Click" />
+                <Button Content="Faturalar" Style="{StaticResource ModernMenuButton}" Click="InvoiceButton_Click" />
+                <Button Content="Çıkış" Style="{StaticResource ModernMenuButton}" Click="ExitButton_Click" Margin="10,30,10,10" />
             </StackPanel>
 
-            <Frame Name="MainFrame" Background="#FFFFFF" />
-            
-        </DockPanel>
+            <!-- Ana İçerik -->
+            <Border Grid.Column="1" Background="Black" CornerRadius="10" Margin="10">
+                <Frame Name="MainFrame" Background="#1E1E1E" />
+            </Border>
+        </Grid>
     </Grid>
 </Window>

@@ -52,10 +52,14 @@ namespace YrlmzTakipSistemi
                         {
                             Id = reader.GetInt32(0),
                             CustomerId = reader.GetInt32(1),
-                            Date = reader.GetString(2),
-                            ProductName = reader.GetString(3),
-                            Quantity = reader.GetInt32(4),
-                            Price = reader.GetDouble(5)
+                            Tarih = reader.IsDBNull(2) ? string.Empty : reader.GetString(2),  
+                            Aciklama = reader.IsDBNull(3) ? string.Empty : reader.GetString(3),  
+                            Notlar = reader.IsDBNull(4) ? null : reader.GetString(4),  
+                            Adet = reader.GetInt32(5),
+                            BirimFiyat = reader.IsDBNull(6) ? 0.0 : reader.GetDouble(6),
+                            Ucret = reader.IsDBNull(7) ? 0.0 : reader.GetDouble(7),
+                            Odenen = reader.IsDBNull(8) ? 0.0 : reader.GetDouble(8),
+                            AlacakDurumu = reader.IsDBNull(9) ? 0.0 : reader.GetDouble(9)
                         });
                     }
                 }
@@ -78,7 +82,7 @@ namespace YrlmzTakipSistemi
             {
                 var selectedTransaction = (Transaction)TransactionsDataGrid.SelectedItem;
 
-                var result = MessageBox.Show(selectedTransaction.ProductName + " Silmek istediğinize emin misiniz?",
+                var result = MessageBox.Show(selectedTransaction.Aciklama + " Silmek istediğinize emin misiniz?",
                                  "Silme Onayı",
                                  MessageBoxButton.YesNo,
                                  MessageBoxImage.Question);

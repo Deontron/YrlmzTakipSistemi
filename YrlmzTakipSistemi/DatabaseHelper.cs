@@ -10,25 +10,22 @@ namespace YrlmzTakipSistemi
 {
     internal class DatabaseHelper
     {
-        private string dbPath = "data source=company_tracking_system.db"; // Yeni veritabanı adı
+        private string dbPath = "data source=company_tracking_system.db";
 
-        // Veritabanı bağlantısı oluşturma
         public SQLiteConnection GetConnection()
         {
             return new SQLiteConnection(dbPath);
         }
 
-        // Veritabanı dosyası var mı, kontrol et
         public void CheckDatabaseExists()
         {
-            if (!File.Exists("company_tracking_system.db")) // Yeni veritabanı adı
+            if (!File.Exists("company_tracking_system.db"))
             {
-                SQLiteConnection.CreateFile("company_tracking_system.db"); // Yeni veritabanı adı
+                SQLiteConnection.CreateFile("company_tracking_system.db");
                 CreateTables();
             }
         }
 
-        // Veritabanı tablolarını oluşturma
         private void CreateTables()
         {
             using (var connection = GetConnection())
@@ -46,12 +43,56 @@ namespace YrlmzTakipSistemi
                 CREATE TABLE Transactions (
                     Id INTEGER PRIMARY KEY AUTOINCREMENT,
                     CustomerId INTEGER NOT NULL,
-                    Date TEXT NOT NULL,
-                    ProductName TEXT NOT NULL,
-                    Quantity INTEGER NOT NULL,
-                    Price REAL NOT NULL,
+                    Tarih TEXT NOT NULL DEFAULT CURRENT_DATE,
+                    Aciklama TEXT NOT NULL,
+                    Notlar TEXT, 
+                    Adet INTEGER,
+                    BirimFiyat REAL,
+                    Ucret REAL,
+                    Odenen REAL,
+                    AlacakDurumu REAL,
                     FOREIGN KEY (CustomerId) REFERENCES Customers(Id)
-                )";
+                );
+                
+                CREATE TRIGGER CalculateAmounts
+                AFTER INSERT ON Transactions
+                FOR EACH ROW
+                BEGIN
+                    UPDATE Transactions
+                    SET 
+                        Ucret = COALESCE(NEW.Ucret, NEW.BirimFiyat * NEW.Adet)
+                    WHERE Id = NEW.Id;
+                
+                    UPDATE Transactions
+                    SET 
+                        AlacakDurumu = (
+            SELECT Ucret - IFNULL(NEW.Odenen, 0) 
+            FROM Transactions 
+            WHERE Id = NEW.Id
+        )
+                    WHERE Id = NEW.Id;
+                END;
+                
+                CREATE TRIGGER UpdateAmounts
+                AFTER UPDATE OF BirimFiyat, Adet, Ucret, Odenen ON Transactions
+                FOR EACH ROW
+                BEGIN
+                    UPDATE Transactions
+                    SET 
+                        Ucret = COALESCE(NEW.Ucret, NEW.BirimFiyat * NEW.Adet)
+                    WHERE Id = NEW.Id;
+                
+                    UPDATE Transactions
+                    SET 
+                        AlacakDurumu = (
+            SELECT Ucret - IFNULL(NEW.Odenen, 0) 
+            FROM Transactions 
+            WHERE Id = NEW.Id
+        )
+                    WHERE Id = NEW.Id;
+                END;
+                ";
+
 
                 var command = new SQLiteCommand(createCustomersTable, connection);
                 command.ExecuteNonQuery();

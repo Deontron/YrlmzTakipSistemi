@@ -167,9 +167,13 @@ namespace YrlmzTakipSistemi
     {
         public int Id { get; set; }
         public int CustomerId { get; set; }
-        public string Date { get; set; }
-        public String ProductName { get; set; }
-        public float Quantity { get; set; }
-        public double Price { get; set; }
+        public string Tarih { get; set; }
+        public String Aciklama { get; set; }
+        public String Notlar { get; set; }
+        public int Adet { get; set; }
+        public double BirimFiyat { get; set; }
+        public double Ucret { get; set; }
+        public double Odenen { get; set; }
+        public double AlacakDurumu { get; set; }
     }
 }

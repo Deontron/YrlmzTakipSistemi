@@ -8,16 +8,12 @@
         WindowStartupLocation="CenterScreen"
         Background="#1E1E1E">
     <Grid>
-        <!-- Üst Menü -->
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="200" />
-                <!-- Yan Menü -->
                 <ColumnDefinition />
-                <!-- Ana İçerik -->
             </Grid.ColumnDefinitions>
 
-            <!-- Yan Menü -->
             <StackPanel Background="#2D3E50" Grid.Column="0" Width="200" VerticalAlignment="Stretch">
                 <TextBlock Text="Yrlmz Takip Sistemi" 
                            FontSize="18" 
@@ -28,10 +24,10 @@
                 <Button Content="Müşteriler" Style="{StaticResource ModernMenuButton}" Click="CustomersButton_Click" />
                 <Button Content="Gelir/Gider" Style="{StaticResource ModernMenuButton}" Click="IncomeExpenseButton_Click" />
                 <Button Content="Faturalar" Style="{StaticResource ModernMenuButton}" Click="InvoiceButton_Click" />
+                <Button Content="Çek/Senet" Style="{StaticResource ModernMenuButton}" Click="InvoiceButton_Click" />
                 <Button Content="Çıkış" Style="{StaticResource ModernMenuButton}" Click="ExitButton_Click" Margin="10,30,10,10" />
             </StackPanel>
 
-            <!-- Ana İçerik -->
             <Border Grid.Column="1" Background="Black" CornerRadius="10" Margin="10">
                 <Frame Name="MainFrame" Background="#1E1E1E" />
             </Border>

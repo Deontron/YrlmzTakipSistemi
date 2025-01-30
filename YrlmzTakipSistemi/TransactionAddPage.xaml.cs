@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Data.SQLite;
+using System.Data.Entity.Core.Common.CommandTrees;
 
 namespace YrlmzTakipSistemi
 {
@@ -34,35 +35,97 @@ namespace YrlmzTakipSistemi
         public void GetCustomer(Customer customer)
         {
             currentCustomer = customer;
+            TitleTextBlock.Text = $"{currentCustomer.Name} - İşlem Ekle";
         }
 
         private void SaveTransactionButton_Click(object sender, RoutedEventArgs e)
         {
-            string name = NameTextBox.Text;
-            string phone = PhoneTextBox.Text;
-            string email = EmailTextBox.Text;
-            string address = AddressTextBox.Text;
+            string description = DescriptionTextBox.Text;
+            string note = NoteTextBox.Text;
 
+            double price = 0;
+            int quantity = 0;
+            double amount = 0;
+            double paid = 0;
 
-            if (string.IsNullOrEmpty(name))
+            if (!string.IsNullOrEmpty(PriceTextBox.Text))
             {
-                MessageBox.Show("İşlem adı boş olamaz.", "Hata", MessageBoxButton.OK, MessageBoxImage.Warning);
+                if (double.TryParse(PriceTextBox.Text, out price))
+                {
+                }
+                else
+                {
+                    MessageBox.Show("Fiyat değeri geçersiz");
+                return;
+                }
+            }
+
+            if (!string.IsNullOrEmpty(QuantityTextBox.Text))
+            {
+                if (int.TryParse(QuantityTextBox.Text, out quantity))
+                {
+                }
+                else
+                {
+                    MessageBox.Show("Adet değeri geçersiz");
+                return;
+                }
+            }
+
+            if (!string.IsNullOrEmpty(AmountTextBox.Text))
+            {
+                if (double.TryParse(AmountTextBox.Text, out amount))
+                {
+                }
+                else
+                {
+                    MessageBox.Show("Ücret değeri geçersiz");
+                return;
+                }
+            }
+
+            if (!string.IsNullOrEmpty(PaidTextBox.Text))
+            {
+                if (double.TryParse(PaidTextBox.Text, out paid))
+                {
+                }
+                else
+                {
+                    MessageBox.Show("Ödenen değeri geçersiz");
+                return;
+                }
+            }
+
+            if (string.IsNullOrEmpty(description))
+            {
+                MessageBox.Show("İşlem Açıklaması boş olamaz.", "Hata", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
-            MessageBox.Show($"İşlem {name} başarıyla eklendi!", "Hop!");
+            MessageBox.Show($"İşlem {description} başarıyla eklendi!", "Hop!");
 
             using (var connection = dbHelper.GetConnection())
             {
                 connection.Open();
 
-                string insertQuery = "INSERT INTO Transactions (CustomerId, ProductName, Date, Quantity, Price) VALUES (@CustomerId, @Name, @Email, @Quantity, @Price)";
+                string insertQuery = "INSERT INTO Transactions (CustomerId, Aciklama, Notlar, Adet, BirimFiyat, Ucret, Odenen) VALUES (@CustomerId, @Description, @Note, @Quantity, @Price, @Amount, @Paid)";
                 var command = new SQLiteCommand(insertQuery, connection);
-                command.Parameters.AddWithValue("@Name", name);
-                command.Parameters.AddWithValue("@Email", email);
+                command.Parameters.AddWithValue("@Description", description);
+                command.Parameters.AddWithValue("@Note", note);
                 command.Parameters.AddWithValue("@CustomerId", currentCustomer.Id);
-                command.Parameters.AddWithValue("@Quantity", currentCustomer.Id);
-                command.Parameters.AddWithValue("@Price", currentCustomer.Id);
+                command.Parameters.AddWithValue("@Quantity", quantity);
+                command.Parameters.AddWithValue("@Price", price);
+
+                if(amount != 0)
+                {
+                    command.Parameters.AddWithValue("@Amount", amount);
+                }
+                else
+                {
+                    command.Parameters.AddWithValue("@Amount", (price * quantity));
+                }
+
+                command.Parameters.AddWithValue("@Paid", paid);
 
                 command.ExecuteNonQuery();
             }
@@ -77,10 +140,12 @@ namespace YrlmzTakipSistemi
 
         private void ClearForm()
         {
-            NameTextBox.Clear();
-            PhoneTextBox.Clear();
-            EmailTextBox.Clear();
-            AddressTextBox.Clear();
+            DescriptionTextBox.Clear();
+            NoteTextBox.Clear();
+            PriceTextBox.Clear();
+            QuantityTextBox.Clear();
+            AmountTextBox.Clear();
+            PaidTextBox.Clear();
         }
     }
 }

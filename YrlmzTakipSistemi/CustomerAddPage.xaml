@@ -9,7 +9,6 @@
       Title="Müşteri Ekleme Sayfası">
 
     <Grid Background="#2B2B2B">
-        <!-- Başlık -->
         <TextBlock Text="Yeni Müşteri Ekle" 
                    HorizontalAlignment="Center" 
                    VerticalAlignment="Top" 
@@ -18,34 +17,28 @@
                    Foreground="#FFFFFF" 
                    Margin="0,20,0,0"/>
 
-        <!-- Form Alanları -->
         <StackPanel HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,80,0,0">
-            <!-- Ad Soyad -->
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,10,0,0">
                 <TextBlock Text="Ad Soyad:" Width="100" FontSize="16" Foreground="#FFFFFF" VerticalAlignment="Center" />
                 <TextBox Name="NameTextBox" Width="250" Height="35" FontSize="14" Background="#1E1E1E" Foreground="#FFFFFF" BorderBrush="#444444" BorderThickness="1"/>
             </StackPanel>
 
-            <!-- Telefon -->
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,10,0,0">
                 <TextBlock Text="Telefon:" Width="100" FontSize="16" Foreground="#FFFFFF" VerticalAlignment="Center" />
                 <TextBox Name="PhoneTextBox" Width="250" Height="35" FontSize="14" Background="#1E1E1E" Foreground="#FFFFFF" BorderBrush="#444444" BorderThickness="1"/>
             </StackPanel>
 
-            <!-- E-posta -->
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,10,0,0">
                 <TextBlock Text="E-posta:" Width="100" FontSize="16" Foreground="#FFFFFF" VerticalAlignment="Center" />
                 <TextBox Name="EmailTextBox" Width="250" Height="35" FontSize="14" Background="#1E1E1E" Foreground="#FFFFFF" BorderBrush="#444444" BorderThickness="1"/>
             </StackPanel>
 
-            <!-- Adres -->
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,10,0,0">
                 <TextBlock Text="Adres:" Width="100" FontSize="16" Foreground="#FFFFFF" VerticalAlignment="Center" />
                 <TextBox Name="AddressTextBox" Width="250" Height="35" FontSize="14" Background="#1E1E1E" Foreground="#FFFFFF" BorderBrush="#444444" BorderThickness="1"/>
             </StackPanel>
         </StackPanel>
 
-        <!-- Ekleme Butonu -->
         <Button Content="Müşteri Ekle" 
                 HorizontalAlignment="Center" 
                 VerticalAlignment="Bottom" 

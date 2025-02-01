@@ -43,12 +43,12 @@ namespace YrlmzTakipSistemi
                 CREATE TABLE Transactions (
                     Id INTEGER PRIMARY KEY AUTOINCREMENT,
                     CustomerId INTEGER NOT NULL,
-                    Tarih TEXT NOT NULL DEFAULT CURRENT_DATE,
+                    Tarih TEXT NOT NULL DEFAULT (strftime('%d-%m-%Y', 'now')),
                     Aciklama TEXT NOT NULL,
                     Notlar TEXT, 
                     Adet INTEGER,
                     BirimFiyat REAL,
-                    Ucret REAL,
+                    Tutar REAL,
                     Odenen REAL,
                     AlacakDurumu REAL,
                     FOREIGN KEY (CustomerId) REFERENCES Customers(Id)
@@ -60,44 +60,56 @@ namespace YrlmzTakipSistemi
                 BEGIN
                     UPDATE Transactions
                     SET 
-                        Ucret = COALESCE(NEW.Ucret, NEW.BirimFiyat * NEW.Adet)
+                        Tutar = COALESCE(NEW.Tutar, NEW.BirimFiyat * NEW.Adet)
                     WHERE Id = NEW.Id;
                 
                     UPDATE Transactions
                     SET 
                         AlacakDurumu = (
-            SELECT Ucret - IFNULL(NEW.Odenen, 0) 
-            FROM Transactions 
-            WHERE Id = NEW.Id
+                    SELECT Tutar - IFNULL(NEW.Odenen, 0) 
+                    FROM Transactions 
+                    WHERE Id = NEW.Id
         )
                     WHERE Id = NEW.Id;
                 END;
                 
                 CREATE TRIGGER UpdateAmounts
-                AFTER UPDATE OF BirimFiyat, Adet, Ucret, Odenen ON Transactions
+                AFTER UPDATE OF BirimFiyat, Adet, Tutar, Odenen ON Transactions
                 FOR EACH ROW
                 BEGIN
                     UPDATE Transactions
                     SET 
-                        Ucret = COALESCE(NEW.Ucret, NEW.BirimFiyat * NEW.Adet)
+                        Tutar = COALESCE(NEW.Tutar, NEW.BirimFiyat * NEW.Adet)
                     WHERE Id = NEW.Id;
                 
                     UPDATE Transactions
                     SET 
                         AlacakDurumu = (
-            SELECT Ucret - IFNULL(NEW.Odenen, 0) 
-            FROM Transactions 
-            WHERE Id = NEW.Id
+                    SELECT Tutar - IFNULL(NEW.Odenen, 0) 
+                    FROM Transactions 
+                    WHERE Id = NEW.Id
         )
                     WHERE Id = NEW.Id;
                 END;
                 ";
 
+                string createProductsTable = @"
+                CREATE TABLE IF NOT EXISTS Products (
+                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    CustomerId INTEGER NOT NULL,
+                    Tarih TEXT NOT NULL DEFAULT (strftime('%d-%m-%Y', 'now')),
+                    Isim TEXT NOT NULL,
+                    Fiyat REAL,
+                    FOREIGN KEY (CustomerId) REFERENCES Customers(Id)
+                )";
 
                 var command = new SQLiteCommand(createCustomersTable, connection);
                 command.ExecuteNonQuery();
 
                 command = new SQLiteCommand(createTransactionsTable, connection);
+                command.ExecuteNonQuery();
+
+                command = new SQLiteCommand(createProductsTable, connection);
                 command.ExecuteNonQuery();
             }
         }

@@ -22,22 +22,20 @@ namespace YrlmzTakipSistemi
         {
             InitializeComponent();
             dbHelper = new DatabaseHelper();
-            dbHelper.CheckDatabaseExists(); // Veritabanı kontrolü ve oluşturma
+            dbHelper.CheckDatabaseExists(); 
+            MainFrame.Navigate(new CustomersPage());
         }
 
-        // Müşteriler sayfasına yönlendirme
         private void CustomersButton_Click(object sender, RoutedEventArgs e)
         {
             MainFrame.Navigate(new CustomersPage());
         }
 
-        // Gelir/Gider sayfasına yönlendirme
         private void IncomeExpenseButton_Click(object sender, RoutedEventArgs e)
         {
             MainFrame.Navigate(new IncomeExpensePage());
         }
 
-        // Faturalar sayfasına yönlendirme
         private void InvoiceButton_Click(object sender, RoutedEventArgs e)
         {
             MainFrame.Navigate(new InvoicePage());

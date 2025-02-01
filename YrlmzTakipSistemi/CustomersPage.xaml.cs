@@ -54,7 +54,7 @@ namespace YrlmzTakipSistemi
                         {
                             Id = reader.GetInt32(0),
                             Name = reader.GetString(1),
-                            Email = reader.IsDBNull(2) ? null : reader.GetString(2)
+                            Email = reader.IsDBNull(2) ? string.Empty : reader.GetString(2)
                         });
                     }
                 }
@@ -63,8 +63,7 @@ namespace YrlmzTakipSistemi
             return customers;
         }
 
-
-        private void ShowTransactionsButton_Click(object sender, RoutedEventArgs e)
+        private void CustomersDataGrid_MouseDoubleClick(object sender, RoutedEventArgs e)
         {
             if (CustomersDataGrid.SelectedItem != null)
             {
@@ -172,8 +171,15 @@ namespace YrlmzTakipSistemi
         public String Notlar { get; set; }
         public int Adet { get; set; }
         public double BirimFiyat { get; set; }
-        public double Ucret { get; set; }
+        public double Tutar { get; set; }
         public double Odenen { get; set; }
         public double AlacakDurumu { get; set; }
     }
+
+    public class Product
+    {
+        public string Isim { get; set; }
+        public double Fiyat { get; set; }
+    }
+
 }

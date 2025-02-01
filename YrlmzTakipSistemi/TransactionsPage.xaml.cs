@@ -54,10 +54,10 @@ namespace YrlmzTakipSistemi
                             CustomerId = reader.GetInt32(1),
                             Tarih = reader.IsDBNull(2) ? string.Empty : reader.GetString(2),  
                             Aciklama = reader.IsDBNull(3) ? string.Empty : reader.GetString(3),  
-                            Notlar = reader.IsDBNull(4) ? null : reader.GetString(4),  
+                            Notlar = reader.IsDBNull(4) ? string.Empty : reader.GetString(4),  
                             Adet = reader.GetInt32(5),
                             BirimFiyat = reader.IsDBNull(6) ? 0.0 : reader.GetDouble(6),
-                            Ucret = reader.IsDBNull(7) ? 0.0 : reader.GetDouble(7),
+                            Tutar = reader.IsDBNull(7) ? 0.0 : reader.GetDouble(7),
                             Odenen = reader.IsDBNull(8) ? 0.0 : reader.GetDouble(8),
                             AlacakDurumu = reader.IsDBNull(9) ? 0.0 : reader.GetDouble(9)
                         });

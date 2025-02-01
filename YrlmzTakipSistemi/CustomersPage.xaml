@@ -13,7 +13,6 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <!-- Başlık -->
         <TextBlock Text="Müşteriler" 
                    HorizontalAlignment="Center" 
                    VerticalAlignment="Center" 
@@ -23,20 +22,20 @@
                    Margin="0,0,0,20" 
                    Grid.Row="0" />
 
-        <!-- DataGrid -->
         <Border Grid.Row="1" Background="#1E1E1E" CornerRadius="10" BorderBrush="#444444" BorderThickness="1">
-            <DataGrid Name="CustomersDataGrid" 
-                      HorizontalAlignment="Stretch" 
-                      VerticalAlignment="Stretch" 
-                      AutoGenerateColumns="True" 
-                      SelectionMode="Single" 
-                      CanUserAddRows="False" 
-                      Background="#1E1E1E" 
-                      Foreground="#E0E0E0" 
-                      BorderThickness="0" 
-                      ColumnWidth="*" 
-                      RowBackground="#2E2E2E" 
-                      AlternatingRowBackground="#3B3B3B">
+                <DataGrid Name="CustomersDataGrid" 
+                    MouseDoubleClick="CustomersDataGrid_MouseDoubleClick"
+                    HorizontalAlignment="Stretch" 
+                    VerticalAlignment="Stretch" 
+                    AutoGenerateColumns="True" 
+                    SelectionMode="Single" 
+                    CanUserAddRows="False" 
+                    Background="#1E1E1E" 
+                    Foreground="#E0E0E0" 
+                    BorderThickness="0" 
+                    ColumnWidth="*" 
+                    RowBackground="#2E2E2E" 
+                    AlternatingRowBackground="#3B3B3B">
                 <DataGrid.ColumnHeaderStyle>
                     <Style TargetType="DataGridColumnHeader">
                         <Setter Property="Background" Value="#333333" />
@@ -49,13 +48,12 @@
                     </Style>
                 </DataGrid.ColumnHeaderStyle>
             </DataGrid>
+
         </Border>
 
-        <!-- Butonlar -->
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="2" Margin="0,20,0,0">
             <Button Content="Seçili Müşteriyi Sil" Style="{StaticResource ModernButtonStyle}" Background="#D32F2F" Click="DeleteCustomerButton_Click"/>
             <Button Content="Yeni Müşteri Ekle" Style="{StaticResource ModernButtonStyle}" Background="#388E3C" Click="AddCustomerButton_Click"/>
-            <Button Content="Seçili Müşteriye Git" Style="{StaticResource ModernButtonStyle}" Background="#1976D2" Click="ShowTransactionsButton_Click"/>
         </StackPanel>
     </Grid>
 </Page>

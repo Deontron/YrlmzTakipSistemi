@@ -14,6 +14,8 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Data.SQLite;
 using System.Data.Entity.Core.Common.CommandTrees;
+using System.Collections.ObjectModel;
+using Google.Apis.Drive.v3.Data;
 
 namespace YrlmzTakipSistemi
 {
@@ -25,17 +27,29 @@ namespace YrlmzTakipSistemi
 
         private DatabaseHelper dbHelper;
         Customer currentCustomer;
+        public ObservableCollection<Product> Products { get; set; }
 
         public TransactionAddPage()
         {
             InitializeComponent();
             dbHelper = new DatabaseHelper();
+            DataContext = this;
+            Products = new ObservableCollection<Product>();
+            LoadProducts();
         }
 
         public void GetCustomer(Customer customer)
         {
             currentCustomer = customer;
-            TitleTextBlock.Text = $"{currentCustomer.Name} - İşlem Ekle";
+            TitleTextBlock.Text = $"{currentCustomer.Name} - Yeni İşlem Ekle";
+        }
+
+        private void BackButton_Click(object sender, RoutedEventArgs e)
+        {
+            var mainWindow = (MainWindow)Application.Current.MainWindow;
+            TransactionsPage tp = new TransactionsPage();
+            tp.LoadCustomerTransactions(currentCustomer);
+            mainWindow.MainFrame.Navigate(tp);
         }
 
         private void SaveTransactionButton_Click(object sender, RoutedEventArgs e)
@@ -56,7 +70,7 @@ namespace YrlmzTakipSistemi
                 else
                 {
                     MessageBox.Show("Fiyat değeri geçersiz");
-                return;
+                    return;
                 }
             }
 
@@ -68,7 +82,7 @@ namespace YrlmzTakipSistemi
                 else
                 {
                     MessageBox.Show("Adet değeri geçersiz");
-                return;
+                    return;
                 }
             }
 
@@ -80,7 +94,7 @@ namespace YrlmzTakipSistemi
                 else
                 {
                     MessageBox.Show("Ücret değeri geçersiz");
-                return;
+                    return;
                 }
             }
 
@@ -92,7 +106,7 @@ namespace YrlmzTakipSistemi
                 else
                 {
                     MessageBox.Show("Ödenen değeri geçersiz");
-                return;
+                    return;
                 }
             }
 
@@ -102,13 +116,11 @@ namespace YrlmzTakipSistemi
                 return;
             }
 
-            MessageBox.Show($"İşlem {description} başarıyla eklendi!", "Hop!");
-
             using (var connection = dbHelper.GetConnection())
             {
                 connection.Open();
 
-                string insertQuery = "INSERT INTO Transactions (CustomerId, Aciklama, Notlar, Adet, BirimFiyat, Ucret, Odenen) VALUES (@CustomerId, @Description, @Note, @Quantity, @Price, @Amount, @Paid)";
+                string insertQuery = "INSERT INTO Transactions (CustomerId, Aciklama, Notlar, Adet, BirimFiyat, Tutar, Odenen) VALUES (@CustomerId, @Description, @Note, @Quantity, @Price, @Amount, @Paid)";
                 var command = new SQLiteCommand(insertQuery, connection);
                 command.Parameters.AddWithValue("@Description", description);
                 command.Parameters.AddWithValue("@Note", note);
@@ -116,7 +128,7 @@ namespace YrlmzTakipSistemi
                 command.Parameters.AddWithValue("@Quantity", quantity);
                 command.Parameters.AddWithValue("@Price", price);
 
-                if(amount != 0)
+                if (amount != 0)
                 {
                     command.Parameters.AddWithValue("@Amount", amount);
                 }
@@ -128,6 +140,13 @@ namespace YrlmzTakipSistemi
                 command.Parameters.AddWithValue("@Paid", paid);
 
                 command.ExecuteNonQuery();
+            }
+
+            MessageBox.Show($"İşlem {description} başarıyla eklendi!", "Hop!");
+
+            if (SaveProductBox.IsChecked == true)
+            {
+                SaveProduct(description, price);
             }
 
             ClearForm();
@@ -146,6 +165,72 @@ namespace YrlmzTakipSistemi
             QuantityTextBox.Clear();
             AmountTextBox.Clear();
             PaidTextBox.Clear();
+        }
+
+        private void LoadProducts()
+        {
+            try
+            {
+                Products.Clear();
+
+                using (var connection = dbHelper.GetConnection())
+                {
+                    connection.Open();
+                    string query = "SELECT Isim, Fiyat FROM Products";
+
+                    using (SQLiteCommand cmd = new SQLiteCommand(query, connection))
+                    using (SQLiteDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            string isim = reader.GetString(0);
+                            double fiyat = reader.IsDBNull(1) ? 0 : reader.GetDouble(1);
+
+                            Application.Current.Dispatcher.Invoke(() =>
+                            {
+                                Products.Add(new Product
+                                {
+                                    Isim = isim,
+                                    Fiyat = fiyat
+                                });
+                            });
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Ürünleri yüklerken hata oluştu: " + ex.Message, "Hata", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void ProductSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var selectedProduct = (Product)ProductListBox.SelectedItem;
+
+            if (selectedProduct != null)
+            {
+                DescriptionTextBox.Text = selectedProduct.Isim;
+
+                PriceTextBox.Text = selectedProduct.Fiyat.ToString();
+            }
+        }
+
+        private void SaveProduct(string Name, double Price)
+        {
+            using (var connection = dbHelper.GetConnection())
+            {
+                connection.Open();
+
+                string insertQuery = "INSERT INTO Products (CustomerId, Isim, Fiyat) VALUES (@CustomerId, @Name, @Price)";
+                var command = new SQLiteCommand(insertQuery, connection);
+                command.Parameters.AddWithValue("@CustomerId", currentCustomer.Id);
+                command.Parameters.AddWithValue("@Name", Name);
+                command.Parameters.AddWithValue("@Price", Price);
+
+
+                command.ExecuteNonQuery();
+            }
         }
     }
 }

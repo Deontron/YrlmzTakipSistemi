@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Data.SQLite;
+using System.Collections.ObjectModel;
 
 namespace YrlmzTakipSistemi
 {
@@ -22,6 +23,7 @@ namespace YrlmzTakipSistemi
     public partial class CustomersPage : Page
     {
         private DatabaseHelper _databaseHelper;
+        private ObservableCollection<Customer> customers = new ObservableCollection<Customer>();
 
         public CustomersPage()
         {
@@ -36,9 +38,9 @@ namespace YrlmzTakipSistemi
             CustomersDataGrid.ItemsSource = customers;
         }
 
-        private List<Customer> GetCustomersFromDatabase()
+        private ObservableCollection<Customer> GetCustomersFromDatabase()
         {
-            List<Customer> customers = new List<Customer>();
+            customers.Clear();
 
             using (var connection = _databaseHelper.GetConnection())
             {
@@ -153,6 +155,77 @@ namespace YrlmzTakipSistemi
                 }
             }
         }
+
+        private void CustomersDataGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
+        {
+            var customer = e.Row.Item as Customer;
+            if (customer != null)
+            {
+                bool updateSuccess = UpdateCustomerInDatabase(customer);
+
+                if (updateSuccess)
+                {
+                    LoadCustomers(); 
+                }
+                else
+                {
+                    MessageBox.Show("Müşteri güncellenemedi!");
+                }
+            }
+        }
+
+        private bool UpdateCustomerInDatabase(Customer customer)
+        {
+            using (var connection = _databaseHelper.GetConnection())
+            {
+                try
+                {
+                    connection.Open();
+                    if (connection.State != System.Data.ConnectionState.Open)
+                    {
+                        MessageBox.Show("Veritabanı bağlantısı başarısız!");
+                        return false;
+                    }
+
+                    using (var transaction = connection.BeginTransaction())
+                    {
+                        try
+                        {
+                            string updateCustomerQuery = "UPDATE Customers SET Name = @Name, Email = @Email WHERE Id = @Id";
+                            using (var updateCustomerCommand = new SQLiteCommand(updateCustomerQuery, connection, transaction))
+                            {
+                                updateCustomerCommand.Parameters.AddWithValue("@Name", customer.Name);
+                                updateCustomerCommand.Parameters.AddWithValue("@Email", customer.Email);
+                                updateCustomerCommand.Parameters.AddWithValue("@Id", customer.Id);
+
+                                int rowsAffected = updateCustomerCommand.ExecuteNonQuery();
+                                if (rowsAffected == 0)
+                                {
+                                    MessageBox.Show("Güncellenen müşteri bulunamadı. Id: " + customer.Id);
+                                    transaction.Rollback();
+                                    return false;
+                                }
+                            }
+
+                            transaction.Commit();
+                            MessageBox.Show("Müşteri başarıyla güncellendi.");
+                            return true;
+                        }
+                        catch (Exception ex)
+                        {
+                            transaction.Rollback();
+                            MessageBox.Show("Güncelleme hatası: " + ex.Message);
+                            return false;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Bağlantı hatası: " + ex.Message);
+                    return false;
+                }
+            }
+        }
     }
 
     public class Customer
@@ -178,6 +251,9 @@ namespace YrlmzTakipSistemi
 
     public class Product
     {
+        public int Id { get; set; }
+        public int CustomerId { get; set; }
+        public string Tarih { get; set; }
         public string Isim { get; set; }
         public double Fiyat { get; set; }
     }

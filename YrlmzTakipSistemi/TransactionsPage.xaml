@@ -30,7 +30,7 @@
             <DataGrid Name="TransactionsDataGrid" 
               HorizontalAlignment="Stretch" 
               VerticalAlignment="Stretch" 
-              AutoGenerateColumns="True" 
+              AutoGenerateColumns="False" 
               SelectionMode="Single" 
               CanUserAddRows="False" 
               Background="#1E1E1E" 
@@ -38,7 +38,8 @@
               BorderThickness="0" 
               ColumnWidth="*" 
               RowBackground="#2E2E2E" 
-              AlternatingRowBackground="#3B3B3B">
+              AlternatingRowBackground="#3B3B3B"
+              FontSize="20">
                 <DataGrid.ColumnHeaderStyle>
                     <Style TargetType="DataGridColumnHeader">
                         <Setter Property="Background" Value="#333333" />
@@ -50,15 +51,28 @@
                         <Setter Property="HorizontalContentAlignment" Value="Center" />
                     </Style>
                 </DataGrid.ColumnHeaderStyle>
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Tarih" Binding="{Binding Tarih}" Width="*" />
+                    <DataGridTextColumn Header="Açıklama" Binding="{Binding Aciklama}" Width="*" />
+                    <DataGridTextColumn Header="Not" Binding="{Binding Notlar}" Width="*" />
+                    <DataGridTextColumn Header="Adet" Binding="{Binding Adet}" Width="*" />
+                    <DataGridTextColumn Header="Fiyat" Binding="{Binding BirimFiyat}" Width="*" />
+                    <DataGridTextColumn Header="Tutar" Binding="{Binding Tutar}" Width="*" />
+                    <DataGridTextColumn Header="Ödenen" Binding="{Binding Odenen}" Width="*" />
+                    <DataGridTextColumn Header="AlacakDurumu" Binding="{Binding AlacakDurumu}" Width="*" />
+                    <DataGridTextColumn Header="Id" Binding="{Binding Id}" Width="0" Visibility="Collapsed" />
+                    <DataGridTextColumn Header="CustomerId" Binding="{Binding CustomerId}" Width="0" Visibility="Collapsed" />
+                </DataGrid.Columns>
             </DataGrid>
         </Border>
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="2" Margin="0,20,0,0">
 
-            <Button Content="Seçili İşlemi Sil" Background="#D32F2F" Style="{StaticResource ModernButtonStyle}" Click="DeleteTransactionButton_Click">
-            </Button>
-            <Button Content="Yeni İşlem Ekle" Background="#388E3C" Style="{StaticResource ModernButtonStyle}" Click="AddTransactionButton_Click">
-            </Button>
+            <Button Content="Geri" Background="#3B4D61" Style="{StaticResource ModernButtonStyle}" Click="BackButton_Click"/>
+            <Button Content="Seçili İşlemi Sil" Background="#D32F2F" Style="{StaticResource ModernButtonStyle}" Click="DeleteTransactionButton_Click"/>
+            <Button Content="Yeni İşlem Ekle" Background="#388E3C" Style="{StaticResource ModernButtonStyle}" Click="AddTransactionButton_Click"/>
+            <Button Content="Ödeme Ekle" Background="#8A2BE2" Style="{StaticResource ModernButtonStyle}" Click="AddPaymentButton_Click"/>
+            <Button Content="Güncelle" Background="#1976D2" Style="{StaticResource ModernButtonStyle}" Click="AddTransactionButton_Click"/>
         </StackPanel>
     </Grid>
 </Page>

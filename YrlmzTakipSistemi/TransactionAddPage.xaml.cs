@@ -16,6 +16,8 @@ using System.Data.SQLite;
 using System.Data.Entity.Core.Common.CommandTrees;
 using System.Collections.ObjectModel;
 using Google.Apis.Drive.v3.Data;
+using System.Windows.Controls.Primitives;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace YrlmzTakipSistemi
 {
@@ -35,13 +37,13 @@ namespace YrlmzTakipSistemi
             dbHelper = new DatabaseHelper();
             DataContext = this;
             Products = new ObservableCollection<Product>();
-            LoadProducts();
         }
 
         public void GetCustomer(Customer customer)
         {
             currentCustomer = customer;
             TitleTextBlock.Text = $"{currentCustomer.Name} - Yeni İşlem Ekle";
+            LoadProducts();
         }
 
         private void BackButton_Click(object sender, RoutedEventArgs e)
@@ -176,20 +178,24 @@ namespace YrlmzTakipSistemi
                 using (var connection = dbHelper.GetConnection())
                 {
                     connection.Open();
-                    string query = "SELECT Isim, Fiyat FROM Products";
+                    string query = "SELECT * FROM Products WHERE CustomerId = @CustomerId";
 
-                    using (SQLiteCommand cmd = new SQLiteCommand(query, connection))
-                    using (SQLiteDataReader reader = cmd.ExecuteReader())
+                    SQLiteCommand command = new SQLiteCommand(query, connection);
+                    command.Parameters.AddWithValue("@CustomerId", currentCustomer.Id);
+
+                    using (SQLiteDataReader reader = command.ExecuteReader())
                     {
                         while (reader.Read())
                         {
-                            string isim = reader.GetString(0);
-                            double fiyat = reader.IsDBNull(1) ? 0 : reader.GetDouble(1);
+                            string tarih = reader.GetString(2);
+                            string isim = reader.GetString(3);
+                            double fiyat = reader.IsDBNull(4) ? 0 : reader.GetDouble(4);
 
                             Application.Current.Dispatcher.Invoke(() =>
                             {
                                 Products.Add(new Product
                                 {
+                                    Tarih = tarih,
                                     Isim = isim,
                                     Fiyat = fiyat
                                 });

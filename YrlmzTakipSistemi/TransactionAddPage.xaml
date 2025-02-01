@@ -27,17 +27,18 @@
                 </Grid.ColumnDefinitions>
 
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,10,0,0" Grid.Column="0">
-                    <TextBlock Text="Açıklama:" Width="100" FontSize="16" Foreground="White" VerticalAlignment="Center" />
+                    <TextBlock Text="Açıklama:" Width="100" FontSize="20" Foreground="White" VerticalAlignment="Center" />
                     <TextBox Name="DescriptionTextBox" Width="250" Height="35" FontSize="14"
                          Background="#1E1E1E" Foreground="White" BorderBrush="#444444" BorderThickness="1"/>
                 </StackPanel>
 
-                <Expander Header="Ürünler" IsExpanded="False" Background="#3B4D61" Foreground="White" Margin="10,10,10,0" Padding="5" Grid.Column="1">
+                <Expander Header="Ürünler" FontSize="20" IsExpanded="False" Background="#3B4D61" Foreground="White" Margin="10,10,10,0" Padding="5" Grid.Column="1">
                     <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                         <ListBox x:Name="ProductListBox" ItemsSource="{Binding Products}" Background="#444444" BorderBrush="#444444" SelectionChanged="ProductSelectionChanged">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="{Binding Tarih}" FontSize="16" Padding="5" Width="150" Foreground="White" />
                                         <TextBlock Text="{Binding Isim}" FontSize="16" Padding="5" Width="150" Foreground="White" />
                                         <TextBlock Text="{Binding Fiyat}" FontSize="16" Padding="5" Width="100" Foreground="#388E3C"/>
                                     </StackPanel>
@@ -47,37 +48,37 @@
                     </ScrollViewer>
                 </Expander>
 
-                <CheckBox x:Name="SaveProductBox" Content="Ürünü Kaydet" Foreground="White" HorizontalAlignment="Left" Margin="10,10,10,0" Grid.Column="2"/>
+                <CheckBox x:Name="SaveProductBox" Content="Ürünü Kaydet" FontSize="20" Foreground="White" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="10,10,10,0" Grid.Column="2"/>
 
             </Grid>
 
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,10,0,0">
-                <TextBlock Text="Notlar:" Width="100" FontSize="16" Foreground="White" VerticalAlignment="Center" />
-                <TextBox Name="NoteTextBox" Width="250" Height="35" FontSize="14"
+                <TextBlock Text="Notlar:" Width="100" FontSize="20" Foreground="White" VerticalAlignment="Center" />
+                <TextBox Name="NoteTextBox" Width="250" Height="35" FontSize="18"
                      Background="#1E1E1E" Foreground="White" BorderBrush="#444444" BorderThickness="1"/>
             </StackPanel>
 
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,10,0,0">
-                <TextBlock Text="Adet:" Width="100" FontSize="16" Foreground="White" VerticalAlignment="Center" />
-                <TextBox Name="QuantityTextBox" Width="250" Height="35" FontSize="14"
+                <TextBlock Text="Adet:" Width="100" FontSize="20" Foreground="White" VerticalAlignment="Center" />
+                <TextBox Name="QuantityTextBox" Width="250" Height="35" FontSize="18"
                      Background="#1E1E1E" Foreground="White" BorderBrush="#444444" BorderThickness="1"/>
             </StackPanel>
 
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,10,0,0">
-                <TextBlock Text="Fiyat:" Width="100" FontSize="16" Foreground="White" VerticalAlignment="Center" />
-                <TextBox Name="PriceTextBox" Width="250" Height="35" FontSize="14"
+                <TextBlock Text="Fiyat:" Width="100" FontSize="20" Foreground="White" VerticalAlignment="Center" />
+                <TextBox Name="PriceTextBox" Width="250" Height="35" FontSize="18"
                      Background="#1E1E1E" Foreground="White" BorderBrush="#444444" BorderThickness="1"/>
             </StackPanel>
 
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,10,0,0">
-                <TextBlock Text="Ücret:" Width="100" FontSize="16" Foreground="White" VerticalAlignment="Center" />
-                <TextBox Name="AmountTextBox" Width="250" Height="35" FontSize="14"
+                <TextBlock Text="Ücret:" Width="100" FontSize="20" Foreground="White" VerticalAlignment="Center" />
+                <TextBox Name="AmountTextBox" Width="250" Height="35" FontSize="18"
                      Background="#1E1E1E" Foreground="White" BorderBrush="#444444" BorderThickness="1"/>
             </StackPanel>
 
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,10,0,0">
-                <TextBlock Text="Ödenen:" Width="100" FontSize="16" Foreground="White" VerticalAlignment="Center" />
-                <TextBox Name="PaidTextBox" Width="250" Height="35" FontSize="14"
+                <TextBlock Text="Ödenen:" Width="100" FontSize="20" Foreground="White" VerticalAlignment="Center" />
+                <TextBox Name="PaidTextBox" Width="250" Height="35" FontSize="18"
                      Background="#1E1E1E" Foreground="White" BorderBrush="#444444" BorderThickness="1"/>
             </StackPanel>
         </StackPanel>
@@ -91,7 +92,7 @@
             <Button Content="İşlem Ekle" Background="#388E3C"
             Style="{StaticResource ModernButtonStyle}" 
             Click="SaveTransactionButton_Click"/>
-            
+
         </StackPanel>
 
     </Grid>

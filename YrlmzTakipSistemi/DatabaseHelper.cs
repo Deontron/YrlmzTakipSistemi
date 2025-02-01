@@ -66,7 +66,7 @@ namespace YrlmzTakipSistemi
                     UPDATE Transactions
                     SET 
                         AlacakDurumu = (
-                    SELECT Tutar - IFNULL(NEW.Odenen, 0) 
+                    SELECT IFNULL(Tutar, 0) - IFNULL(NEW.Odenen, 0) 
                     FROM Transactions 
                     WHERE Id = NEW.Id
         )
@@ -85,7 +85,7 @@ namespace YrlmzTakipSistemi
                     UPDATE Transactions
                     SET 
                         AlacakDurumu = (
-                    SELECT Tutar - IFNULL(NEW.Odenen, 0) 
+                    SELECT IFNULL(Tutar, 0) - IFNULL(NEW.Odenen, 0) 
                     FROM Transactions 
                     WHERE Id = NEW.Id
         )

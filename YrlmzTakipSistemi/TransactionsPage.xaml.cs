@@ -54,8 +54,8 @@ namespace YrlmzTakipSistemi
                             CustomerId = reader.GetInt32(1),
                             Tarih = reader.IsDBNull(2) ? string.Empty : reader.GetString(2),  
                             Aciklama = reader.IsDBNull(3) ? string.Empty : reader.GetString(3),  
-                            Notlar = reader.IsDBNull(4) ? string.Empty : reader.GetString(4),  
-                            Adet = reader.GetInt32(5),
+                            Notlar = reader.IsDBNull(4) ? string.Empty : reader.GetString(4),
+                            Adet = reader.IsDBNull(5) ? 0 : reader.GetInt32(5),
                             BirimFiyat = reader.IsDBNull(6) ? 0.0 : reader.GetDouble(6),
                             Tutar = reader.IsDBNull(7) ? 0.0 : reader.GetDouble(7),
                             Odenen = reader.IsDBNull(8) ? 0.0 : reader.GetDouble(8),
@@ -108,6 +108,12 @@ namespace YrlmzTakipSistemi
             }
         }
 
+        private void BackButton_Click(object sender, RoutedEventArgs e)
+        {
+            var mainWindow = (MainWindow)Application.Current.MainWindow;
+            mainWindow.MainFrame.Navigate(new CustomersPage());
+        }
+
         private bool DeleteTransactionFromDatabase(int transactionId)
         {
             using (var connection = _databaseHelper.GetConnection())
@@ -136,6 +142,14 @@ namespace YrlmzTakipSistemi
                     }
                 }
             }
+        }
+
+        private void AddPaymentButton_Click(object sender, RoutedEventArgs e)
+        {
+            var mainWindow = (MainWindow)Application.Current.MainWindow;
+            PaymentAddPage pp = new PaymentAddPage();
+            pp.GetCustomer(currentCustomer);
+            mainWindow.MainFrame.Navigate(pp);
         }
     }
 }

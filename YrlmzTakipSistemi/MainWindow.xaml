@@ -6,7 +6,8 @@
         mc:Ignorable="d"
         Title="Takip Sistemi" Height="600" Width="1000"
         WindowStartupLocation="CenterScreen"
-        Background="#1E1E1E">
+        Background="#1E1E1E"
+        WindowState="Maximized">
     <Grid>
         <Grid>
             <Grid.ColumnDefinitions>

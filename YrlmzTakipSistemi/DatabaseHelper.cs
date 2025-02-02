@@ -35,8 +35,10 @@ namespace YrlmzTakipSistemi
                 string createCustomersTable = @"
                 CREATE TABLE IF NOT EXISTS Customers (
                     Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    Tarih TEXT NOT NULL DEFAULT (strftime('%d-%m-%Y', 'now')),
                     Name TEXT NOT NULL,
-                    Email TEXT
+                    Contact TEXT,
+                    Sum REAL
                 )";
 
                 string createTransactionsTable = @"
@@ -103,6 +105,21 @@ namespace YrlmzTakipSistemi
                     FOREIGN KEY (CustomerId) REFERENCES Customers(Id)
                 )";
 
+                string createPaymentsTable = @"
+                CREATE TABLE IF NOT EXISTS Payments (
+                    Id INTEGER PRIMARY KEY AUTOINCREMENT, 
+                    CustomerId INTEGER NOT NULL,
+                    Tarih TEXT NOT NULL DEFAULT (strftime('%d-%m-%Y', 'now')), 
+                    Musteri TEXT NOT NULL,  
+                    Borclu TEXT NOT NULL,  
+                    KasideYeri TEXT NOT NULL,  
+                    Kategori INTEGER NOT NULL, 
+                    Tutar REAL NOT NULL, 
+                    OdemeTarihi TEXT NOT NULL, 
+                    OdendiMi BOOLEAN, 
+                    FOREIGN KEY (CustomerId) REFERENCES Customers(Id) 
+                )";
+
                 var command = new SQLiteCommand(createCustomersTable, connection);
                 command.ExecuteNonQuery();
 
@@ -110,6 +127,9 @@ namespace YrlmzTakipSistemi
                 command.ExecuteNonQuery();
 
                 command = new SQLiteCommand(createProductsTable, connection);
+                command.ExecuteNonQuery();
+
+                command = new SQLiteCommand(createPaymentsTable, connection);
                 command.ExecuteNonQuery();
             }
         }

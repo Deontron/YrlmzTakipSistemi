@@ -15,7 +15,8 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <TextBlock Text="Ödemeler" 
+        <TextBlock Name="TitleTextBlock" 
+               Text="Ödemeler" 
                HorizontalAlignment="Center" 
                VerticalAlignment="Center" 
                FontSize="28" 
@@ -26,6 +27,7 @@
 
         <Border Grid.Row="1" Background="#1E1E1E" CornerRadius="10" BorderBrush="#444444" BorderThickness="1">
             <DataGrid Name="PaymentsDataGrid" 
+                MouseDoubleClick="PaymentsDataGrid_MouseDoubleClick"
                 HorizontalAlignment="Stretch" 
                 VerticalAlignment="Stretch" 
                 AutoGenerateColumns="False" 
@@ -51,10 +53,46 @@
                 </DataGrid.ColumnHeaderStyle>
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Tarih" Binding="{Binding Tarih}" Width="*" />
-                    <DataGridTextColumn Header="Açıklama" Binding="{Binding Aciklama}" Width="*" />
-                    <DataGridTextColumn Header="Miktar" Binding="{Binding Miktar}" Width="*" />
-                    <DataGridTextColumn Header="Kategori" Binding="{Binding Kategori}" Width="*" />
-                    <DataGridTextColumn Header="ÖdenmeDurumu" Binding="{Binding OdendiMi}" Width="*" />
+                    <DataGridTextColumn Header="Müşteri" Binding="{Binding Musteri}" Width="*" />
+                    <DataGridTextColumn Header="Borçlu" Binding="{Binding Borclu}" Width="*" />
+                    <DataGridTextColumn Header="KaşideYeri" Binding="{Binding KasideYeri}" Width="*" />
+                    <DataGridTextColumn Header="Kategori" Binding="{Binding KategoriDescription}" Width="*">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="HorizontalAlignment" Value="Center"/>
+                                <Setter Property="FontWeight" Value="Bold"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Kategori}" Value="1">
+                                        <Setter Property="Foreground" Value="#3F51B5"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding Kategori}" Value="2">
+                                        <Setter Property="Foreground" Value="#9C27B0"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding Kategori}" Value="3">
+                                        <Setter Property="Foreground" Value="#009688"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="Tutar" Binding="{Binding Tutar}" Width="*" />
+                    <DataGridTextColumn Header="ÖdemeTarihi" Binding="{Binding OdemeTarihi}" Width="*" />
+                    <DataGridTextColumn Header="Durum" Binding="{Binding OdendiMiDescription}" Width="*">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="HorizontalAlignment" Value="Center"/>
+                                <Setter Property="FontWeight" Value="Bold"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding OdendiMi}" Value="True">
+                                        <Setter Property="Foreground" Value="#4CAF50"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding OdendiMi}" Value="False">
+                                        <Setter Property="Foreground" Value="#F44336"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
                     <DataGridTextColumn Header="Id" Binding="{Binding Id}" Width="0" Visibility="Collapsed" />
                     <DataGridTextColumn Header="CustomerId" Binding="{Binding CustomerId}" Width="0" Visibility="Collapsed" />
                 </DataGrid.Columns>
@@ -63,9 +101,8 @@
         </Border>
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="2" Margin="0,20,0,0">
-            <Button Content="Geri" Background="#3B4D61" Style="{StaticResource ModernButtonStyle}" Click="BackButton_Click"/>
-            <Button Content="Seçili Ödemeyi Sil" Style="{StaticResource ModernButtonStyle}" Background="#D32F2F" Click="DeleteCustomerButton_Click"/>
-            <Button Content="Güncelle" Background="#1976D2" Style="{StaticResource ModernButtonStyle}" Click="AddCustomerButton_Click"/>
+            <Button Content="Seçili Ödemeyi Sil" Style="{StaticResource ModernButtonStyle}" Background="#D32F2F" Click="DeletePaymentButton_Click"/>
+            <Button Content="Güncelle" Background="#1976D2" Style="{StaticResource ModernButtonStyle}" Click="DeletePaymentButton_Click"/>
         </StackPanel>
     </Grid>
 </Page>

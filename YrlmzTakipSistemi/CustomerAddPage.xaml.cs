@@ -31,10 +31,17 @@ namespace YrlmzTakipSistemi
         private void SaveCustomerButton_Click(object sender, RoutedEventArgs e)
         {
             string name = NameTextBox.Text;
-            string phone = PhoneTextBox.Text;
-            string email = EmailTextBox.Text;
-            string address = AddressTextBox.Text;
+            string contact = ContactTextBox.Text;
+            double amount = 0;
 
+            if (!string.IsNullOrEmpty(SumTextBox.Text))
+            {
+                if (!double.TryParse(SumTextBox.Text, out amount))
+                {
+                    MessageBox.Show("Miktar değeri geçersiz veya sıfırdan küçük olamaz.");
+                    return;
+                }
+            }
 
             if (string.IsNullOrEmpty(name))
             {
@@ -48,26 +55,36 @@ namespace YrlmzTakipSistemi
             {
                 connection.Open();
 
-                string insertQuery = "INSERT INTO Customers (Name, Email) VALUES (@Name, @Email)";
+                string insertQuery = "INSERT INTO Customers (Name, Contact, Sum) VALUES (@Name, @Contact, @Sum)";
                 var command = new SQLiteCommand(insertQuery, connection);
                 command.Parameters.AddWithValue("@Name", name);
-                command.Parameters.AddWithValue("@Email", email);
+                command.Parameters.AddWithValue("@Contact", contact);
+                command.Parameters.AddWithValue("@Sum", amount);
 
                 command.ExecuteNonQuery();
             }
 
             ClearForm();
 
-            var mainWindow = (MainWindow)Application.Current.MainWindow;
-            mainWindow.MainFrame.Navigate(new CustomersPage());
+            Back();
         }
 
         private void ClearForm()
         {
             NameTextBox.Clear();
-            PhoneTextBox.Clear();
-            EmailTextBox.Clear();
-            AddressTextBox.Clear();
+            ContactTextBox.Clear();
+            SumTextBox.Clear();
+        }
+
+        private void BackButton_Click(object sender, RoutedEventArgs e)
+        {
+            Back();
+        }
+
+        private void Back()
+        {
+            var mainWindow = (MainWindow)Application.Current.MainWindow;
+            mainWindow.MainFrame.Navigate(new CustomersPage());
         }
     }
 }

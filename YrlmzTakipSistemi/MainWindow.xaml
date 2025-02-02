@@ -25,7 +25,7 @@
                 <Button Content="Müşteriler" Style="{StaticResource ModernMenuButton}" Click="CustomersButton_Click" />
                 <Button Content="Gelir/Gider" Style="{StaticResource ModernMenuButton}" Click="IncomeExpenseButton_Click" />
                 <Button Content="Faturalar" Style="{StaticResource ModernMenuButton}" Click="InvoiceButton_Click" />
-                <Button Content="Çek/Senet" Style="{StaticResource ModernMenuButton}" Click="InvoiceButton_Click" />
+                <Button Content="Çek/Senet" Style="{StaticResource ModernMenuButton}" Click="CheckBillButton_Click" />
                 <Button Content="Çıkış" Style="{StaticResource ModernMenuButton}" Click="ExitButton_Click" Margin="10,30,10,10" />
             </StackPanel>
 

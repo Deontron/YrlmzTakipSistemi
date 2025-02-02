@@ -13,8 +13,11 @@ namespace YrlmzTakipSistemi
     public class Customer
     {
         public int Id { get; set; }
+        public string Tarih { get; set; }
         public string Name { get; set; }
-        public string Email { get; set; }
+        public string Contact { get; set; }
+        public double Sum { get; set; }
+        
     }
 
     public class Transaction
@@ -45,9 +48,14 @@ namespace YrlmzTakipSistemi
         public int Id { get; set; }
         public int CustomerId { get; set; }
         public string Tarih { get; set; }
-        public string Aciklama { get; set; }
-        public double Miktar { get; set; }
+        public string Musteri { get; set; }
+        public string Borclu { get; set; }
+        public string KasideYeri { get; set; }
         public int Kategori { get; set; }
+        public string KategoriDescription { get; set; }
+        public double Tutar { get; set; }
+        public string OdemeTarihi { get; set; }
         public bool OdendiMi { get; set; }
+        public string OdendiMiDescription { get; set; }
     }
 }

@@ -20,26 +20,32 @@
 
         <StackPanel HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,80,0,0">
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,10,0,0" Grid.Column="0">
-                <TextBlock Text="Açıklama:" Width="100" FontSize="20" Foreground="White" VerticalAlignment="Center" />
-                <TextBox Name="DescriptionTextBox" Width="250" Height="35" FontSize="14"
+                <TextBlock Text="Müşteri:" Width="100" FontSize="20" Foreground="White" VerticalAlignment="Center" />
+                <TextBox Name="CostumerTextBox" Width="250" Height="35" FontSize="14"
                      Background="#1E1E1E" Foreground="White" BorderBrush="#444444" BorderThickness="1"/>
             </StackPanel>
 
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,10,0,0">
-                <TextBlock Text="Notlar:" Width="100" FontSize="20" Foreground="White" VerticalAlignment="Center" />
-                <TextBox Name="NoteTextBox" Width="250" Height="35" FontSize="18"
+                <TextBlock Text="Borçlu:" Width="100" FontSize="20" Foreground="White" VerticalAlignment="Center" />
+                <TextBox Name="DebtorTextBox" Width="250" Height="35" FontSize="18"
                  Background="#1E1E1E" Foreground="White" BorderBrush="#444444" BorderThickness="1"/>
             </StackPanel>
 
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,10,0,0">
-                <TextBlock Text="Miktar:" Width="100" FontSize="20" Foreground="White" VerticalAlignment="Center" />
+                <TextBlock Text="Kaşide Yeri:" Width="100" FontSize="20" Foreground="White" VerticalAlignment="Center" />
+                <TextBox Name="PlaceTextBox" Width="250" Height="35" FontSize="18"
+                Background="#1E1E1E" Foreground="White" BorderBrush="#444444" BorderThickness="1"/>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,10,0,0">
+                <TextBlock Text="Tutar:" Width="100" FontSize="20" Foreground="White" VerticalAlignment="Center" />
                 <TextBox Name="AmountTextBox" Width="250" Height="35" FontSize="18"
                  Background="#1E1E1E" Foreground="White" BorderBrush="#444444" BorderThickness="1"/>
             </StackPanel>
 
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,10,0,0">
                 <TextBlock Text="Tarih:" Width="100" FontSize="20" Foreground="White" VerticalAlignment="Center" />
-                <DatePicker Name="TransactionDatePicker">
+                <DatePicker Name="PaymentDatePicker">
                     <DatePicker.Resources>
                         <Style TargetType="TextBox">
                             <Setter Property="Background" Value="#2B2B2B"/>
@@ -52,9 +58,11 @@
 
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,10,0,0">
                 <RadioButton Name="CheckButton" Content="Çek" FontSize="20" Foreground="White" VerticalContentAlignment="Center" Margin="10,0,10,0"/>
-                <RadioButton Name="SenetButton" Content="Senet" FontSize="20" Foreground="White" VerticalContentAlignment="Center" Margin="10,0,10,0"/>
+                <RadioButton Name="BillButton" Content="Senet" FontSize="20" Foreground="White" VerticalContentAlignment="Center" Margin="10,0,10,0"/>
                 <RadioButton Name="CashButton" Content="Nakit" FontSize="20" Foreground="White" VerticalContentAlignment="Center" Margin="10,0,10,0"/>
             </StackPanel>
+
+            <CheckBox x:Name="PaidBox" Content="Ödendi Mi?" FontSize="20" Foreground="White" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="10,10,10,0"/>
 
         </StackPanel>
 

@@ -53,5 +53,10 @@ namespace YrlmzTakipSistemi
                 Application.Current.Shutdown();
             }
         }
+
+        private void CheckBillButton_Click(object sender, RoutedEventArgs e)
+        {
+            MainFrame.Navigate(new PaymentsPage());
+        }
     }
 }

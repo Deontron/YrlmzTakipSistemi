@@ -55,8 +55,10 @@ namespace YrlmzTakipSistemi
                         customers.Add(new Customer
                         {
                             Id = reader.GetInt32(0),
-                            Name = reader.GetString(1),
-                            Email = reader.IsDBNull(2) ? string.Empty : reader.GetString(2)
+                            Tarih = reader.IsDBNull(1) ? string.Empty : reader.GetString(1),
+                            Name = reader.IsDBNull(2) ? string.Empty : reader.GetString(2),
+                            Contact = reader.IsDBNull(3) ? string.Empty : reader.GetString(3),
+                            Sum = reader.IsDBNull(4) ? 0 : reader.GetDouble(4)
                         });
                     }
                 }
@@ -165,7 +167,7 @@ namespace YrlmzTakipSistemi
 
                 if (updateSuccess)
                 {
-                    LoadCustomers(); 
+                    LoadCustomers();
                 }
                 else
                 {
@@ -191,11 +193,11 @@ namespace YrlmzTakipSistemi
                     {
                         try
                         {
-                            string updateCustomerQuery = "UPDATE Customers SET Name = @Name, Email = @Email WHERE Id = @Id";
+                            string updateCustomerQuery = "UPDATE Customers SET Name = @Name, Contact = @Contact WHERE Id = @Id";
                             using (var updateCustomerCommand = new SQLiteCommand(updateCustomerQuery, connection, transaction))
                             {
                                 updateCustomerCommand.Parameters.AddWithValue("@Name", customer.Name);
-                                updateCustomerCommand.Parameters.AddWithValue("@Email", customer.Email);
+                                updateCustomerCommand.Parameters.AddWithValue("@Contact", customer.Contact);
                                 updateCustomerCommand.Parameters.AddWithValue("@Id", customer.Id);
 
                                 int rowsAffected = updateCustomerCommand.ExecuteNonQuery();

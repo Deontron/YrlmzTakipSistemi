@@ -17,58 +17,54 @@ using System.Data.SQLite;
 namespace YrlmzTakipSistemi
 {
     /// <summary>
-    /// Interaction logic for TransactionsPage.xaml
+    /// Interaction logic for ProductsPage.xaml
     /// </summary>
-    public partial class TransactionsPage : Page
+    public partial class ProductsPage : Page
     {
         private DatabaseHelper dbHelper;
         private Customer currentCustomer;
 
-        public TransactionsPage()
+        public ProductsPage()
         {
             InitializeComponent();
             dbHelper = new DatabaseHelper();
+
         }
 
-        public void LoadCustomerTransactions(Customer customer)
+        public void LoadCustomerProducts(Customer customer)
         {
             currentCustomer = customer;
 
-            TitleTextBlock.Text = $"{customer.Name} - İşlemler"; 
+            TitleTextBlock.Text = $"{customer.Name} - Ürünler";
             using (var connection = dbHelper.GetConnection())
             {
                 connection.Open();
-                string query = "SELECT * FROM Transactions WHERE CustomerId = @CustomerId";
+                string query = "SELECT * FROM Products WHERE CustomerId = @CustomerId";
                 SQLiteCommand command = new SQLiteCommand(query, connection);
                 command.Parameters.AddWithValue("@CustomerId", customer.Id);
 
-                List<Transaction> transactions = new List<Transaction>();
+                List<Product> products = new List<Product>();
 
                 using (SQLiteDataReader reader = command.ExecuteReader())
                 {
                     while (reader.Read())
                     {
-                        transactions.Add(new Transaction
+                        products.Add(new Product
                         {
                             Id = reader.GetInt32(0),
                             CustomerId = reader.GetInt32(1),
-                            Tarih = reader.IsDBNull(2) ? string.Empty : reader.GetString(2),  
-                            Aciklama = reader.IsDBNull(3) ? string.Empty : reader.GetString(3),  
-                            Notlar = reader.IsDBNull(4) ? string.Empty : reader.GetString(4),
-                            Adet = reader.IsDBNull(5) ? 0 : reader.GetInt32(5),
-                            BirimFiyat = reader.IsDBNull(6) ? 0.0 : reader.GetDouble(6),
-                            Tutar = reader.IsDBNull(7) ? 0.0 : reader.GetDouble(7),
-                            Odenen = reader.IsDBNull(8) ? 0.0 : reader.GetDouble(8),
-                            AlacakDurumu = reader.IsDBNull(9) ? 0.0 : reader.GetDouble(9)
+                            Tarih = reader.IsDBNull(2) ? string.Empty : reader.GetString(2),
+                            Isim = reader.IsDBNull(3) ? string.Empty : reader.GetString(3),
+                            Fiyat = reader.IsDBNull(4) ? 0.0 : reader.GetDouble(4),
                         });
                     }
                 }
 
-                TransactionsDataGrid.ItemsSource = transactions;
+                ProductsDataGrid.ItemsSource = products;
             }
         }
 
-        private void AddTransactionButton_Click(object sender, RoutedEventArgs e)
+        private void BackButton_Click(object sender, RoutedEventArgs e)
         {
             var mainWindow = (MainWindow)Application.Current.MainWindow;
             TransactionAddPage transactionAddPage = new TransactionAddPage();
@@ -76,25 +72,25 @@ namespace YrlmzTakipSistemi
             mainWindow.MainFrame.Navigate(transactionAddPage);
         }
 
-        private void DeleteTransactionButton_Click(object sender, RoutedEventArgs e)
+        private void DeleteProductButton_Click(object sender, RoutedEventArgs e)
         {
-            if (TransactionsDataGrid.SelectedItem != null)
+            if (ProductsDataGrid.SelectedItem != null)
             {
-                var selectedTransaction = (Transaction)TransactionsDataGrid.SelectedItem;
+                var selectedProduct = (Product)ProductsDataGrid.SelectedItem;
 
-                var result = MessageBox.Show(selectedTransaction.Aciklama + " Silmek istediğinize emin misiniz?",
+                var result = MessageBox.Show(selectedProduct.Isim + " Silmek istediğinize emin misiniz?",
                                  "Silme Onayı",
                                  MessageBoxButton.YesNo,
                                  MessageBoxImage.Question);
 
                 if (result == MessageBoxResult.Yes)
                 {
-                    bool success = DeleteTransactionFromDatabase(selectedTransaction.Id);
+                    bool success = DeleteProductFromDatabase(selectedProduct.Id);
 
                     if (success)
                     {
-                        MessageBox.Show("İşlem başarıyla silindi.", "Hop!");
-                        LoadCustomerTransactions(currentCustomer);
+                        MessageBox.Show("Ürün başarıyla silindi.", "Hop!");
+                        LoadCustomerProducts(currentCustomer);
                     }
                     else
                     {
@@ -104,17 +100,10 @@ namespace YrlmzTakipSistemi
             }
             else
             {
-                MessageBox.Show("Lütfen silmek için bir işlem seçin.", "Hop!");
+                MessageBox.Show("Lütfen silmek için bir ürün seçin.", "Hop!");
             }
         }
-
-        private void BackButton_Click(object sender, RoutedEventArgs e)
-        {
-            var mainWindow = (MainWindow)Application.Current.MainWindow;
-            mainWindow.MainFrame.Navigate(new CustomersPage());
-        }
-
-        private bool DeleteTransactionFromDatabase(int transactionId)
+        private bool DeleteProductFromDatabase(int productId)
         {
             using (var connection = dbHelper.GetConnection())
             {
@@ -124,12 +113,12 @@ namespace YrlmzTakipSistemi
                 {
                     try
                     {
-                        string deleteTransactionsQuery = "DELETE FROM Transactions WHERE Id = @Id";
-                        using (var deleteTransactionsCommand = new SQLiteCommand(deleteTransactionsQuery, connection, transaction))
+                        string deleteProductsQuery = "DELETE FROM Products WHERE Id = @Id";
+                        using (var deleteProductsCommand = new SQLiteCommand(deleteProductsQuery, connection, transaction))
                         {
-                            deleteTransactionsCommand.Parameters.AddWithValue("@Id", transactionId);
+                            deleteProductsCommand.Parameters.AddWithValue("@Id", productId);
 
-                            int rowsAffected = deleteTransactionsCommand.ExecuteNonQuery();
+                            int rowsAffected = deleteProductsCommand.ExecuteNonQuery();
 
                             transaction.Commit();
                             return rowsAffected > 0;
@@ -144,12 +133,18 @@ namespace YrlmzTakipSistemi
             }
         }
 
-        private void AddPaymentButton_Click(object sender, RoutedEventArgs e)
+
+        private void AddProductButton_Click(object sender, RoutedEventArgs e)
         {
             var mainWindow = (MainWindow)Application.Current.MainWindow;
-            PaymentAddPage pp = new PaymentAddPage();
-            pp.GetCustomer(currentCustomer);
-            mainWindow.MainFrame.Navigate(pp);
+            ProductsAddPage productAddPage = new ProductsAddPage();
+            productAddPage.GetCustomer(currentCustomer);
+            mainWindow.MainFrame.Navigate(productAddPage);
+        }
+
+        private void UpdateProductButton_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }

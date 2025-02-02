@@ -238,5 +238,13 @@ namespace YrlmzTakipSistemi
                 command.ExecuteNonQuery();
             }
         }
+
+        private void ManageProductsButton_Click(object sender, RoutedEventArgs e)
+        {
+            var mainWindow = (MainWindow)Application.Current.MainWindow;
+            ProductsPage productsPage = new ProductsPage();
+            productsPage.LoadCustomerProducts(currentCustomer);
+            mainWindow.MainFrame.Navigate(productsPage);
+        }
     }
 }

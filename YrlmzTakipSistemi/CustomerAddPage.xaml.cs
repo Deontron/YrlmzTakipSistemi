@@ -55,11 +55,11 @@ namespace YrlmzTakipSistemi
             {
                 connection.Open();
 
-                string insertQuery = "INSERT INTO Customers (Name, Contact, Sum) VALUES (@Name, @Contact, @Sum)";
+                string insertQuery = "INSERT INTO Customers (Name, Contact, Debt) VALUES (@Name, @Contact, @Debt)";
                 var command = new SQLiteCommand(insertQuery, connection);
                 command.Parameters.AddWithValue("@Name", name);
                 command.Parameters.AddWithValue("@Contact", contact);
-                command.Parameters.AddWithValue("@Sum", amount);
+                command.Parameters.AddWithValue("@Debt", amount);
 
                 command.ExecuteNonQuery();
             }

@@ -133,10 +133,12 @@ namespace YrlmzTakipSistemi
                 if (amount != 0)
                 {
                     command.Parameters.AddWithValue("@Amount", amount);
+                    UpdateCustomerDebt(amount);
                 }
                 else
                 {
                     command.Parameters.AddWithValue("@Amount", (price * quantity));
+                    UpdateCustomerDebt((price * quantity));
                 }
 
                 command.Parameters.AddWithValue("@Paid", paid);
@@ -245,6 +247,39 @@ namespace YrlmzTakipSistemi
             ProductsPage productsPage = new ProductsPage();
             productsPage.LoadCustomerProducts(currentCustomer);
             mainWindow.MainFrame.Navigate(productsPage);
+        }
+
+        private void UpdateCustomerDebt(double amount)
+        {
+            double totalDebt = 0;
+
+            using (var connection = dbHelper.GetConnection())
+            {
+                connection.Open();
+
+                string query = "SELECT Debt FROM Customers WHERE Id = @CustomerId";
+                SQLiteCommand command = new SQLiteCommand(query, connection);
+                command.Parameters.AddWithValue("@CustomerId", currentCustomer.Id);
+
+                var result = command.ExecuteScalar();
+                if (result != DBNull.Value)
+                {
+                    totalDebt = Convert.ToDouble(result);
+                }
+            }
+
+            totalDebt += amount;
+
+            using (var connection = dbHelper.GetConnection())
+            {
+                connection.Open();
+
+                string updateQuery = "UPDATE Customers SET Debt = @Debt WHERE Id = @CustomerId";
+                SQLiteCommand updateCommand = new SQLiteCommand(updateQuery, connection);
+                updateCommand.Parameters.AddWithValue("@Debt", totalDebt);
+                updateCommand.Parameters.AddWithValue("@CustomerId", currentCustomer.Id);
+                updateCommand.ExecuteNonQuery();
+            }
         }
     }
 }

@@ -22,14 +22,15 @@ namespace YrlmzTakipSistemi
     /// </summary>
     public partial class CustomersPage : Page
     {
-        private DatabaseHelper _databaseHelper;
+        private DatabaseHelper dbHelper;
         private ObservableCollection<Customer> customers = new ObservableCollection<Customer>();
 
         public CustomersPage()
         {
             InitializeComponent();
-            _databaseHelper = new DatabaseHelper();
+            dbHelper = new DatabaseHelper();
             LoadCustomers();
+            LoadTotalDebt();
         }
 
         private void LoadCustomers()
@@ -42,7 +43,7 @@ namespace YrlmzTakipSistemi
         {
             customers.Clear();
 
-            using (var connection = _databaseHelper.GetConnection())
+            using (var connection = dbHelper.GetConnection())
             {
                 connection.Open();
                 string query = "SELECT * FROM Customers";
@@ -58,7 +59,7 @@ namespace YrlmzTakipSistemi
                             Tarih = reader.IsDBNull(1) ? string.Empty : reader.GetString(1),
                             Name = reader.IsDBNull(2) ? string.Empty : reader.GetString(2),
                             Contact = reader.IsDBNull(3) ? string.Empty : reader.GetString(3),
-                            Sum = reader.IsDBNull(4) ? 0 : reader.GetDouble(4)
+                            Debt = reader.IsDBNull(4) ? 0 : reader.GetDouble(4)
                         });
                     }
                 }
@@ -124,7 +125,7 @@ namespace YrlmzTakipSistemi
 
         private bool DeleteCustomerFromDatabase(int customerId)
         {
-            using (var connection = _databaseHelper.GetConnection())
+            using (var connection = dbHelper.GetConnection())
             {
                 connection.Open();
 
@@ -178,7 +179,7 @@ namespace YrlmzTakipSistemi
 
         private bool UpdateCustomerInDatabase(Customer customer)
         {
-            using (var connection = _databaseHelper.GetConnection())
+            using (var connection = dbHelper.GetConnection())
             {
                 try
                 {
@@ -227,6 +228,37 @@ namespace YrlmzTakipSistemi
                     return false;
                 }
             }
+        }
+
+        private void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            string searchText = SearchTextBox.Text.ToLower(); 
+
+            var filteredCustomers = customers.Where(c => c.Name.ToLower().Contains(searchText)).ToList();
+
+            CustomersDataGrid.ItemsSource = filteredCustomers;
+        }
+
+        private void LoadTotalDebt()
+        {
+            double totalDebt = 0;
+
+            using (var connection = dbHelper.GetConnection())
+            {
+                connection.Open();
+
+                string query = "SELECT SUM(Debt) FROM Customers"; 
+
+                SQLiteCommand command = new SQLiteCommand(query, connection);
+
+                var result = command.ExecuteScalar();
+                if (result != DBNull.Value)
+                {
+                    totalDebt = Convert.ToDouble(result);
+                }
+            }
+
+            SumTextBlock.Text = $"Toplam Alacak: {totalDebt} TL";
         }
     }
 }

@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Data.SQLite;
+using System.Collections.ObjectModel;
 
 namespace YrlmzTakipSistemi
 {
@@ -22,6 +23,7 @@ namespace YrlmzTakipSistemi
     public partial class PaymentsPage : Page
     {
         private DatabaseHelper dbHelper;
+        private ObservableCollection<Payment> payments = new ObservableCollection<Payment>();
 
         public PaymentsPage()
         {
@@ -32,14 +34,14 @@ namespace YrlmzTakipSistemi
 
         public void LoadPayments()
         {
+            payments.Clear();
+
             using (var connection = dbHelper.GetConnection())
             {
                 connection.Open();
 
                 string query = "SELECT * FROM Payments";
                 SQLiteCommand command = new SQLiteCommand(query, connection);
-
-                List<Payment> payments = new List<Payment>();
 
                 using (SQLiteDataReader reader = command.ExecuteReader())
                 {
@@ -53,7 +55,7 @@ namespace YrlmzTakipSistemi
                             Musteri = reader.IsDBNull(3) ? string.Empty : reader.GetString(3),
                             Borclu = reader.IsDBNull(4) ? string.Empty : reader.GetString(4),
                             KasideYeri = reader.IsDBNull(5) ? string.Empty : reader.GetString(5),
-                            Kategori = reader.IsDBNull(6) ? 0 : reader.GetInt32(6),  // Kategori id'si
+                            Kategori = reader.IsDBNull(6) ? 0 : reader.GetInt32(6),  
                             Tutar = reader.IsDBNull(7) ? 0 : reader.GetDouble(7),
                             OdemeTarihi = reader.IsDBNull(8) ? string.Empty : reader.GetString(8),
                             OdendiMi = reader.IsDBNull(9) ? false : reader.GetBoolean(9)
@@ -165,7 +167,7 @@ namespace YrlmzTakipSistemi
                     command.ExecuteNonQuery();
                 }
 
-                PaymentsDataGrid.Items.Refresh();
+                LoadPayments();
             }
         }
 

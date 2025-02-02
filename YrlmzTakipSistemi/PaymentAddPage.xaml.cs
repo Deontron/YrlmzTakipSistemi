@@ -68,13 +68,13 @@ namespace YrlmzTakipSistemi
             {
                 if (!double.TryParse(AmountTextBox.Text, out amount))
                 {
-                    MessageBox.Show("Miktar değeri geçersiz.");
+                    MessageBox.Show("Miktar değeri geçersiz.", "Hata", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
             }
             else
             {
-                MessageBox.Show("Miktar boş olamaz.");
+                MessageBox.Show("Miktar boş olamaz.", "Hata", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
@@ -110,6 +110,8 @@ namespace YrlmzTakipSistemi
                     paymentCommand.Parameters.AddWithValue("@CustomerId", currentCustomer.Id);
                     paymentCommand.ExecuteNonQuery();
                 }
+
+                UpdateCustomerDebt(amount);
 
                 MessageBox.Show($"{customerName} ödemesi başarıyla eklendi!", "Hop!");
 
@@ -159,6 +161,39 @@ namespace YrlmzTakipSistemi
             CostumerTextBox.Clear();
             CostumerTextBox.Clear();
             AmountTextBox.Clear();
+        }
+
+        private void UpdateCustomerDebt(double amount)
+        {
+            double totalDebt = 0;
+
+            using (var connection = dbHelper.GetConnection())
+            {
+                connection.Open();
+
+                string query = "SELECT Debt FROM Customers WHERE Id = @CustomerId";
+                SQLiteCommand command = new SQLiteCommand(query, connection);
+                command.Parameters.AddWithValue("@CustomerId", currentCustomer.Id);
+
+                var result = command.ExecuteScalar();
+                if (result != DBNull.Value)
+                {
+                    totalDebt = Convert.ToDouble(result);
+                }
+            }
+
+            totalDebt -= amount;
+
+            using (var connection = dbHelper.GetConnection())
+            {
+                connection.Open();
+
+                string updateQuery = "UPDATE Customers SET Debt = @Debt WHERE Id = @CustomerId";
+                SQLiteCommand updateCommand = new SQLiteCommand(updateQuery, connection);
+                updateCommand.Parameters.AddWithValue("@Debt", totalDebt);
+                updateCommand.Parameters.AddWithValue("@CustomerId", currentCustomer.Id);
+                updateCommand.ExecuteNonQuery();
+            }
         }
     }
 }

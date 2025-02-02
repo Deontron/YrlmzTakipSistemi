@@ -38,7 +38,7 @@ namespace YrlmzTakipSistemi
                     Tarih TEXT NOT NULL DEFAULT (strftime('%d-%m-%Y', 'now')),
                     Name TEXT NOT NULL,
                     Contact TEXT,
-                    Sum REAL
+                    Debt REAL
                 )";
 
                 string createTransactionsTable = @"

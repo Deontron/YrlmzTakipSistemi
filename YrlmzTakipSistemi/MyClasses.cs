@@ -16,7 +16,7 @@ namespace YrlmzTakipSistemi
         public string Tarih { get; set; }
         public string Name { get; set; }
         public string Contact { get; set; }
-        public double Sum { get; set; }
+        public double Debt { get; set; }
         
     }
 

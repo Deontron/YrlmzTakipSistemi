@@ -13,6 +13,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <TextBlock Name="TitleTextBlock" 
@@ -38,7 +39,7 @@
                         <DataGridTextColumn.ElementStyle>
                             <Style TargetType="TextBlock">
                                 <Setter Property="HorizontalAlignment" Value="Center"/>
-                                <Setter Property="FontWeight" Value="Bold"/>
+                                <Setter Property="FontWeight" Value="SemiBold"/>
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding Kategori}" Value="1">
                                         <Setter Property="Foreground" Value="#3F51B5"/>
@@ -55,17 +56,23 @@
                     </DataGridTextColumn>
                     <DataGridTextColumn Header="Tutar" Binding="{Binding Tutar}" Width="*" />
                     <DataGridTextColumn Header="ÖdemeTarihi" Binding="{Binding OdemeTarihi}" Width="*" />
-                    <DataGridTextColumn Header="Durum" Binding="{Binding OdendiMiDescription}" Width="*">
+                    <DataGridTextColumn Header="Durum" Binding="{Binding OdemeDescription}" Width="*">
                         <DataGridTextColumn.ElementStyle>
                             <Style TargetType="TextBlock">
                                 <Setter Property="HorizontalAlignment" Value="Center"/>
-                                <Setter Property="FontWeight" Value="Bold"/>
+                                <Setter Property="FontWeight" Value="SemiBold"/>
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding OdendiMi}" Value="True">
-                                        <Setter Property="Foreground" Value="#4CAF50"/>
+                                    <DataTrigger Binding="{Binding OdemeDurumu}" Value="1">
+                                        <Setter Property="Foreground" Value="Red"/>
                                     </DataTrigger>
-                                    <DataTrigger Binding="{Binding OdendiMi}" Value="False">
-                                        <Setter Property="Foreground" Value="#F44336"/>
+                                    <DataTrigger Binding="{Binding OdemeDurumu}" Value="2">
+                                        <Setter Property="Foreground" Value="Green"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding OdemeDurumu}" Value="3">
+                                        <Setter Property="Foreground" Value="Blue"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding OdemeDurumu}" Value="4">
+                                        <Setter Property="Foreground" Value="Purple"/>
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
@@ -78,7 +85,17 @@
 
         </Border>
 
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="2" Margin="0,20,0,0">
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="2" Margin="0,10,0,0">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,10,0,0">
+                <TextBlock Text="Aranacak İsim:" Width="250" FontSize="20" Foreground="#FFFFFF" VerticalAlignment="Center" />
+                <TextBox Name="SearchTextBox" Width="250" Height="35" FontSize="18" Background="#1E1E1E" Foreground="#FFFFFF" BorderBrush="#444444" BorderThickness="1" TextChanged="SearchTextBox_TextChanged"/>
+            </StackPanel>
+
+            <TextBlock Name="SumTextBlock" Text="Toplam Alacak: 10000" Width="250" FontSize="20" TextAlignment="Right"
+Foreground="#FFFFFF" VerticalAlignment="Center" Margin="0,5,0,0"/>
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="3" Margin="0,20,0,0">
             <Button Content="Seçili Ödemeyi Sil" Style="{StaticResource ModernButtonStyle}" Background="#D32F2F" Click="DeletePaymentButton_Click"/>
             <Button Content="Güncelle" Background="#1976D2" Style="{StaticResource ModernButtonStyle}" Click="DeletePaymentButton_Click"/>
         </StackPanel>

@@ -45,7 +45,17 @@
             </DataGrid>
         </Border>
 
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="2" Margin="0,20,0,0">
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="2" Margin="0,10,0,0">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,10,0,0">
+                <TextBlock Text="Aranacak İsim:" Width="250" FontSize="20" Foreground="#FFFFFF" VerticalAlignment="Center" />
+                <TextBox Name="SearchTextBox" Width="250" Height="35" FontSize="18" Background="#1E1E1E" Foreground="#FFFFFF" BorderBrush="#444444" BorderThickness="1" TextChanged="SearchTextBox_TextChanged"/>
+            </StackPanel>
+
+            <TextBlock Name="SumTextBlock" Text="Toplam Alacak: 10000" Width="250" FontSize="20" TextAlignment="Right"
+       Foreground="#FFFFFF" VerticalAlignment="Center" Margin="0,5,0,0"/>
+        </StackPanel>
+        
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="3" Margin="0,20,0,0">
 
             <Button Content="Geri" Background="#3B4D61" Style="{StaticResource ModernButtonStyle}" Click="BackButton_Click"/>
             <Button Content="Seçili İşlemi Sil" Background="#D32F2F" Style="{StaticResource ModernButtonStyle}" Click="DeleteTransactionButton_Click"/>

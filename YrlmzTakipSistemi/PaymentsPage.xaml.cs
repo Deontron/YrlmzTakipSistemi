@@ -58,7 +58,7 @@ namespace YrlmzTakipSistemi
                             Kategori = reader.IsDBNull(6) ? 0 : reader.GetInt32(6),  
                             Tutar = reader.IsDBNull(7) ? 0 : reader.GetDouble(7),
                             OdemeTarihi = reader.IsDBNull(8) ? string.Empty : reader.GetString(8),
-                            OdendiMi = reader.IsDBNull(9) ? false : reader.GetBoolean(9)
+                            OdemeDurumu = reader.IsDBNull(9) ? 0 : reader.GetInt32(9)
                         });
                     }
                 }
@@ -73,15 +73,26 @@ namespace YrlmzTakipSistemi
                         case 2:
                             payment.KategoriDescription = "Senet";
                             break;
-                        case 3:
-                            payment.KategoriDescription = "Nakit";
-                            break;
                         default:
                             payment.KategoriDescription = "Bilinmeyen";
                             break;
                     }
 
-                    payment.OdendiMiDescription = payment.OdendiMi ? "Ödendi" : "Ödenmedi";
+                    switch (payment.OdemeDurumu)
+                    {
+                        case 1:
+                            payment.OdemeDescription = "Ödenmedi";
+                            break;
+                        case 2:
+                            payment.OdemeDescription = "Tahsil";
+                            break;
+                        case 3:
+                            payment.OdemeDescription = "Bankada";
+                            break;
+                        default:
+                            payment.KategoriDescription = "Bilinmeyen";
+                            break;
+                    }
                 }
 
                 PaymentsDataGrid.ItemsSource = payments;
@@ -155,14 +166,14 @@ namespace YrlmzTakipSistemi
         {
             if (PaymentsDataGrid.SelectedItem is Payment selectedPayment)
             {
-                selectedPayment.OdendiMi = !selectedPayment.OdendiMi;
+                //selectedPayment.OdendiMi = !selectedPayment.OdendiMi;
 
                 using (var connection = dbHelper.GetConnection())
                 {
                     connection.Open();
-                    string updateQuery = "UPDATE Payments SET OdendiMi = @YeniDurum WHERE Id = @PaymentId";
+                    string updateQuery = "UPDATE Payments SET OdemeDurumu = @YeniDurum WHERE Id = @PaymentId";
                     SQLiteCommand command = new SQLiteCommand(updateQuery, connection);
-                    command.Parameters.AddWithValue("@YeniDurum", selectedPayment.OdendiMi);
+                    //command.Parameters.AddWithValue("@YeniDurum", selectedPayment.OdendiMi);
                     command.Parameters.AddWithValue("@PaymentId", selectedPayment.Id);
                     command.ExecuteNonQuery();
                 }
@@ -171,6 +182,13 @@ namespace YrlmzTakipSistemi
             }
         }
 
+        private void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            string searchText = SearchTextBox.Text.ToLower();
 
+            var filteredCustomers = payments.Where(c => c.Musteri.ToLower().Contains(searchText)).ToList();
+
+            PaymentsDataGrid.ItemsSource = filteredCustomers;
+        }
     }
 }

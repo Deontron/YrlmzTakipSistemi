@@ -111,12 +111,12 @@ namespace YrlmzTakipSistemi
                     CustomerId INTEGER NOT NULL,
                     Tarih TEXT NOT NULL DEFAULT (strftime('%d-%m-%Y', 'now')), 
                     Musteri TEXT NOT NULL,  
-                    Borclu TEXT NOT NULL,  
-                    KasideYeri TEXT NOT NULL,  
+                    Borclu TEXT,  
+                    KasideYeri TEXT,  
                     Kategori INTEGER NOT NULL, 
                     Tutar REAL NOT NULL, 
                     OdemeTarihi TEXT NOT NULL, 
-                    OdendiMi BOOLEAN, 
+                    OdemeDurumu INTEGER NOT NULL, 
                     FOREIGN KEY (CustomerId) REFERENCES Customers(Id) 
                 )";
 

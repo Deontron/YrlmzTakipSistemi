@@ -194,11 +194,12 @@ namespace YrlmzTakipSistemi
                     {
                         try
                         {
-                            string updateCustomerQuery = "UPDATE Customers SET Name = @Name, Contact = @Contact WHERE Id = @Id";
+                            string updateCustomerQuery = "UPDATE Customers SET Name = @Name, Contact = @Contact, Debt = @Debt WHERE Id = @Id";
                             using (var updateCustomerCommand = new SQLiteCommand(updateCustomerQuery, connection, transaction))
                             {
                                 updateCustomerCommand.Parameters.AddWithValue("@Name", customer.Name);
                                 updateCustomerCommand.Parameters.AddWithValue("@Contact", customer.Contact);
+                                updateCustomerCommand.Parameters.AddWithValue("@Debt", customer.Debt);
                                 updateCustomerCommand.Parameters.AddWithValue("@Id", customer.Id);
 
                                 int rowsAffected = updateCustomerCommand.ExecuteNonQuery();
@@ -212,6 +213,7 @@ namespace YrlmzTakipSistemi
 
                             transaction.Commit();
                             MessageBox.Show("Müşteri başarıyla güncellendi.");
+                            LoadTotalDebt();
                             return true;
                         }
                         catch (Exception ex)
@@ -232,7 +234,7 @@ namespace YrlmzTakipSistemi
 
         private void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            string searchText = SearchTextBox.Text.ToLower(); 
+            string searchText = SearchTextBox.Text.ToLower();
 
             var filteredCustomers = customers.Where(c => c.Name.ToLower().Contains(searchText)).ToList();
 
@@ -247,7 +249,7 @@ namespace YrlmzTakipSistemi
             {
                 connection.Open();
 
-                string query = "SELECT SUM(Debt) FROM Customers"; 
+                string query = "SELECT SUM(Debt) FROM Customers";
 
                 SQLiteCommand command = new SQLiteCommand(query, connection);
 
@@ -259,6 +261,28 @@ namespace YrlmzTakipSistemi
             }
 
             SumTextBlock.Text = $"Toplam Alacak: {totalDebt} TL";
+        }
+
+        private void UpdateButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (CustomersDataGrid.SelectedItem != null)
+            {
+                var selectedCustomer = (Customer)CustomersDataGrid.SelectedItem;
+
+                var result = MessageBox.Show(selectedCustomer.Name + " Güncellemek istediğinize emin misiniz?",
+                                 "Güncelleme Onayı",
+                                 MessageBoxButton.YesNo,
+                                 MessageBoxImage.Question);
+
+                if (result == MessageBoxResult.Yes)
+                {
+                    UpdateCustomerInDatabase(selectedCustomer);
+                }
+            }
+            else
+            {
+                MessageBox.Show("Lütfen güncellemek için bir müşteri seçin.", "Hop!");
+            }
         }
     }
 }

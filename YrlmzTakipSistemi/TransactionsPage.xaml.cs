@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Data.SQLite;
+using System.Collections.ObjectModel;
 
 namespace YrlmzTakipSistemi
 {
@@ -23,6 +24,7 @@ namespace YrlmzTakipSistemi
     {
         private DatabaseHelper dbHelper;
         private Customer currentCustomer;
+        private ObservableCollection<Transaction> transactions = new ObservableCollection<Transaction>();
 
         public TransactionsPage()
         {
@@ -41,8 +43,6 @@ namespace YrlmzTakipSistemi
                 string query = "SELECT * FROM Transactions WHERE CustomerId = @CustomerId";
                 SQLiteCommand command = new SQLiteCommand(query, connection);
                 command.Parameters.AddWithValue("@CustomerId", customer.Id);
-
-                List<Transaction> transactions = new List<Transaction>();
 
                 using (SQLiteDataReader reader = command.ExecuteReader())
                 {
@@ -150,6 +150,15 @@ namespace YrlmzTakipSistemi
             PaymentAddPage pp = new PaymentAddPage();
             pp.GetCustomer(currentCustomer);
             mainWindow.MainFrame.Navigate(pp);
+        }
+
+        private void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            string searchText = SearchTextBox.Text.ToLower();
+
+            var filteredCustomers = transactions.Where(c => c.Aciklama.ToLower().Contains(searchText)).ToList();
+
+            TransactionsDataGrid.ItemsSource = filteredCustomers;
         }
     }
 }

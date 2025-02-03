@@ -59,7 +59,7 @@ namespace YrlmzTakipSistemi
             string place = PlaceTextBox.Text;
             double amount = 0;
             int category = GetSelectedPaymentMethod();
-            bool paidState = GetPaidState();
+            int paidState = GetPaidState();
             string formattedDate = PaymentDatePicker.SelectedDate.HasValue
                 ? PaymentDatePicker.SelectedDate.Value.ToString("dd-MM-yyyy")
                 : string.Empty;
@@ -84,6 +84,18 @@ namespace YrlmzTakipSistemi
                 return;
             }
 
+            if (category == 0)
+            {
+                MessageBox.Show("Kategori boş olamaz.", "Hata", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            if (paidState == 0)
+            {
+                MessageBox.Show("Ödeme durumu boş olamaz.", "Hata", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
             try
             {
                 using (var connection = dbHelper.GetConnection())
@@ -98,17 +110,20 @@ namespace YrlmzTakipSistemi
                     transactionCommand.Parameters.AddWithValue("@CustomerId", currentCustomer.Id);
                     transactionCommand.ExecuteNonQuery();
 
-                    string insertPaymentQuery = "INSERT INTO Payments (CustomerId, Musteri, Borclu, KasideYeri, Kategori, Tutar, OdemeTarihi, OdendiMi) VALUES (@CustomerId, @Musteri, @Borclu, @KasideYeri, @Kategori, @Tutar, @OdemeTarihi, @OdendiMi)";
-                    var paymentCommand = new SQLiteCommand(insertPaymentQuery, connection);
-                    paymentCommand.Parameters.AddWithValue("@Musteri", customerName);
-                    paymentCommand.Parameters.AddWithValue("@Borclu", debtor);
-                    paymentCommand.Parameters.AddWithValue("@KasideYeri", place);
-                    paymentCommand.Parameters.AddWithValue("@Kategori", category);
-                    paymentCommand.Parameters.AddWithValue("@Tutar", amount);
-                    paymentCommand.Parameters.AddWithValue("@OdemeTarihi", formattedDate);
-                    paymentCommand.Parameters.AddWithValue("@OdendiMi", paidState);
-                    paymentCommand.Parameters.AddWithValue("@CustomerId", currentCustomer.Id);
-                    paymentCommand.ExecuteNonQuery();
+                    if (category != 3)
+                    {
+                        string insertPaymentQuery = "INSERT INTO Payments (CustomerId, Musteri, Borclu, KasideYeri, Kategori, Tutar, OdemeTarihi, OdemeDurumu) VALUES (@CustomerId, @Musteri, @Borclu, @KasideYeri, @Kategori, @Tutar, @OdemeTarihi, @OdemeDurumu)";
+                        var paymentCommand = new SQLiteCommand(insertPaymentQuery, connection);
+                        paymentCommand.Parameters.AddWithValue("@Musteri", customerName);
+                        paymentCommand.Parameters.AddWithValue("@Borclu", debtor);
+                        paymentCommand.Parameters.AddWithValue("@KasideYeri", place);
+                        paymentCommand.Parameters.AddWithValue("@Kategori", category);
+                        paymentCommand.Parameters.AddWithValue("@Tutar", amount);
+                        paymentCommand.Parameters.AddWithValue("@OdemeTarihi", formattedDate);
+                        paymentCommand.Parameters.AddWithValue("@OdemeDurumu", paidState);
+                        paymentCommand.Parameters.AddWithValue("@CustomerId", currentCustomer.Id);
+                        paymentCommand.ExecuteNonQuery();
+                    }
                 }
 
                 UpdateCustomerDebt(amount);
@@ -144,15 +159,27 @@ namespace YrlmzTakipSistemi
             }
         }
 
-        private bool GetPaidState()
+        private int GetPaidState()
         {
-            if (PaidBox.IsChecked == true)
+            if (UnpaidButton.IsChecked == true)
             {
-                return true;
+                return 1;
+            }
+            else if (CollectButton.IsChecked == true)
+            {
+                return 2;
+            }
+            else if (BankButton.IsChecked == true)
+            {
+                return 3;
+            }
+            else if (OtherButton.IsChecked == true)
+            {
+                return 4;
             }
             else
             {
-                return false;
+                return 0;
             }
         }
 

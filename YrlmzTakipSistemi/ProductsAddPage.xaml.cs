@@ -32,6 +32,7 @@ namespace YrlmzTakipSistemi
         public void GetCustomer(Customer customer)
         {
             currentCustomer = customer;
+            TitleTextBlock.Text = $"{currentCustomer.Name} - Yeni Ürün Ekle";
         }
 
         private void SaveProductButton_Click(object sender, RoutedEventArgs e)

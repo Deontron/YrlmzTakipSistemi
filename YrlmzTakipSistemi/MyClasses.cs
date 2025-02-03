@@ -55,7 +55,7 @@ namespace YrlmzTakipSistemi
         public string KategoriDescription { get; set; }
         public double Tutar { get; set; }
         public string OdemeTarihi { get; set; }
-        public bool OdendiMi { get; set; }
-        public string OdendiMiDescription { get; set; }
+        public int OdemeDurumu { get; set; }
+        public string OdemeDescription { get; set; }
     }
 }

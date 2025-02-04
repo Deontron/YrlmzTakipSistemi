@@ -20,8 +20,8 @@
 
         <StackPanel HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,80,0,0">
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,10,0,0" Grid.Column="0">
-                <TextBlock Text="Müşteri:" Width="100" FontSize="20" Foreground="White" VerticalAlignment="Center" />
-                <TextBox Name="CostumerTextBox" Width="250" Height="35" FontSize="14"
+                <TextBlock Text="Açıklama:" Width="100" FontSize="20" Foreground="White" VerticalAlignment="Center" />
+                <TextBox Name="DescriptionTextBox" Width="250" Height="35" FontSize="14"
                      Background="#1E1E1E" Foreground="White" BorderBrush="#444444" BorderThickness="1"/>
             </StackPanel>
 
@@ -42,7 +42,7 @@
                 <RadioButton Name="BillButton" Content="Senet" FontSize="20" Foreground="White" VerticalContentAlignment="Center" Margin="10,0,10,0"/>
                 <RadioButton Name="CashButton" Content="Nakit" FontSize="20" Foreground="White" VerticalContentAlignment="Center" Margin="10,0,10,0"/>
             </StackPanel>
-            
+
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,10,0,0">
                 <TextBlock Text="Tutar:" Width="100" FontSize="20" Foreground="White" VerticalAlignment="Center" />
                 <TextBox Name="AmountTextBox" Width="250" Height="35" FontSize="18"
@@ -66,10 +66,12 @@
                 <RadioButton Name="UnpaidButton" Content="Ödenmedi" FontSize="20" Foreground="White" VerticalContentAlignment="Center" Margin="10,0,10,0"/>
                 <RadioButton Name="CollectButton" Content="Tahsil" FontSize="20" Foreground="White" VerticalContentAlignment="Center" Margin="10,0,10,0"/>
                 <RadioButton Name="BankButton" Content="Bankada" FontSize="20" Foreground="White" VerticalContentAlignment="Center" Margin="10,0,10,0"/>
-                <RadioButton Name="OtherButton" Content="Diğer" FontSize="20" Foreground="White" VerticalContentAlignment="Center" Margin="10,0,10,0"/>
+                <RadioButton Name="OtherButton" Content="Diğer:" FontSize="20" Foreground="White" VerticalContentAlignment="Center" Margin="10,0,10,0"/>
+
             </StackPanel>
 
-            <CheckBox x:Name="PaidBox" Content="Ödendi Mi?" FontSize="20" Foreground="White" VerticalContentAlignment="Center" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="10,10,10,0"/>
+            <TextBox Name="OtherTextBox" Width="250" Height="35" FontSize="18" Margin="0,10,0,0"
+                Background="#1E1E1E" Foreground="White" BorderBrush="#444444" BorderThickness="1"/>
 
         </StackPanel>
 

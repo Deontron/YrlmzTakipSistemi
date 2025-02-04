@@ -30,7 +30,6 @@
           MouseDoubleClick="CustomersDataGrid_MouseDoubleClick">
                     
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Tarih" Binding="{Binding Tarih}" Width="*" />
                     <DataGridTextColumn Header="İsim" Binding="{Binding Name}" Width="*" />
                     <DataGridTextColumn Header="İletişim" Binding="{Binding Contact}" Width="*" />
                     <DataGridTextColumn Header="Alacak" Binding="{Binding Debt}" Width="*" />

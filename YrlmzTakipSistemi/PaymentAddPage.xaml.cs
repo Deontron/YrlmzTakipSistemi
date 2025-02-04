@@ -36,7 +36,6 @@ namespace YrlmzTakipSistemi
         {
             currentCustomer = customer;
             TitleTextBlock.Text = $"{currentCustomer.Name} - Yeni Ödeme Ekle";
-            CostumerTextBox.Text = currentCustomer.Name;
         }
 
         private void BackButton_Click(object sender, RoutedEventArgs e)
@@ -54,12 +53,13 @@ namespace YrlmzTakipSistemi
 
         private void SavePaymentButton_Click(object sender, RoutedEventArgs e)
         {
-            string customerName = CostumerTextBox.Text;
+            string description = DescriptionTextBox.Text;
             string debtor = DebtorTextBox.Text;
             string place = PlaceTextBox.Text;
             double amount = 0;
             int category = GetSelectedPaymentMethod();
             int paidState = GetPaidState();
+            string paidDescription = GetPaidDescription();
             string formattedDate = PaymentDatePicker.SelectedDate.HasValue
                 ? PaymentDatePicker.SelectedDate.Value.ToString("dd-MM-yyyy")
                 : string.Empty;
@@ -75,12 +75,6 @@ namespace YrlmzTakipSistemi
             else
             {
                 MessageBox.Show("Miktar boş olamaz.", "Hata", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-
-            if (string.IsNullOrEmpty(customerName))
-            {
-                MessageBox.Show("Müşteri ismi boş olamaz.", "Hata", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
@@ -104,7 +98,7 @@ namespace YrlmzTakipSistemi
 
                     string insertTransactionQuery = "INSERT INTO Transactions (CustomerId, Aciklama, Notlar, Odenen) VALUES (@CustomerId, @Description, @Note, @Paid)";
                     var transactionCommand = new SQLiteCommand(insertTransactionQuery, connection);
-                    transactionCommand.Parameters.AddWithValue("@Description", customerName);
+                    transactionCommand.Parameters.AddWithValue("@Description", description);
                     transactionCommand.Parameters.AddWithValue("@Note", formattedDate);
                     transactionCommand.Parameters.AddWithValue("@Paid", amount);
                     transactionCommand.Parameters.AddWithValue("@CustomerId", currentCustomer.Id);
@@ -112,15 +106,16 @@ namespace YrlmzTakipSistemi
 
                     if (category != 3)
                     {
-                        string insertPaymentQuery = "INSERT INTO Payments (CustomerId, Musteri, Borclu, KasideYeri, Kategori, Tutar, OdemeTarihi, OdemeDurumu) VALUES (@CustomerId, @Musteri, @Borclu, @KasideYeri, @Kategori, @Tutar, @OdemeTarihi, @OdemeDurumu)";
+                        string insertPaymentQuery = "INSERT INTO Payments (CustomerId, Musteri, Borclu, KasideYeri, Kategori, Tutar, OdemeTarihi, OdemeDurumu, OdemeDescription) VALUES (@CustomerId, @Musteri, @Borclu, @KasideYeri, @Kategori, @Tutar, @OdemeTarihi, @OdemeDurumu, @OdemeDescription)";
                         var paymentCommand = new SQLiteCommand(insertPaymentQuery, connection);
-                        paymentCommand.Parameters.AddWithValue("@Musteri", customerName);
+                        paymentCommand.Parameters.AddWithValue("@Musteri", currentCustomer.Name);
                         paymentCommand.Parameters.AddWithValue("@Borclu", debtor);
                         paymentCommand.Parameters.AddWithValue("@KasideYeri", place);
                         paymentCommand.Parameters.AddWithValue("@Kategori", category);
                         paymentCommand.Parameters.AddWithValue("@Tutar", amount);
                         paymentCommand.Parameters.AddWithValue("@OdemeTarihi", formattedDate);
                         paymentCommand.Parameters.AddWithValue("@OdemeDurumu", paidState);
+                        paymentCommand.Parameters.AddWithValue("@OdemeDescription", paidDescription);
                         paymentCommand.Parameters.AddWithValue("@CustomerId", currentCustomer.Id);
                         paymentCommand.ExecuteNonQuery();
                     }
@@ -128,7 +123,7 @@ namespace YrlmzTakipSistemi
 
                 UpdateCustomerDebt(amount);
 
-                MessageBox.Show($"{customerName} ödemesi başarıyla eklendi!", "Hop!");
+                MessageBox.Show($"{currentCustomer.Name} ödemesi başarıyla eklendi!", "Hop!");
 
                 ClearForm();
                 Back();
@@ -159,6 +154,30 @@ namespace YrlmzTakipSistemi
             }
         }
 
+        private string GetPaidDescription()
+        {
+            if (UnpaidButton.IsChecked == true)
+            {
+                return "Ödenmedi";
+            }
+            else if (CollectButton.IsChecked == true)
+            {
+                return "Tahsil";
+            }
+            else if (BankButton.IsChecked == true)
+            {
+                return "Bankada";
+            }
+            else if (OtherButton.IsChecked == true)
+            {
+                return OtherTextBox.Text;
+            }
+            else
+            {
+                return "Bilinmiyor";
+            }
+        }
+
         private int GetPaidState()
         {
             if (UnpaidButton.IsChecked == true)
@@ -185,9 +204,10 @@ namespace YrlmzTakipSistemi
 
         private void ClearForm()
         {
-            CostumerTextBox.Clear();
-            CostumerTextBox.Clear();
+            DescriptionTextBox.Clear();
+            DebtorTextBox.Clear();
             AmountTextBox.Clear();
+            PlaceTextBox.Clear();
         }
 
         private void UpdateCustomerDebt(double amount)

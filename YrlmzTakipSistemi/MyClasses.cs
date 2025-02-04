@@ -58,4 +58,17 @@ namespace YrlmzTakipSistemi
         public int OdemeDurumu { get; set; }
         public string OdemeDescription { get; set; }
     }
+
+    public class Invoice
+    {
+        public int Id { get; set; }
+        public int CustomerId { get; set; }
+        public string Tarih { get; set; }
+        public string Musteri { get; set; }
+        public string FaturaNo { get; set; }
+        public string FaturaTarihi { get; set; }
+        public double Tutar { get; set; }
+        public double KDV { get; set; }
+        public double Toplam { get; set; }
+    }
 }

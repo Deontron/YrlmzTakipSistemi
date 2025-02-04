@@ -65,6 +65,7 @@ namespace YrlmzTakipSistemi
                 }
 
                 TransactionsDataGrid.ItemsSource = transactions;
+                UpdateTotalAmount();
             }
         }
 
@@ -160,5 +161,45 @@ namespace YrlmzTakipSistemi
 
             TransactionsDataGrid.ItemsSource = filteredCustomers;
         }
+
+        private double GetCustomerTotalDebt(int customerId)
+        {
+            double totalDebt = 0;
+
+            using (var connection = dbHelper.GetConnection())
+            {
+                connection.Open();
+                string query = "SELECT SUM(AlacakDurumu) FROM Transactions WHERE CustomerId = @CustomerId";
+                SQLiteCommand command = new SQLiteCommand(query, connection);
+                command.Parameters.AddWithValue("@CustomerId", customerId);
+
+                var result = command.ExecuteScalar();
+                if (result != DBNull.Value && result != null)
+                {
+                    totalDebt = Convert.ToDouble(result);
+                }
+            }
+
+            return totalDebt;
+        }
+        private void UpdateTotalAmount()
+        {
+            double totalAmount = GetCustomerTotalDebt(currentCustomer.Id);
+            SumTextBlock.Text = $"Toplam Alacak: {totalAmount.ToString("N2")} TL";
+        }
+
+        private void TransactionsDataGrid_LoadingRow(object sender, DataGridRowEventArgs e)
+        {
+            Transaction transaction = e.Row.Item as Transaction;
+
+            if (transaction != null)
+            {
+                if (transaction.Odenen > 0)
+                {
+                    e.Row.Background = new SolidColorBrush(Colors.DarkGreen); 
+                }
+            }
+        }
+
     }
 }

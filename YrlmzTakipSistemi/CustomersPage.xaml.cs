@@ -260,7 +260,7 @@ namespace YrlmzTakipSistemi
                 }
             }
 
-            SumTextBlock.Text = $"Toplam Alacak: {totalDebt} TL";
+            SumTextBlock.Text = $"Toplam Alacak: {totalDebt.ToString("N2")} TL";
         }
 
         private void UpdateButton_Click(object sender, RoutedEventArgs e)

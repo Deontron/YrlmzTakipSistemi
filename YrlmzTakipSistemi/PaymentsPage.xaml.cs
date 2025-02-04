@@ -14,6 +14,8 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Data.SQLite;
 using System.Collections.ObjectModel;
+using Google.Apis.Drive.v3.Data;
+using System.Numerics;
 
 namespace YrlmzTakipSistemi
 {
@@ -55,10 +57,11 @@ namespace YrlmzTakipSistemi
                             Musteri = reader.IsDBNull(3) ? string.Empty : reader.GetString(3),
                             Borclu = reader.IsDBNull(4) ? string.Empty : reader.GetString(4),
                             KasideYeri = reader.IsDBNull(5) ? string.Empty : reader.GetString(5),
-                            Kategori = reader.IsDBNull(6) ? 0 : reader.GetInt32(6),  
+                            Kategori = reader.IsDBNull(6) ? 0 : reader.GetInt32(6),
                             Tutar = reader.IsDBNull(7) ? 0 : reader.GetDouble(7),
                             OdemeTarihi = reader.IsDBNull(8) ? string.Empty : reader.GetString(8),
-                            OdemeDurumu = reader.IsDBNull(9) ? 0 : reader.GetInt32(9)
+                            OdemeDurumu = reader.IsDBNull(9) ? 0 : reader.GetInt32(9),
+                            OdemeDescription = reader.IsDBNull(10) ? string.Empty : reader.GetString(10)
                         });
                     }
                 }
@@ -77,25 +80,10 @@ namespace YrlmzTakipSistemi
                             payment.KategoriDescription = "Bilinmeyen";
                             break;
                     }
-
-                    switch (payment.OdemeDurumu)
-                    {
-                        case 1:
-                            payment.OdemeDescription = "Ödenmedi";
-                            break;
-                        case 2:
-                            payment.OdemeDescription = "Tahsil";
-                            break;
-                        case 3:
-                            payment.OdemeDescription = "Bankada";
-                            break;
-                        default:
-                            payment.KategoriDescription = "Bilinmeyen";
-                            break;
-                    }
                 }
 
                 PaymentsDataGrid.ItemsSource = payments;
+                UpdateTotalAmount();
             }
         }
 
@@ -190,5 +178,129 @@ namespace YrlmzTakipSistemi
 
             PaymentsDataGrid.ItemsSource = filteredCustomers;
         }
+
+        private void UpdateTotalAmount()
+        {
+            double totalAmount = 0;
+
+            using (var connection = dbHelper.GetConnection())
+            {
+                connection.Open();
+
+                string query = "SELECT Tutar FROM Payments WHERE OdemeDurumu = 1 OR OdemeDurumu = 3";
+                using (SQLiteCommand command = new SQLiteCommand(query, connection))
+                using (SQLiteDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        if (!reader.IsDBNull(0)) 
+                        {
+                            totalAmount += reader.GetDouble(0);
+                        }
+                    }
+                }
+            }
+
+            SumTextBlock.Text = $"Toplam Alacak: {totalAmount.ToString("N2")} TL";
+
+        }
+
+        private void UpdateButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (PaymentsDataGrid.SelectedItem != null)
+            {
+                var selectedPayment = (Payment)PaymentsDataGrid.SelectedItem;
+
+                var result = MessageBox.Show(selectedPayment.Musteri + " Güncellemek istediğinize emin misiniz?",
+                                 "Güncelleme Onayı",
+                                 MessageBoxButton.YesNo,
+                                 MessageBoxImage.Question);
+
+                if (result == MessageBoxResult.Yes)
+                {
+                    UpdatePaymentInDatabase(selectedPayment);
+                }
+            }
+            else
+            {
+                MessageBox.Show("Lütfen güncellemek için bir müşteri seçin.", "Hop!");
+            }
+        }
+
+        private bool UpdatePaymentInDatabase(Payment payment)
+        {
+            using (var connection = dbHelper.GetConnection())
+            {
+                try
+                {
+                    connection.Open();
+                    if (connection.State != System.Data.ConnectionState.Open)
+                    {
+                        MessageBox.Show("Veritabanı bağlantısı başarısız!");
+                        return false;
+                    }
+
+                    using (var transaction = connection.BeginTransaction())
+                    {
+                        try
+                        {
+                            string updatePaymentQuery = @"
+                        UPDATE Payments 
+                        SET Musteri = @Musteri, 
+                            Borclu = @Borclu, 
+                            KasideYeri = @KasideYeri, 
+                            Kategori = @Kategori, 
+                            Tutar = @Tutar, 
+                            OdemeTarihi = @OdemeTarihi, 
+                            OdemeDurumu = @OdemeDurumu, 
+                            OdemeDescription = @OdemeDescription 
+                        WHERE Id = @Id";
+
+                            using (var updatePaymentCommand = new SQLiteCommand(updatePaymentQuery, connection, transaction))
+                            {
+                                updatePaymentCommand.Parameters.AddWithValue("@Musteri", payment.Musteri);
+                                updatePaymentCommand.Parameters.AddWithValue("@Borclu", payment.Borclu);
+                                updatePaymentCommand.Parameters.AddWithValue("@KasideYeri", payment.KasideYeri);
+                                updatePaymentCommand.Parameters.AddWithValue("@Kategori", payment.Kategori);
+                                updatePaymentCommand.Parameters.AddWithValue("@Tutar", payment.Tutar);
+                                updatePaymentCommand.Parameters.AddWithValue("@OdemeTarihi", payment.OdemeTarihi);
+                                updatePaymentCommand.Parameters.AddWithValue("@OdemeDurumu", payment.OdemeDurumu);
+                                updatePaymentCommand.Parameters.AddWithValue("@OdemeDescription", payment.OdemeDescription);
+                                updatePaymentCommand.Parameters.AddWithValue("@Id", payment.Id);
+
+                                int rowsAffected = updatePaymentCommand.ExecuteNonQuery();
+                                if (rowsAffected == 0)
+                                {
+                                    MessageBox.Show("Güncellenen ödeme bulunamadı. Id: " + payment.Id);
+                                    transaction.Rollback();
+                                    return false;
+                                }
+                            }
+
+                            transaction.Commit(); 
+
+                            MessageBox.Show("Ödeme başarıyla güncellendi.");
+
+                            LoadPayments();
+                            UpdateTotalAmount();
+
+                            return true;
+                        }
+                        catch (Exception ex)
+                        {
+                            transaction.Rollback(); 
+                            MessageBox.Show("Güncelleme hatası: " + ex.Message);
+                            return false;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Bağlantı hatası: " + ex.Message);
+                    return false;
+                }
+            }
+        }
+
     }
 }

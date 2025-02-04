@@ -117,7 +117,22 @@ namespace YrlmzTakipSistemi
                     Tutar REAL NOT NULL, 
                     OdemeTarihi TEXT NOT NULL, 
                     OdemeDurumu INTEGER NOT NULL, 
+                    OdemeDescription TEXT NOT NULL, 
                     FOREIGN KEY (CustomerId) REFERENCES Customers(Id) 
+                )";
+
+                string createInvoicesTable = @"
+                CREATE TABLE IF NOT EXISTS Invoices (
+                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    CustomerId INTEGER NOT NULL,
+                    Tarih TEXT NOT NULL DEFAULT (strftime('%d-%m-%Y', 'now')),
+                    Musteri TEXT NOT NULL,
+                    FaturaNo TEXT NOT NULL,
+                    FaturaTarihi TEXT,
+                    Tutar REAL,
+                    KDV REAL,
+                    Toplam REAL,
+                    FOREIGN KEY (CustomerId) REFERENCES Customers(Id)
                 )";
 
                 var command = new SQLiteCommand(createCustomersTable, connection);
@@ -130,6 +145,9 @@ namespace YrlmzTakipSistemi
                 command.ExecuteNonQuery();
 
                 command = new SQLiteCommand(createPaymentsTable, connection);
+                command.ExecuteNonQuery();
+                
+                command = new SQLiteCommand(createInvoicesTable, connection);
                 command.ExecuteNonQuery();
             }
         }

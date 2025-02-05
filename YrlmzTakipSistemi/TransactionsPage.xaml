@@ -60,6 +60,7 @@
             <Button Content="Seçili İşlemi Sil" Background="#D32F2F" Style="{StaticResource ModernButtonStyle}" Click="DeleteTransactionButton_Click"/>
             <Button Content="Yeni İşlem Ekle" Background="#388E3C" Style="{StaticResource ModernButtonStyle}" Click="AddTransactionButton_Click"/>
             <Button Content="Ödeme Ekle" Background="#8A2BE2" Style="{StaticResource ModernButtonStyle}" Click="AddPaymentButton_Click"/>
+            <Button Content="Fatura Ekle" Background="#D2691E" Style="{StaticResource ModernButtonStyle}" Click="AddInvoiceButton_Click"/>
             <Button Content="Güncelle" Background="#1976D2" Style="{StaticResource ModernButtonStyle}" Click="AddTransactionButton_Click"/>
         </StackPanel>
     </Grid>

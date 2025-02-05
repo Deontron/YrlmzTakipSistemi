@@ -83,7 +83,7 @@
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,20,0,0">
             <Button Content="Geri" Background="#3B4D61" Style="{StaticResource ModernButtonStyle}" Click="BackButton_Click"/>
             <Button Content="İşlem Ekle" Background="#388E3C" Style="{StaticResource ModernButtonStyle}" Click="SaveTransactionButton_Click"/>
-            <Button Content="Ürünleri Düzenle" Background="#8A2BE2" Style="{StaticResource ModernButtonStyle}" Click="ManageProductsButton_Click"/>
+            <Button Content="Ürünleri Düzenle" Background="#1976D2" Style="{StaticResource ModernButtonStyle}" Click="ManageProductsButton_Click"/>
         </StackPanel>
 
     </Grid>

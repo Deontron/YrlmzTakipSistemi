@@ -63,6 +63,8 @@ namespace YrlmzTakipSistemi
                         });
                     }
                 }
+                connection.Close();
+
             }
 
             return customers;
@@ -147,6 +149,8 @@ namespace YrlmzTakipSistemi
                             int rowsAffected = deleteCustomerCommand.ExecuteNonQuery();
 
                             transaction.Commit();
+                            connection.Close();
+
                             return rowsAffected > 0;
                         }
                     }
@@ -214,6 +218,8 @@ namespace YrlmzTakipSistemi
                             transaction.Commit();
                             MessageBox.Show("Müşteri başarıyla güncellendi.");
                             LoadTotalDebt();
+                            connection.Close();
+
                             return true;
                         }
                         catch (Exception ex)
@@ -258,6 +264,8 @@ namespace YrlmzTakipSistemi
                 {
                     totalDebt = Convert.ToDouble(result);
                 }
+                connection.Close();
+
             }
 
             SumTextBlock.Text = $"Toplam Alacak: {totalDebt.ToString("N2")} TL";

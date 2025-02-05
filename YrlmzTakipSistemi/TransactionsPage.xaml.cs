@@ -196,10 +196,17 @@ namespace YrlmzTakipSistemi
             {
                 if (transaction.Odenen > 0)
                 {
-                    e.Row.Background = new SolidColorBrush(Colors.DarkGreen); 
+                    e.Row.Background = new SolidColorBrush(Colors.MediumPurple); 
                 }
             }
         }
 
+        private void AddInvoiceButton_Click(object sender, RoutedEventArgs e)
+        {
+            var mainWindow = (MainWindow)Application.Current.MainWindow;
+            InvoiceAddPage invoiceAddPage = new InvoiceAddPage();
+            invoiceAddPage.GetCustomer(currentCustomer);
+            mainWindow.MainFrame.Navigate(invoiceAddPage);
+        }
     }
 }

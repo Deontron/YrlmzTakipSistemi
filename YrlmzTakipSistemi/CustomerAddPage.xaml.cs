@@ -81,7 +81,11 @@ namespace YrlmzTakipSistemi
         private void ClearForm()
         {
             NameTextBox.Clear();
+            LongNameTextBox.Clear();
             ContactTextBox.Clear();
+            AddressTextBox.Clear();
+            TaxNoTextBox.Clear();
+            TaxOfficeTextBox.Clear();
             SumTextBox.Clear();
         }
 

@@ -154,19 +154,51 @@ namespace YrlmzTakipSistemi
         {
             if (PaymentsDataGrid.SelectedItem is Payment selectedPayment)
             {
-                //selectedPayment.OdendiMi = !selectedPayment.OdendiMi;
+                selectedPayment.OdemeDurumu++;
+
+                if (selectedPayment.OdemeDurumu > 4)
+                {
+                    selectedPayment.OdemeDurumu = 1;
+                }
+
+                selectedPayment.OdemeDescription = GetPaidDescription(selectedPayment.OdemeDurumu);
 
                 using (var connection = dbHelper.GetConnection())
                 {
                     connection.Open();
-                    string updateQuery = "UPDATE Payments SET OdemeDurumu = @YeniDurum WHERE Id = @PaymentId";
+                    string updateQuery = "UPDATE Payments SET OdemeDurumu = @YeniDurum, OdemeDescription = @OdemeDescription WHERE Id = @PaymentId";
                     SQLiteCommand command = new SQLiteCommand(updateQuery, connection);
-                    //command.Parameters.AddWithValue("@YeniDurum", selectedPayment.OdendiMi);
+                    command.Parameters.AddWithValue("@YeniDurum", selectedPayment.OdemeDurumu);
+                    command.Parameters.AddWithValue("@OdemeDescription", selectedPayment.OdemeDescription);
                     command.Parameters.AddWithValue("@PaymentId", selectedPayment.Id);
                     command.ExecuteNonQuery();
                 }
 
                 LoadPayments();
+            }
+        }
+
+        private string GetPaidDescription(int state)
+        {
+            if (state == 1)
+            {
+                return "Ödenmedi";
+            }
+            else if (state == 2)
+            {
+                return "Bankada";
+            }
+            else if (state == 3)
+            {
+                return "Tahsil";
+            }
+            else if (state == 4)
+            {
+                return "Diğer";
+            }
+            else
+            {
+                return "Bilinmiyor";
             }
         }
 
@@ -187,13 +219,13 @@ namespace YrlmzTakipSistemi
             {
                 connection.Open();
 
-                string query = "SELECT Tutar FROM Payments WHERE OdemeDurumu = 1 OR OdemeDurumu = 3";
+                string query = "SELECT Tutar FROM Payments WHERE OdemeDurumu = 1 OR OdemeDurumu = 2";
                 using (SQLiteCommand command = new SQLiteCommand(query, connection))
                 using (SQLiteDataReader reader = command.ExecuteReader())
                 {
                     while (reader.Read())
                     {
-                        if (!reader.IsDBNull(0)) 
+                        if (!reader.IsDBNull(0))
                         {
                             totalAmount += reader.GetDouble(0);
                         }
@@ -277,7 +309,7 @@ namespace YrlmzTakipSistemi
                                 }
                             }
 
-                            transaction.Commit(); 
+                            transaction.Commit();
 
                             MessageBox.Show("Ödeme başarıyla güncellendi.");
 
@@ -288,7 +320,7 @@ namespace YrlmzTakipSistemi
                         }
                         catch (Exception ex)
                         {
-                            transaction.Rollback(); 
+                            transaction.Rollback();
                             MessageBox.Show("Güncelleme hatası: " + ex.Message);
                             return false;
                         }

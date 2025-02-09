@@ -95,7 +95,7 @@ namespace YrlmzTakipSistemi
                 }
                 else
                 {
-                    MessageBox.Show("Ücret değeri geçersiz");
+                    MessageBox.Show("Tutar değeri geçersiz");
                     return;
                 }
             }

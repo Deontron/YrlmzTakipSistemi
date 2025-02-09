@@ -13,9 +13,12 @@ namespace YrlmzTakipSistemi
     public class Customer
     {
         public int Id { get; set; }
-        public string Tarih { get; set; }
         public string Name { get; set; }
+        public string LongName { get; set; }
         public string Contact { get; set; }
+        public string Address { get; set; }
+        public string TaxNo { get; set; }
+        public string TaxOffice { get; set; }
         public double Debt { get; set; }
         
     }
@@ -24,6 +27,7 @@ namespace YrlmzTakipSistemi
     {
         public int Id { get; set; }
         public int CustomerId { get; set; }
+        public int DocId { get; set; }
         public string Tarih { get; set; }
         public String Aciklama { get; set; }
         public String Notlar { get; set; }

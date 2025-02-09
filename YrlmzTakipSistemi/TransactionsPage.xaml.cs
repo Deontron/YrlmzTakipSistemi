@@ -52,14 +52,15 @@ namespace YrlmzTakipSistemi
                         {
                             Id = reader.GetInt32(0),
                             CustomerId = reader.GetInt32(1),
-                            Tarih = reader.IsDBNull(2) ? string.Empty : reader.GetString(2),  
-                            Aciklama = reader.IsDBNull(3) ? string.Empty : reader.GetString(3),  
-                            Notlar = reader.IsDBNull(4) ? string.Empty : reader.GetString(4),
-                            Adet = reader.IsDBNull(5) ? 0 : reader.GetInt32(5),
-                            BirimFiyat = reader.IsDBNull(6) ? 0.0 : reader.GetDouble(6),
-                            Tutar = reader.IsDBNull(7) ? 0.0 : reader.GetDouble(7),
-                            Odenen = reader.IsDBNull(8) ? 0.0 : reader.GetDouble(8),
-                            AlacakDurumu = reader.IsDBNull(9) ? 0.0 : reader.GetDouble(9)
+                            DocId = reader.IsDBNull(2) ? 0 : reader.GetInt32(2),
+                            Tarih = reader.IsDBNull(3) ? string.Empty : reader.GetString(3),  
+                            Aciklama = reader.IsDBNull(4) ? string.Empty : reader.GetString(4),  
+                            Notlar = reader.IsDBNull(5) ? string.Empty : reader.GetString(5),
+                            Adet = reader.IsDBNull(6) ? 0 : reader.GetInt32(6),
+                            BirimFiyat = reader.IsDBNull(7) ? 0.0 : reader.GetDouble(7),
+                            Tutar = reader.IsDBNull(8) ? 0.0 : reader.GetDouble(8),
+                            Odenen = reader.IsDBNull(9) ? 0.0 : reader.GetDouble(9),
+                            AlacakDurumu = reader.IsDBNull(10) ? 0.0 : reader.GetDouble(10)
                         });
                     }
                 }
@@ -207,6 +208,14 @@ namespace YrlmzTakipSistemi
             InvoiceAddPage invoiceAddPage = new InvoiceAddPage();
             invoiceAddPage.GetCustomer(currentCustomer);
             mainWindow.MainFrame.Navigate(invoiceAddPage);
+        }
+
+        private void CustomerInfoButton_Click(object sender, RoutedEventArgs e)
+        {
+            var mainWindow = (MainWindow)Application.Current.MainWindow;
+            InfoPage infoPage = new InfoPage();
+            infoPage.LoadCustomerInfo(currentCustomer);
+            mainWindow.MainFrame.Navigate(infoPage);
         }
     }
 }

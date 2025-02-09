@@ -35,65 +35,14 @@ namespace YrlmzTakipSistemi
                 string createCustomersTable = @"
                 CREATE TABLE IF NOT EXISTS Customers (
                     Id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    Tarih TEXT NOT NULL DEFAULT (strftime('%d-%m-%Y', 'now')),
                     Name TEXT NOT NULL,
+                    LongName TEXT,
                     Contact TEXT,
+                    Address TEXT,
+                    TaxNo TEXT,
+                    TaxOffice TEXT,
                     Debt REAL
                 )";
-
-                string createTransactionsTable = @"
-                CREATE TABLE Transactions (
-                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    CustomerId INTEGER NOT NULL,
-                    Tarih TEXT NOT NULL DEFAULT (strftime('%d-%m-%Y', 'now')),
-                    Aciklama TEXT NOT NULL,
-                    Notlar TEXT, 
-                    Adet INTEGER,
-                    BirimFiyat REAL,
-                    Tutar REAL,
-                    Odenen REAL,
-                    AlacakDurumu REAL,
-                    FOREIGN KEY (CustomerId) REFERENCES Customers(Id)
-                );
-                
-                CREATE TRIGGER CalculateAmounts
-                AFTER INSERT ON Transactions
-                FOR EACH ROW
-                BEGIN
-                    UPDATE Transactions
-                    SET 
-                        Tutar = COALESCE(NEW.Tutar, NEW.BirimFiyat * NEW.Adet)
-                    WHERE Id = NEW.Id;
-                
-                    UPDATE Transactions
-                    SET 
-                        AlacakDurumu = (
-                    SELECT IFNULL(Tutar, 0) - IFNULL(NEW.Odenen, 0) 
-                    FROM Transactions 
-                    WHERE Id = NEW.Id
-        )
-                    WHERE Id = NEW.Id;
-                END;
-                
-                CREATE TRIGGER UpdateAmounts
-                AFTER UPDATE OF BirimFiyat, Adet, Tutar, Odenen ON Transactions
-                FOR EACH ROW
-                BEGIN
-                    UPDATE Transactions
-                    SET 
-                        Tutar = COALESCE(NEW.Tutar, NEW.BirimFiyat * NEW.Adet)
-                    WHERE Id = NEW.Id;
-                
-                    UPDATE Transactions
-                    SET 
-                        AlacakDurumu = (
-                    SELECT IFNULL(Tutar, 0) - IFNULL(NEW.Odenen, 0) 
-                    FROM Transactions 
-                    WHERE Id = NEW.Id
-        )
-                    WHERE Id = NEW.Id;
-                END;
-                ";
 
                 string createProductsTable = @"
                 CREATE TABLE IF NOT EXISTS Products (
@@ -102,7 +51,25 @@ namespace YrlmzTakipSistemi
                     Tarih TEXT NOT NULL DEFAULT (strftime('%d-%m-%Y', 'now')),
                     Isim TEXT NOT NULL,
                     Fiyat REAL,
-                    FOREIGN KEY (CustomerId) REFERENCES Customers(Id)
+                    FOREIGN KEY (CustomerId) REFERENCES Customers(Id) ON DELETE CASCADE
+                )";
+
+                //DocType TEXT CHECK(DocType IN('Invoice', 'Payment') OR DocType IS NULL), 
+
+                string createTransactionsTable = @"
+                CREATE TABLE Transactions (
+                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    CustomerId INTEGER NOT NULL,
+                    DocId INTEGER,  
+                    Tarih TEXT NOT NULL DEFAULT (strftime('%d-%m-%Y', 'now')),
+                    Aciklama TEXT NOT NULL,
+                    Notlar TEXT, 
+                    Adet INTEGER,
+                    BirimFiyat REAL,
+                    Tutar REAL DEFAULT 0,
+                    Odenen REAL DEFAULT 0,
+                    AlacakDurumu REAL GENERATED ALWAYS AS (Tutar - Odenen) STORED,
+                    FOREIGN KEY (CustomerId) REFERENCES Customers(Id) ON DELETE CASCADE
                 )";
 
                 string createPaymentsTable = @"
@@ -118,7 +85,7 @@ namespace YrlmzTakipSistemi
                     OdemeTarihi TEXT NOT NULL, 
                     OdemeDurumu INTEGER NOT NULL, 
                     OdemeDescription TEXT NOT NULL, 
-                    FOREIGN KEY (CustomerId) REFERENCES Customers(Id) 
+                    FOREIGN KEY (CustomerId) REFERENCES Customers(Id)
                 )";
 
                 string createInvoicesTable = @"
@@ -132,7 +99,7 @@ namespace YrlmzTakipSistemi
                     Tutar REAL,
                     KDV REAL,
                     Toplam REAL,
-                    FOREIGN KEY (CustomerId) REFERENCES Customers(Id)
+                    FOREIGN KEY (CustomerId) REFERENCES Customers(Id)  
                 )";
 
                 var command = new SQLiteCommand(createCustomersTable, connection);

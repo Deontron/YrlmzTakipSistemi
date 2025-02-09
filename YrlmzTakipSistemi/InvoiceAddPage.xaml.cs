@@ -86,16 +86,24 @@ namespace YrlmzTakipSistemi
                 {
                     connection.Open();
 
-                        string insertInvoiceQuery = "INSERT INTO Invoices (CustomerId, Musteri, FaturaNo, FaturaTarihi, Tutar, KDV, Toplam) VALUES (@CostumerId, @Musteri, @FaturaNo, @FaturaTarihi, @Tutar, @KDV, @Toplam)";
-                        var invoiceCommand = new SQLiteCommand(insertInvoiceQuery, connection);
-                        invoiceCommand.Parameters.AddWithValue("@Musteri", customer);
-                        invoiceCommand.Parameters.AddWithValue("@CostumerId", 0);
-                        invoiceCommand.Parameters.AddWithValue("@FaturaNo", invoiceNo);
-                        invoiceCommand.Parameters.AddWithValue("@FaturaTarihi", invoiceDate);
-                        invoiceCommand.Parameters.AddWithValue("@Tutar", amount);
-                        invoiceCommand.Parameters.AddWithValue("@KDV", Kdv);
-                        invoiceCommand.Parameters.AddWithValue("@Toplam", total);
-                        invoiceCommand.ExecuteNonQuery();
+                    string insertTransactionQuery = "INSERT INTO Transactions (CustomerId, Aciklama, Notlar, Tutar) VALUES (@CustomerId, @Description, @Note, @Amount)";
+                    var transactionCommand = new SQLiteCommand(insertTransactionQuery, connection);
+                    transactionCommand.Parameters.AddWithValue("@Description", "Fatura Kesildi");
+                    transactionCommand.Parameters.AddWithValue("@Note", invoiceNo);
+                    transactionCommand.Parameters.AddWithValue("@Amount", Kdv);
+                    transactionCommand.Parameters.AddWithValue("@CustomerId", currentCustomer.Id);
+                    transactionCommand.ExecuteNonQuery();
+
+                    string insertInvoiceQuery = "INSERT INTO Invoices (CustomerId, Musteri, FaturaNo, FaturaTarihi, Tutar, KDV, Toplam) VALUES (@CostumerId, @Musteri, @FaturaNo, @FaturaTarihi, @Tutar, @KDV, @Toplam)";
+                    var invoiceCommand = new SQLiteCommand(insertInvoiceQuery, connection);
+                    invoiceCommand.Parameters.AddWithValue("@Musteri", customer);
+                    invoiceCommand.Parameters.AddWithValue("@CostumerId", 0);
+                    invoiceCommand.Parameters.AddWithValue("@FaturaNo", invoiceNo);
+                    invoiceCommand.Parameters.AddWithValue("@FaturaTarihi", invoiceDate);
+                    invoiceCommand.Parameters.AddWithValue("@Tutar", amount);
+                    invoiceCommand.Parameters.AddWithValue("@KDV", Kdv);
+                    invoiceCommand.Parameters.AddWithValue("@Toplam", total);
+                    invoiceCommand.ExecuteNonQuery();
                 }
 
                 MessageBox.Show("Fatura başarıyla eklendi!", "Hop!");

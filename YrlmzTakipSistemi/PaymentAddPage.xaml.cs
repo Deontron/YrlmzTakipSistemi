@@ -184,11 +184,11 @@ namespace YrlmzTakipSistemi
             {
                 return 1;
             }
-            else if (CollectButton.IsChecked == true)
+            else if (BankButton.IsChecked == true)
             {
                 return 2;
             }
-            else if (BankButton.IsChecked == true)
+            else if (CollectButton.IsChecked == true)
             {
                 return 3;
             }

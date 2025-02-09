@@ -56,10 +56,13 @@ namespace YrlmzTakipSistemi
                         customers.Add(new Customer
                         {
                             Id = reader.GetInt32(0),
-                            Tarih = reader.IsDBNull(1) ? string.Empty : reader.GetString(1),
-                            Name = reader.IsDBNull(2) ? string.Empty : reader.GetString(2),
+                            Name = reader.IsDBNull(1) ? string.Empty : reader.GetString(1),
+                            LongName = reader.IsDBNull(2) ? string.Empty : reader.GetString(2),
                             Contact = reader.IsDBNull(3) ? string.Empty : reader.GetString(3),
-                            Debt = reader.IsDBNull(4) ? 0 : reader.GetDouble(4)
+                            Address = reader.IsDBNull(4) ? string.Empty : reader.GetString(4),
+                            TaxNo = reader.IsDBNull(5) ? string.Empty : reader.GetString(5),
+                            TaxOffice = reader.IsDBNull(6) ? string.Empty : reader.GetString(6),
+                            Debt = reader.IsDBNull(7) ? 0 : reader.GetDouble(7)
                         });
                     }
                 }
@@ -80,10 +83,6 @@ namespace YrlmzTakipSistemi
 
                 var selectedCustomer = (Customer)CustomersDataGrid.SelectedItem;
                 transactionsPage.LoadCustomerTransactions(selectedCustomer);
-            }
-            else
-            {
-                MessageBox.Show("Lütfen bir müşteri seçin.", "Hop!");
             }
         }
 

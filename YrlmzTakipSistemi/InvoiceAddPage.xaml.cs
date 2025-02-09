@@ -108,6 +108,7 @@ namespace YrlmzTakipSistemi
 
                 MessageBox.Show("Fatura başarıyla eklendi!", "Hop!");
 
+                UpdateCustomerDebt(Kdv);
                 Back();
             }
             catch (Exception ex)
@@ -127,6 +128,43 @@ namespace YrlmzTakipSistemi
             TransactionsPage transactionsPage = new TransactionsPage();
             transactionsPage.LoadCustomerTransactions(currentCustomer);
             mainWindow.MainFrame.Navigate(transactionsPage);
+        }
+
+        private void UpdateCustomerDebt(double amount)
+        {
+            double totalDebt = 0;
+
+            using (var connection = dbHelper.GetConnection())
+            {
+                connection.Open();
+
+                string query = "SELECT Debt FROM Customers WHERE Id = @CustomerId";
+                SQLiteCommand command = new SQLiteCommand(query, connection);
+                command.Parameters.AddWithValue("@CustomerId", currentCustomer.Id);
+
+                var result = command.ExecuteScalar();
+                if (result != DBNull.Value)
+                {
+                    totalDebt = Convert.ToDouble(result);
+                }
+
+                connection.Close();
+            }
+
+            totalDebt += amount;
+
+            using (var connection = dbHelper.GetConnection())
+            {
+                connection.Open();
+
+                string updateQuery = "UPDATE Customers SET Debt = @Debt WHERE Id = @CustomerId";
+                SQLiteCommand updateCommand = new SQLiteCommand(updateQuery, connection);
+                updateCommand.Parameters.AddWithValue("@Debt", totalDebt);
+                updateCommand.Parameters.AddWithValue("@CustomerId", currentCustomer.Id);
+                updateCommand.ExecuteNonQuery();
+
+                connection.Close();
+            }
         }
     }
 }

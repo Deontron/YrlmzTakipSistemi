@@ -34,6 +34,8 @@ namespace YrlmzTakipSistemi
 
         public void LoadCustomerTransactions(Customer customer)
         {
+            transactions.Clear();
+
             currentCustomer = customer;
 
             TitleTextBlock.Text = $"{customer.Name} - İşlemler"; 

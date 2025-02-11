@@ -10,29 +10,43 @@ namespace YrlmzTakipSistemi
 {
     internal class DatabaseHelper
     {
-        private string dbPath = "data source=company_tracking_system.db";
+        private const string DbFileName = "company_tracking_system.db";
+        private const string DbPath = "data source=" + DbFileName;
 
         public SQLiteConnection GetConnection()
         {
-            return new SQLiteConnection(dbPath);
+            return new SQLiteConnection(DbPath);
         }
 
         public void CheckDatabaseExists()
         {
-            if (!File.Exists("company_tracking_system.db"))
-            {
-                SQLiteConnection.CreateFile("company_tracking_system.db");
-                CreateTables();
-            }
-        }
+            bool dbExists = File.Exists(DbFileName);
 
-        private void CreateTables()
-        {
+            if (!dbExists)
+            {
+                SQLiteConnection.CreateFile(DbFileName);
+            }
+
             using (var connection = GetConnection())
             {
                 connection.Open();
 
-                string createCustomersTable = @"
+                using (var command = new SQLiteCommand("PRAGMA foreign_keys = ON;", connection))
+                {
+                    command.ExecuteNonQuery();
+                }
+
+                if (!dbExists)
+                {
+                    CreateTables(connection);
+                }
+                connection.Close();
+            }
+        }
+
+        private void CreateTables(SQLiteConnection connection)
+        {
+            string createCustomersTable = @"
                 CREATE TABLE IF NOT EXISTS Customers (
                     Id INTEGER PRIMARY KEY AUTOINCREMENT,
                     Name TEXT NOT NULL,
@@ -41,80 +55,93 @@ namespace YrlmzTakipSistemi
                     Address TEXT,
                     TaxNo TEXT,
                     TaxOffice TEXT,
-                    Debt REAL
+                    Debt DECIMAL(10,2) DEFAULT 0
                 )";
 
-                string createProductsTable = @"
+            string createProductsTable = @"
                 CREATE TABLE IF NOT EXISTS Products (
                     Id INTEGER PRIMARY KEY AUTOINCREMENT,
                     CustomerId INTEGER NOT NULL,
-                    Tarih TEXT NOT NULL DEFAULT (strftime('%d-%m-%Y', 'now')),
+                    Tarih DATETIME NOT NULL DEFAULT (CURRENT_TIMESTAMP),
                     Isim TEXT NOT NULL,
-                    Fiyat REAL,
+                    Fiyat DECIMAL(10,2),
                     FOREIGN KEY (CustomerId) REFERENCES Customers(Id) ON DELETE CASCADE
                 )";
 
-                //DocType TEXT CHECK(DocType IN('Invoice', 'Payment') OR DocType IS NULL), 
-
-                string createTransactionsTable = @"
-                CREATE TABLE Transactions (
+            string createTransactionsTable = @"
+                CREATE TABLE IF NOT EXISTS Transactions (
                     Id INTEGER PRIMARY KEY AUTOINCREMENT,
                     CustomerId INTEGER NOT NULL,
                     DocId INTEGER,  
-                    Tarih TEXT NOT NULL DEFAULT (strftime('%d-%m-%Y', 'now')),
+                    Tarih DATETIME NOT NULL DEFAULT (CURRENT_TIMESTAMP),
                     Aciklama TEXT NOT NULL,
                     Notlar TEXT, 
                     Adet INTEGER,
-                    BirimFiyat REAL,
-                    Tutar REAL DEFAULT 0,
-                    Odenen REAL DEFAULT 0,
-                    AlacakDurumu REAL GENERATED ALWAYS AS (Tutar - Odenen) STORED,
+                    BirimFiyat DECIMAL(10,2),
+                    Tutar DECIMAL(10,2) DEFAULT 0,
+                    Odenen DECIMAL(10,2) DEFAULT 0,
+                    AlacakDurumu DECIMAL(10,2) GENERATED ALWAYS AS (Tutar - Odenen) STORED,
                     FOREIGN KEY (CustomerId) REFERENCES Customers(Id) ON DELETE CASCADE
                 )";
 
-                string createPaymentsTable = @"
+            string createPaymentsTable = @"
                 CREATE TABLE IF NOT EXISTS Payments (
                     Id INTEGER PRIMARY KEY AUTOINCREMENT, 
                     CustomerId INTEGER NOT NULL,
-                    Tarih TEXT NOT NULL DEFAULT (strftime('%d-%m-%Y', 'now')), 
+                    Tarih DATETIME NOT NULL DEFAULT (CURRENT_TIMESTAMP), 
                     Musteri TEXT NOT NULL,  
                     Borclu TEXT,  
                     KasideYeri TEXT,  
                     Kategori INTEGER NOT NULL, 
-                    Tutar REAL NOT NULL, 
-                    OdemeTarihi TEXT NOT NULL, 
+                    Tutar DECIMAL(10,2) NOT NULL, 
+                    OdemeTarihi DATETIME NOT NULL, 
                     OdemeDurumu INTEGER NOT NULL, 
                     OdemeDescription TEXT NOT NULL, 
                     FOREIGN KEY (CustomerId) REFERENCES Customers(Id)
                 )";
 
-                string createInvoicesTable = @"
+            string createInvoicesTable = @"
                 CREATE TABLE IF NOT EXISTS Invoices (
                     Id INTEGER PRIMARY KEY AUTOINCREMENT,
                     CustomerId INTEGER NOT NULL,
-                    Tarih TEXT NOT NULL DEFAULT (strftime('%d-%m-%Y', 'now')),
+                    Tarih DATETIME NOT NULL DEFAULT (CURRENT_TIMESTAMP),
                     Musteri TEXT NOT NULL,
                     FaturaNo TEXT NOT NULL,
-                    FaturaTarihi TEXT,
-                    Tutar REAL,
-                    KDV REAL,
-                    Toplam REAL,
+                    FaturaTarihi DATETIME,
+                    Tutar DECIMAL(10,2),
+                    KDV DECIMAL(10,2),
+                    Toplam DECIMAL(10,2),
                     FOREIGN KEY (CustomerId) REFERENCES Customers(Id)  
                 )";
 
-                var command = new SQLiteCommand(createCustomersTable, connection);
+            string createFinancialTransactionsTable = @"
+                CREATE TABLE IF NOT EXISTS FinancialTransactions (
+                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    CustomerId INTEGER NOT NULL,
+                    Aciklama TEXT NOT NULL,
+                    Tutar DECIMAL(10,2) NOT NULL,
+                    Tarih DATETIME NOT NULL DEFAULT (CURRENT_TIMESTAMP),
+                    FOREIGN KEY (CustomerId) REFERENCES Customers(Id)
+                )";
+
+            using (var command = new SQLiteCommand(connection))
+            {
+                command.CommandText = createCustomersTable;
                 command.ExecuteNonQuery();
 
-                command = new SQLiteCommand(createTransactionsTable, connection);
+                command.CommandText = createProductsTable;
                 command.ExecuteNonQuery();
 
-                command = new SQLiteCommand(createProductsTable, connection);
+                command.CommandText = createTransactionsTable;
                 command.ExecuteNonQuery();
 
-                command = new SQLiteCommand(createPaymentsTable, connection);
+                command.CommandText = createPaymentsTable;
                 command.ExecuteNonQuery();
-                
-                command = new SQLiteCommand(createInvoicesTable, connection);
+
+                command.CommandText = createInvoicesTable;
+                command.ExecuteNonQuery();
+
+                command.CommandText = createFinancialTransactionsTable;
                 command.ExecuteNonQuery();
             }
         }

@@ -38,7 +38,7 @@ namespace YrlmzTakipSistemi
 
             currentCustomer = customer;
 
-            TitleTextBlock.Text = $"{customer.Name} - İşlemler"; 
+            TitleTextBlock.Text = $"{customer.Name} - İşlemler";
             using (var connection = dbHelper.GetConnection())
             {
                 connection.Open();
@@ -55,8 +55,8 @@ namespace YrlmzTakipSistemi
                             Id = reader.GetInt32(0),
                             CustomerId = reader.GetInt32(1),
                             DocId = reader.IsDBNull(2) ? 0 : reader.GetInt32(2),
-                            Tarih = reader.IsDBNull(3) ? string.Empty : reader.GetString(3),  
-                            Aciklama = reader.IsDBNull(4) ? string.Empty : reader.GetString(4),  
+                            Tarih = reader.IsDBNull(3) ? string.Empty : reader.GetDateTime(3).ToString("dd-MM-yyyy"),
+                            Aciklama = reader.IsDBNull(4) ? string.Empty : reader.GetString(4),
                             Notlar = reader.IsDBNull(5) ? string.Empty : reader.GetString(5),
                             Adet = reader.IsDBNull(6) ? 0 : reader.GetInt32(6),
                             BirimFiyat = reader.IsDBNull(7) ? 0.0 : reader.GetDouble(7),
@@ -69,6 +69,8 @@ namespace YrlmzTakipSistemi
 
                 TransactionsDataGrid.ItemsSource = transactions;
                 UpdateTotalAmount();
+
+                connection.Close();
             }
         }
 
@@ -181,6 +183,8 @@ namespace YrlmzTakipSistemi
                 {
                     totalDebt = Convert.ToDouble(result);
                 }
+
+                connection.Close();
             }
 
             return totalDebt;
@@ -199,7 +203,7 @@ namespace YrlmzTakipSistemi
             {
                 if (transaction.Odenen > 0)
                 {
-                    e.Row.Background = new SolidColorBrush(Colors.MediumPurple); 
+                    e.Row.Background = new SolidColorBrush(Colors.MediumPurple);
                 }
             }
         }

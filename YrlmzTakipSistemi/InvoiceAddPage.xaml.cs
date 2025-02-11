@@ -44,9 +44,9 @@ namespace YrlmzTakipSistemi
             double amount = 0;
             double Kdv = 0;
             double total = 0;
-            string invoiceDate = InvoiceDatePicker.SelectedDate.HasValue
-                ? InvoiceDatePicker.SelectedDate.Value.ToString("dd-MM-yyyy")
-                : string.Empty;
+            DateTime invoiceDate = InvoiceDatePicker.SelectedDate.HasValue
+                ? InvoiceDatePicker.SelectedDate.Value
+                : DateTime.Now;
 
             if (!string.IsNullOrEmpty(AmountTextBox.Text))
             {
@@ -104,6 +104,8 @@ namespace YrlmzTakipSistemi
                     invoiceCommand.Parameters.AddWithValue("@KDV", Kdv);
                     invoiceCommand.Parameters.AddWithValue("@Toplam", total);
                     invoiceCommand.ExecuteNonQuery();
+
+                    connection.Close();
                 }
 
                 MessageBox.Show("Fatura başarıyla eklendi!", "Hop!");

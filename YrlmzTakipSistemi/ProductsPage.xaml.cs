@@ -53,7 +53,7 @@ namespace YrlmzTakipSistemi
                         {
                             Id = reader.GetInt32(0),
                             CustomerId = reader.GetInt32(1),
-                            Tarih = reader.IsDBNull(2) ? string.Empty : reader.GetString(2),
+                            Tarih = reader.IsDBNull(2) ? string.Empty : reader.GetDateTime(2).ToString("dd-MM-yyyy"),
                             Isim = reader.IsDBNull(3) ? string.Empty : reader.GetString(3),
                             Fiyat = reader.IsDBNull(4) ? 0.0 : reader.GetDouble(4),
                         });
@@ -61,6 +61,7 @@ namespace YrlmzTakipSistemi
                 }
 
                 ProductsDataGrid.ItemsSource = products;
+                connection.Close();
             }
         }
 

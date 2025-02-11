@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,14 +14,14 @@ namespace YrlmzTakipSistemi
     public class Customer
     {
         public int Id { get; set; }
-        public string Name { get; set; }
-        public string LongName { get; set; }
-        public string Contact { get; set; }
-        public string Address { get; set; }
-        public string TaxNo { get; set; }
-        public string TaxOffice { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string LongName { get; set; } = string.Empty;
+        public string Contact { get; set; } = string.Empty;
+        public string Address { get; set; } = string.Empty;
+        public string TaxNo { get; set; } = string.Empty;
+        public string TaxOffice { get; set; } = string.Empty;
         public double Debt { get; set; }
-        
+
     }
 
     public class Transaction
@@ -28,9 +29,9 @@ namespace YrlmzTakipSistemi
         public int Id { get; set; }
         public int CustomerId { get; set; }
         public int DocId { get; set; }
-        public string Tarih { get; set; }
-        public String Aciklama { get; set; }
-        public String Notlar { get; set; }
+        public string Tarih { get; set; } = string.Empty;
+        public string Aciklama { get; set; } = String.Empty;
+        public string Notlar { get; set; } = String.Empty;
         public int Adet { get; set; }
         public double BirimFiyat { get; set; }
         public double Tutar { get; set; }
@@ -42,8 +43,8 @@ namespace YrlmzTakipSistemi
     {
         public int Id { get; set; }
         public int CustomerId { get; set; }
-        public string Tarih { get; set; }
-        public string Isim { get; set; }
+        public string Tarih { get; set; } = string.Empty;
+        public string Isim { get; set; } = string.Empty;
         public double Fiyat { get; set; }
     }
 
@@ -51,28 +52,44 @@ namespace YrlmzTakipSistemi
     {
         public int Id { get; set; }
         public int CustomerId { get; set; }
-        public string Tarih { get; set; }
-        public string Musteri { get; set; }
-        public string Borclu { get; set; }
-        public string KasideYeri { get; set; }
+        public string Tarih { get; set; } = string.Empty;
+        public string Musteri { get; set; } = string.Empty;
+        public string Borclu { get; set; } = string.Empty;
+        public string KasideYeri { get; set; } = string.Empty;
         public int Kategori { get; set; }
-        public string KategoriDescription { get; set; }
+        public string KategoriDescription { get; set; } = string.Empty;
         public double Tutar { get; set; }
-        public string OdemeTarihi { get; set; }
+        public string OdemeTarihi { get; set; } = string.Empty;
         public int OdemeDurumu { get; set; }
-        public string OdemeDescription { get; set; }
+        public string OdemeDescription { get; set; } = string.Empty;
     }
 
     public class Invoice
     {
         public int Id { get; set; }
         public int CustomerId { get; set; }
-        public string Tarih { get; set; }
-        public string Musteri { get; set; }
-        public string FaturaNo { get; set; }
-        public string FaturaTarihi { get; set; }
+        public string Tarih { get; set; } = string.Empty;
+        public string Musteri { get; set; } = string.Empty;
+        public string FaturaNo { get; set; } = string.Empty;
+        public string FaturaTarihi { get; set; } = string.Empty;
         public double Tutar { get; set; }
         public double KDV { get; set; }
         public double Toplam { get; set; }
+    }
+
+    public class FinancialTransaction
+    {
+        public int Id { get; set; }
+
+        public int CustomerId { get; set; }
+
+        public double Amount { get; set; }
+
+        public string Category { get; set; } = string.Empty;
+
+        public string Description { get; set; } = string.Empty;
+
+        public string TransactionDate { get; set; } = string.Empty;
+
     }
 }

@@ -58,10 +58,10 @@ namespace YrlmzTakipSistemi
                         {
                             Id = reader.GetInt32(0),
                             CustomerId = reader.GetInt32(1),
-                            Tarih = reader.IsDBNull(2) ? string.Empty : reader.GetString(2),
+                            Tarih = reader.IsDBNull(2) ? string.Empty : reader.GetDateTime(2).ToString("dd-MM-yyyy"),
                             Musteri = reader.IsDBNull(3) ? string.Empty : reader.GetString(3),
                             FaturaNo = reader.IsDBNull(4) ? string.Empty : reader.GetString(4),
-                            FaturaTarihi = reader.IsDBNull(5) ? string.Empty : reader.GetString(5),
+                            FaturaTarihi = reader.IsDBNull(5) ? string.Empty : reader.GetDateTime(5).ToString("dd-MM-yyyy"),
                             Tutar = reader.IsDBNull(6) ? 0 : reader.GetDouble(6),
                             KDV = reader.IsDBNull(7) ? 0 : reader.GetDouble(7),
                             Toplam = reader.IsDBNull(8) ? 0 : reader.GetDouble(8)
@@ -133,7 +133,6 @@ namespace YrlmzTakipSistemi
                             int rowsAffected = deleteInvoiceCommand.ExecuteNonQuery();
 
                             transaction.Commit();
-                            connection.Close();
 
                             return rowsAffected > 0;
                         }
@@ -151,7 +150,7 @@ namespace YrlmzTakipSistemi
         {
             if (InvoicesDataGrid.SelectedItem != null)
             {
-                var selectedInvoice= (Invoice)InvoicesDataGrid.SelectedItem;
+                var selectedInvoice = (Invoice)InvoicesDataGrid.SelectedItem;
 
                 var result = MessageBox.Show(selectedInvoice.Musteri + " Güncellemek istediğinize emin misiniz?",
                                  "Güncelleme Onayı",
@@ -209,7 +208,6 @@ namespace YrlmzTakipSistemi
                             transaction.Commit();
                             MessageBox.Show("Fatura başarıyla güncellendi.");
                             LoadTotalAmount();
-                            connection.Close();
                             return true;
                         }
                         catch (Exception ex)

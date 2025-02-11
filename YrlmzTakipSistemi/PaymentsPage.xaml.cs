@@ -53,13 +53,13 @@ namespace YrlmzTakipSistemi
                         {
                             Id = reader.GetInt32(0),
                             CustomerId = reader.GetInt32(1),
-                            Tarih = reader.IsDBNull(2) ? string.Empty : reader.GetString(2),
+                            Tarih = reader.IsDBNull(2) ? string.Empty : reader.GetDateTime(2).ToString("dd-MM-yyyy"),
                             Musteri = reader.IsDBNull(3) ? string.Empty : reader.GetString(3),
                             Borclu = reader.IsDBNull(4) ? string.Empty : reader.GetString(4),
                             KasideYeri = reader.IsDBNull(5) ? string.Empty : reader.GetString(5),
                             Kategori = reader.IsDBNull(6) ? 0 : reader.GetInt32(6),
                             Tutar = reader.IsDBNull(7) ? 0 : reader.GetDouble(7),
-                            OdemeTarihi = reader.IsDBNull(8) ? string.Empty : reader.GetString(8),
+                            OdemeTarihi = reader.IsDBNull(8) ? string.Empty : reader.GetDateTime(8).ToString("dd-MM-yyyy"),
                             OdemeDurumu = reader.IsDBNull(9) ? 0 : reader.GetInt32(9),
                             OdemeDescription = reader.IsDBNull(10) ? string.Empty : reader.GetString(10)
                         });
@@ -84,6 +84,8 @@ namespace YrlmzTakipSistemi
 
                 PaymentsDataGrid.ItemsSource = payments;
                 UpdateTotalAmount();
+
+                connection.Close();
             }
         }
 
@@ -172,6 +174,7 @@ namespace YrlmzTakipSistemi
                     command.Parameters.AddWithValue("@OdemeDescription", selectedPayment.OdemeDescription);
                     command.Parameters.AddWithValue("@PaymentId", selectedPayment.Id);
                     command.ExecuteNonQuery();
+                    connection.Close();
                 }
 
                 LoadPayments();
@@ -231,6 +234,9 @@ namespace YrlmzTakipSistemi
                         }
                     }
                 }
+
+
+                connection.Close();
             }
 
             SumTextBlock.Text = $"Toplam Alacak: {totalAmount.ToString("N2")} TL";

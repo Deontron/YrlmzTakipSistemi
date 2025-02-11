@@ -60,9 +60,8 @@ namespace YrlmzTakipSistemi
             int category = GetSelectedPaymentMethod();
             int paidState = GetPaidState();
             string paidDescription = GetPaidDescription();
-            string formattedDate = PaymentDatePicker.SelectedDate.HasValue
-                ? PaymentDatePicker.SelectedDate.Value.ToString("dd-MM-yyyy")
-                : string.Empty;
+            DateTime formattedDate = PaymentDatePicker.SelectedDate.HasValue
+                ? PaymentDatePicker.SelectedDate.Value.Date : DateTime.Now.Date;
 
             if (!string.IsNullOrEmpty(AmountTextBox.Text))
             {
@@ -119,6 +118,8 @@ namespace YrlmzTakipSistemi
                         paymentCommand.Parameters.AddWithValue("@CustomerId", currentCustomer.Id);
                         paymentCommand.ExecuteNonQuery();
                     }
+
+                    connection.Close();
                 }
 
                 UpdateCustomerDebt(amount);
@@ -227,6 +228,8 @@ namespace YrlmzTakipSistemi
                 {
                     totalDebt = Convert.ToDouble(result);
                 }
+
+                connection.Close();
             }
 
             totalDebt -= amount;
@@ -240,6 +243,8 @@ namespace YrlmzTakipSistemi
                 updateCommand.Parameters.AddWithValue("@Debt", totalDebt);
                 updateCommand.Parameters.AddWithValue("@CustomerId", currentCustomer.Id);
                 updateCommand.ExecuteNonQuery();
+
+                connection.Close();
             }
         }
     }

@@ -70,6 +70,7 @@ namespace YrlmzTakipSistemi
 
 
                 command.ExecuteNonQuery();
+                connection.Close();
             }
 
             MessageBox.Show($"İşlem {name} başarıyla eklendi!", "Hop!");

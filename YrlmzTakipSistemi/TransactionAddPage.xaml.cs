@@ -144,6 +144,7 @@ namespace YrlmzTakipSistemi
                 command.Parameters.AddWithValue("@Paid", paid);
 
                 command.ExecuteNonQuery();
+                connection.Close();
             }
 
             MessageBox.Show($"İşlem {description} başarıyla eklendi!", "Hop!");
@@ -189,7 +190,7 @@ namespace YrlmzTakipSistemi
                     {
                         while (reader.Read())
                         {
-                            string tarih = reader.GetString(2);
+                            string tarih = reader.IsDBNull(2) ? string.Empty : reader.GetDateTime(2).ToString("dd-MM-yyyy");
                             string isim = reader.GetString(3);
                             double fiyat = reader.IsDBNull(4) ? 0 : reader.GetDouble(4);
 
@@ -204,6 +205,8 @@ namespace YrlmzTakipSistemi
                             });
                         }
                     }
+
+                    connection.Close();
                 }
             }
             catch (Exception ex)
@@ -238,6 +241,7 @@ namespace YrlmzTakipSistemi
 
 
                 command.ExecuteNonQuery();
+                connection.Close();
             }
         }
 
@@ -266,6 +270,7 @@ namespace YrlmzTakipSistemi
                 {
                     totalDebt = Convert.ToDouble(result);
                 }
+                connection.Close();
             }
 
             totalDebt += amount;
@@ -279,6 +284,8 @@ namespace YrlmzTakipSistemi
                 updateCommand.Parameters.AddWithValue("@Debt", totalDebt);
                 updateCommand.Parameters.AddWithValue("@CustomerId", currentCustomer.Id);
                 updateCommand.ExecuteNonQuery();
+                
+                connection.Close();
             }
         }
     }

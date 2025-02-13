@@ -80,16 +80,24 @@ namespace YrlmzTakipSistemi
     public class FinancialTransaction
     {
         public int Id { get; set; }
+        public string Tarih { get; set; } = string.Empty;
+        public string Aciklama { get; set; } = string.Empty;
+        public double Tutar { get; set; }
+    }
 
-        public int CustomerId { get; set; }
-
-        public double Amount { get; set; }
-
-        public string Category { get; set; } = string.Empty;
-
-        public string Description { get; set; } = string.Empty;
-
-        public string TransactionDate { get; set; } = string.Empty;
-
+    public class MonthlySummary
+    {
+        public string Ay { get; set; } = string.Empty;
+        public string Yil { get; set; } = string.Empty;
+        public double Gelir { get; set; }
+        public double Gider { get; set; }
+        public double Tutar { get; set; }
+    }
+    public class YearlySummary
+    {
+        public string Yil { get; set; } = string.Empty;
+        public double Gelir { get; set; }
+        public double Gider { get; set; }
+        public double Tutar { get; set; }
     }
 }

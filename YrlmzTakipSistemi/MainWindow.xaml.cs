@@ -33,7 +33,7 @@ namespace YrlmzTakipSistemi
 
         private void IncomeExpenseButton_Click(object sender, RoutedEventArgs e)
         {
-            MainFrame.Navigate(new IncomeExpensePage());
+            MainFrame.Navigate(new FinancialPage());
         }
 
         private void InvoiceButton_Click(object sender, RoutedEventArgs e)

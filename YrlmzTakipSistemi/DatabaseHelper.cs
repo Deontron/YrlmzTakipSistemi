@@ -117,11 +117,9 @@ namespace YrlmzTakipSistemi
             string createFinancialTransactionsTable = @"
                 CREATE TABLE IF NOT EXISTS FinancialTransactions (
                     Id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    CustomerId INTEGER NOT NULL,
-                    Aciklama TEXT NOT NULL,
-                    Tutar DECIMAL(10,2) NOT NULL,
                     Tarih DATETIME NOT NULL DEFAULT (CURRENT_TIMESTAMP),
-                    FOREIGN KEY (CustomerId) REFERENCES Customers(Id)
+                    Aciklama TEXT NOT NULL,
+                    Tutar DECIMAL(10,2) NOT NULL
                 )";
 
             using (var command = new SQLiteCommand(connection))

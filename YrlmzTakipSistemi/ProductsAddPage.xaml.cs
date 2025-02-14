@@ -73,7 +73,7 @@ namespace YrlmzTakipSistemi
                 connection.Close();
             }
 
-            MessageBox.Show($"İşlem {name} başarıyla eklendi!", "Hop!");
+            MessageBox.Show($"{name} başarıyla eklendi!", "Hop!");
             ClearForm();
             Back();
         }

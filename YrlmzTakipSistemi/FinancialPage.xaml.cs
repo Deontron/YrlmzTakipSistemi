@@ -32,6 +32,7 @@ namespace YrlmzTakipSistemi
         }
         private void LoadFinancialData<T>(List<T> data)
         {
+            FinancialDataGrid.ItemsSource = null;
             FinancialDataGrid.ItemsSource = data;
         }
 
@@ -62,15 +63,15 @@ namespace YrlmzTakipSistemi
             {
                 connection.Open();
                 string query = @"
-        SELECT 
-        strftime('%m', Tarih) AS Ay, 
-        SUM(CASE WHEN Tutar > 0 THEN Tutar ELSE 0 END) AS Gelir, 
-        SUM(CASE WHEN Tutar < 0 THEN ABS(Tutar) ELSE 0 END) AS Gider,
-        SUM(Tutar) AS Tutar
-        FROM FinancialTransactions 
-        WHERE strftime('%Y', Tarih) = @Year
-        GROUP BY Ay
-        ORDER BY Ay ASC;";
+                    SELECT 
+                    strftime('%m', Tarih) AS Ay, 
+                    SUM(CASE WHEN Tutar > 0 THEN Tutar ELSE 0 END) AS Gelir, 
+                    SUM(CASE WHEN Tutar < 0 THEN ABS(Tutar) ELSE 0 END) AS Gider,
+                    SUM(Tutar) AS Tutar
+                    FROM FinancialTransactions 
+                    WHERE strftime('%Y', Tarih) = @Year
+                    GROUP BY Ay
+                    ORDER BY Ay ASC;";
 
                 using (var command = new SQLiteCommand(query, connection))
                 {
@@ -104,11 +105,11 @@ namespace YrlmzTakipSistemi
             {
                 connection.Open();
                 string query = @"
-        SELECT Id, strftime('%d-%m-%Y', Tarih) AS Tarih, Aciklama, Tutar
-FROM FinancialTransactions
-WHERE strftime('%Y', Tarih) = @Year
-AND strftime('%m', Tarih) = @Month
-ORDER BY Tarih ASC;";
+                    SELECT Id, strftime('%d-%m-%Y', Tarih) AS Tarih, Aciklama, Tutar
+                    FROM FinancialTransactions
+                    WHERE strftime('%Y', Tarih) = @Year
+                    AND strftime('%m', Tarih) = @Month
+                    ORDER BY Tarih ASC;";
 
                 using (var command = new SQLiteCommand(query, connection))
                 {
@@ -120,7 +121,7 @@ ORDER BY Tarih ASC;";
                         {
                             transactions.Add(new FinancialTransaction
                             {
-                                //Id = reader.GetInt32(0),
+                                Id = reader.GetInt32(0),
                                 Tarih = reader.GetString(1),
                                 Aciklama = reader.GetString(2),
                                 Tutar = reader.GetDouble(3)
@@ -140,14 +141,14 @@ ORDER BY Tarih ASC;";
             {
                 connection.Open();
                 string query = @"
-        SELECT 
-        strftime('%Y', Tarih) AS Yil, 
-        SUM(CASE WHEN Tutar > 0 THEN Tutar ELSE 0 END) AS Gelir, 
-        SUM(CASE WHEN Tutar < 0 THEN ABS(Tutar) ELSE 0 END) AS Gider,
-        SUM(Tutar) AS Tutar
-        FROM FinancialTransactions 
-        GROUP BY Yil 
-        ORDER BY Yil ASC;";
+                    SELECT 
+                    strftime('%Y', Tarih) AS Yil, 
+                    SUM(CASE WHEN Tutar > 0 THEN Tutar ELSE 0 END) AS Gelir, 
+                    SUM(CASE WHEN Tutar < 0 THEN ABS(Tutar) ELSE 0 END) AS Gider,
+                    SUM(Tutar) AS Tutar
+                    FROM FinancialTransactions 
+                    GROUP BY Yil 
+                    ORDER BY Yil ASC;";
 
                 using (var command = new SQLiteCommand(query, connection))
                 using (var reader = command.ExecuteReader())
@@ -181,6 +182,5 @@ ORDER BY Tarih ASC;";
                 e.Column.Visibility = Visibility.Collapsed; 
             }
         }
-
     }
 }

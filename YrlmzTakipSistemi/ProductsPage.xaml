@@ -44,6 +44,7 @@
             <Button Content="Geri" Background="#3B4D61" Style="{StaticResource ModernButtonStyle}" Click="BackButton_Click"/>
             <Button Content="Seçili Ürünü Sil" Background="#D32F2F" Style="{StaticResource ModernButtonStyle}" Click="DeleteProductButton_Click"/>
             <Button Content="Yeni Ürün Ekle" Background="#388E3C" Style="{StaticResource ModernButtonStyle}" Click="AddProductButton_Click"/>
+            <Button Content="Güncelle" Background="#1976D2" Style="{StaticResource ModernButtonStyle}" Click="UpdateProductButton_Click"/>
         </StackPanel>
     </Grid>
 </Page>

@@ -145,7 +145,93 @@ namespace YrlmzTakipSistemi
 
         private void UpdateProductButton_Click(object sender, RoutedEventArgs e)
         {
+            if (ProductsDataGrid.SelectedItem != null)
+            {
+                var selectedProduct = (Product)ProductsDataGrid.SelectedItem;
 
+                var result = MessageBox.Show(selectedProduct.Isim + " Güncellemek istediğinize emin misiniz?",
+                                 "Güncelleme Onayı",
+                                 MessageBoxButton.YesNo,
+                                 MessageBoxImage.Question);
+
+                if (result == MessageBoxResult.Yes)
+                {
+                    UpdateProductInDatabase(selectedProduct);
+                }
+            }
+            else
+            {
+                MessageBox.Show("Lütfen güncellemek için bir ürün seçin.", "Hop!");
+            }
         }
+
+        private bool UpdateProductInDatabase(Product product)
+        {
+            using (var connection = dbHelper.GetConnection())
+            {
+                try
+                {
+                    connection.Open();
+                    if (connection.State != System.Data.ConnectionState.Open)
+                    {
+                        MessageBox.Show("Veritabanı bağlantısı başarısız!");
+                        return false;
+                    }
+
+                    using (var transaction = connection.BeginTransaction())
+                    {
+                        try
+                        {
+                            if (!DateTime.TryParse(product.Tarih, out DateTime parsedDate))
+                            {
+                                MessageBox.Show("Geçersiz tarih formatı: " + product.Tarih);
+                                return false;
+                            }
+
+                            string updateProductQuery = "UPDATE Products SET Isim = @Isim, Tarih = @Tarih, Fiyat = @Fiyat WHERE Id = @Id";
+                            using (var updateProductCommand = new SQLiteCommand(updateProductQuery, connection, transaction))
+                            {
+                                updateProductCommand.Parameters.AddWithValue("@Isim", product.Isim);
+                                updateProductCommand.Parameters.AddWithValue("@Tarih", parsedDate.ToString("yyyy-MM-dd HH:mm:ss"));
+                                updateProductCommand.Parameters.AddWithValue("@Fiyat", product.Fiyat);
+                                updateProductCommand.Parameters.AddWithValue("@Id", product.Id);
+
+                                int rowsAffected = updateProductCommand.ExecuteNonQuery();
+                                if (rowsAffected == 0)
+                                {
+                                    MessageBox.Show($"Güncellenen ürün bulunamadı. Id: {product.Id}");
+                                    transaction.Rollback();
+                                    return false;
+                                }
+                            }
+
+                            transaction.Commit();
+                            MessageBox.Show("Ürün başarıyla güncellendi.");
+                            return true;
+                        }
+                        catch (Exception ex)
+                        {
+                            try
+                            {
+                                transaction.Rollback();
+                            }
+                            catch (Exception rollbackEx)
+                            {
+                                MessageBox.Show("Rollback başarısız: " + rollbackEx.Message);
+                            }
+
+                            MessageBox.Show("Güncelleme hatası: " + ex.Message);
+                            return false;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Bağlantı hatası: " + ex.Message);
+                    return false;
+                }
+            }
+        }
+
     }
 }

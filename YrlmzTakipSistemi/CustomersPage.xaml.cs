@@ -23,12 +23,14 @@ namespace YrlmzTakipSistemi
     public partial class CustomersPage : Page
     {
         private DatabaseHelper dbHelper;
+        private PrintHelper printHelper;
         private ObservableCollection<Customer> customers = new ObservableCollection<Customer>();
 
         public CustomersPage()
         {
             InitializeComponent();
             dbHelper = new DatabaseHelper();
+            printHelper = new PrintHelper();
             LoadCustomers();
             LoadTotalDebt();
         }
@@ -162,24 +164,6 @@ namespace YrlmzTakipSistemi
             }
         }
 
-        private void CustomersDataGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
-        {
-            var customer = e.Row.Item as Customer;
-            if (customer != null)
-            {
-                bool updateSuccess = UpdateCustomerInDatabase(customer);
-
-                if (updateSuccess)
-                {
-                    LoadCustomers();
-                }
-                else
-                {
-                    MessageBox.Show("Müşteri güncellenemedi!");
-                }
-            }
-        }
-
         private bool UpdateCustomerInDatabase(Customer customer)
         {
             using (var connection = dbHelper.GetConnection())
@@ -290,6 +274,12 @@ namespace YrlmzTakipSistemi
             {
                 MessageBox.Show("Lütfen güncellemek için bir müşteri seçin.", "Hop!");
             }
+
+        }
+        private void PrintButton_Click(object sender, RoutedEventArgs e)
+        {
+            printHelper.PrintDataGrid(CustomersDataGrid);
+
         }
     }
 }

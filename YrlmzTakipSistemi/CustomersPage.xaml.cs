@@ -279,7 +279,6 @@ namespace YrlmzTakipSistemi
         private void PrintButton_Click(object sender, RoutedEventArgs e)
         {
             printHelper.PrintDataGrid(CustomersDataGrid);
-
         }
     }
 }

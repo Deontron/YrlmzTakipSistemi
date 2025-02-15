@@ -103,6 +103,13 @@ namespace YrlmzTakipSistemi
                     transactionCommand.Parameters.AddWithValue("@CustomerId", currentCustomer.Id);
                     transactionCommand.ExecuteNonQuery();
 
+                    string insertFinancialTransactionQuery = "INSERT INTO FinancialTransactions (Aciklama, Tarih, Tutar) VALUES (@Aciklama, @Tarih, @Tutar)";
+                    var financialTransactionCommand = new SQLiteCommand(insertFinancialTransactionQuery, connection);
+                    financialTransactionCommand.Parameters.AddWithValue("@Aciklama", description);
+                    financialTransactionCommand.Parameters.AddWithValue("@Tarih", formattedDate);
+                    financialTransactionCommand.Parameters.AddWithValue("@Tutar", amount);
+                    financialTransactionCommand.ExecuteNonQuery();
+
                     if (category != 3)
                     {
                         string insertPaymentQuery = "INSERT INTO Payments (CustomerId, Musteri, Borclu, KasideYeri, Kategori, Tutar, OdemeTarihi, OdemeDurumu, OdemeDescription) VALUES (@CustomerId, @Musteri, @Borclu, @KasideYeri, @Kategori, @Tutar, @OdemeTarihi, @OdemeDurumu, @OdemeDescription)";
@@ -118,8 +125,6 @@ namespace YrlmzTakipSistemi
                         paymentCommand.Parameters.AddWithValue("@CustomerId", currentCustomer.Id);
                         paymentCommand.ExecuteNonQuery();
                     }
-
-                    connection.Close();
                 }
 
                 UpdateCustomerDebt(amount);

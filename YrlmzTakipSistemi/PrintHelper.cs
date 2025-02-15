@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
+using System.Windows.Media;
 
 namespace YrlmzTakipSistemi
 {
@@ -21,9 +18,12 @@ namespace YrlmzTakipSistemi
                 Table table = new Table();
                 doc.Blocks.Add(table);
 
-                for (int i = 0; i < dataGrid.Columns.Count; i++)
+                foreach (var column in dataGrid.Columns)
                 {
-                    table.Columns.Add(new TableColumn());
+                    if (column.Visibility == Visibility.Visible)
+                    {
+                        table.Columns.Add(new TableColumn());
+                    }
                 }
 
                 TableRowGroup headerGroup = new TableRowGroup();
@@ -33,13 +33,16 @@ namespace YrlmzTakipSistemi
 
                 foreach (var column in dataGrid.Columns)
                 {
-                    headerRow.Cells.Add(new TableCell(new Paragraph(new Run(column.Header.ToString())))
+                    if (column.Visibility == Visibility.Visible)
                     {
-                        FontWeight = FontWeights.Bold,
-                        Padding = new Thickness(4),
-                        BorderBrush = System.Windows.Media.Brushes.Black,
-                        BorderThickness = new Thickness(1)
-                    });
+                        headerRow.Cells.Add(new TableCell(new Paragraph(new Run(column.Header.ToString())))
+                        {
+                            FontWeight = FontWeights.Bold,
+                            Padding = new Thickness(4),
+                            BorderBrush = Brushes.Black,
+                            BorderThickness = new Thickness(1)
+                        });
+                    }
                 }
 
                 TableRowGroup bodyGroup = new TableRowGroup();
@@ -47,18 +50,26 @@ namespace YrlmzTakipSistemi
 
                 foreach (var item in dataGrid.Items)
                 {
+                    DataGridRow rowControl = dataGrid.ItemContainerGenerator.ContainerFromItem(item) as DataGridRow;
+
+                    if (rowControl == null || rowControl.Visibility != Visibility.Visible)
+                        continue;
+
                     TableRow newRow = new TableRow();
                     bodyGroup.Rows.Add(newRow);
 
                     foreach (var column in dataGrid.Columns)
                     {
-                        TextBlock cellContent = column.GetCellContent(item) as TextBlock;
-                        newRow.Cells.Add(new TableCell(new Paragraph(new Run(cellContent?.Text ?? "")))
+                        if (column.Visibility == Visibility.Visible)
                         {
-                            Padding = new Thickness(4),
-                            BorderBrush = System.Windows.Media.Brushes.Black,
-                            BorderThickness = new Thickness(1)
-                        });
+                            TextBlock cellContent = column.GetCellContent(item) as TextBlock;
+                            newRow.Cells.Add(new TableCell(new Paragraph(new Run(cellContent?.Text ?? "")))
+                            {
+                                Padding = new Thickness(4),
+                                BorderBrush = Brushes.Black,
+                                BorderThickness = new Thickness(1)
+                            });
+                        }
                     }
                 }
 

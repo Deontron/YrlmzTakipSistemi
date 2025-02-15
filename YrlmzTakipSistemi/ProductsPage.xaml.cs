@@ -23,12 +23,12 @@ namespace YrlmzTakipSistemi
     {
         private DatabaseHelper dbHelper;
         private Customer currentCustomer;
-
+        private PrintHelper printHelper;
         public ProductsPage()
         {
             InitializeComponent();
             dbHelper = new DatabaseHelper();
-
+            printHelper = new PrintHelper();
         }
 
         public void LoadCustomerProducts(Customer customer)
@@ -233,5 +233,9 @@ namespace YrlmzTakipSistemi
             }
         }
 
+        private void PrintButton_Click(object sender, RoutedEventArgs e)
+        {
+            printHelper.PrintDataGrid(ProductsDataGrid);
+        }
     }
 }

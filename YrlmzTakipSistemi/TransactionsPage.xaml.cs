@@ -114,12 +114,6 @@ namespace YrlmzTakipSistemi
             }
         }
 
-        private void BackButton_Click(object sender, RoutedEventArgs e)
-        {
-            var mainWindow = (MainWindow)Application.Current.MainWindow;
-            mainWindow.MainFrame.Navigate(new CustomersPage());
-        }
-
         private bool DeleteTransactionFromDatabase(int transactionId)
         {
             using (var connection = dbHelper.GetConnection())
@@ -150,6 +144,11 @@ namespace YrlmzTakipSistemi
             }
         }
 
+        private void BackButton_Click(object sender, RoutedEventArgs e)
+        {
+            var mainWindow = (MainWindow)Application.Current.MainWindow;
+            mainWindow.MainFrame.Navigate(new CustomersPage());
+        }
         private void AddPaymentButton_Click(object sender, RoutedEventArgs e)
         {
             var mainWindow = (MainWindow)Application.Current.MainWindow;

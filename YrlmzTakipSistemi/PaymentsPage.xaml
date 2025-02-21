@@ -50,10 +50,10 @@
                                 <Setter Property="FontWeight" Value="SemiBold"/>
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding Kategori}" Value="1">
-                                        <Setter Property="Foreground" Value="#3F51B5"/>
+                                        <Setter Property="Foreground" Value="#7E57C2"/>
                                     </DataTrigger>
                                     <DataTrigger Binding="{Binding Kategori}" Value="2">
-                                        <Setter Property="Foreground" Value="#9C27B0"/>
+                                        <Setter Property="Foreground" Value="#AB47BC"/>
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>

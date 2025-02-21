@@ -28,6 +28,7 @@ namespace YrlmzTakipSistemi
     {
         private readonly PaymentRepository _paymentRepository;
         private readonly TransactionRepository _transactionRepository;
+        private readonly CustomerRepository _customerRepository;
         private DatabaseHelper _dbHelper;
         private PrintHelper printHelper;
         private ObservableCollection<Payment> _payments = new ObservableCollection<Payment>();
@@ -39,6 +40,7 @@ namespace YrlmzTakipSistemi
             printHelper = new PrintHelper();
             _paymentRepository = new PaymentRepository(_dbHelper.GetConnection());
             _transactionRepository = new TransactionRepository(_dbHelper.GetConnection());
+            _customerRepository = new CustomerRepository(_dbHelper.GetConnection());
             LoadPayments();
         }
 
@@ -92,6 +94,7 @@ namespace YrlmzTakipSistemi
 
                 if (result == MessageBoxResult.Yes)
                 {
+                    _customerRepository.UpdateCustomerDebtById(selectedPayment.Tutar, selectedPayment.CustomerId);
                     _paymentRepository.Delete(selectedPayment.Id);
                     _transactionRepository.DeleteWithDoc(selectedPayment.Id, "OdemeId");
 

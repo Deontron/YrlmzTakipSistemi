@@ -139,5 +139,20 @@ namespace YrlmzTakipSistemi
         {
             _printHelper.PrintDataGrid(CustomersDataGrid, "Müşteriler");
         }
+
+        private void CustomerInfoButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (CustomersDataGrid.SelectedItem is Customer selectedCustomer)
+            {
+                var mainWindow = (MainWindow)Application.Current.MainWindow;
+                InfoPage infoPage = new InfoPage();
+                infoPage.LoadCustomerInfo(selectedCustomer);
+                mainWindow.MainFrame.Navigate(infoPage);
+            }
+            else
+            {
+                MessageBox.Show("Lütfen görüntülemek için bir müşteri seçin.", "Hop!");
+            }
+        }
     }
 }

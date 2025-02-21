@@ -44,5 +44,16 @@ namespace YrlmzTakipSistemi.Repositories
 
             return totalDebt;
         }
+
+        public void UpdateCustomerDebtById(double amount, int customerId)
+        {
+            double totalDebt = GetCustomerDebtById(customerId);
+
+            totalDebt += amount;
+
+            Customer customer = GetById(customerId);
+            customer.Debt = totalDebt;
+            Update(customer);
+        }
     }
 }

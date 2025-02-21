@@ -192,19 +192,7 @@ namespace YrlmzTakipSistemi
 
         private void UpdateCustomerDebt(double amount)
         {
-            try
-            {
-                var customer = _customerRepository.GetById(_currentCustomer.Id);
-                if (customer != null)
-                {
-                    customer.Debt += amount;
-                    _customerRepository.Update(customer);
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Müşteri borcu güncellenirken bir hata oluştu: {ex.Message}", "Hata", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+            _customerRepository.UpdateCustomerDebtById(amount, _currentCustomer.Id);
         }
 
         private void NavigateToTransactionsPage()

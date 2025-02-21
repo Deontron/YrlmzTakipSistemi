@@ -233,13 +233,7 @@ namespace YrlmzTakipSistemi
 
         private void UpdateCustomerDebt(double amount)
         {
-            double totalDebt = _customerRepository.GetCustomerDebtById(currentCustomer.Id);
-
-            totalDebt -= amount;
-
-            Customer customer = _customerRepository.GetById(currentCustomer.Id);
-            customer.Debt = totalDebt;
-            _customerRepository.Update(customer);
+            _customerRepository.UpdateCustomerDebtById(-amount, currentCustomer.Id);
         }
     }
 }

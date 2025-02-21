@@ -60,6 +60,7 @@
             <Button Content="Seçili Müşteriyi Sil" Style="{StaticResource ModernButtonStyle}" Background="#D32F2F" Click="DeleteCustomerButton_Click"/>
             <Button Content="Yeni Müşteri Ekle" Style="{StaticResource ModernButtonStyle}" Background="#388E3C" Click="AddCustomerButton_Click"/>
             <Button Content="Güncelle" Background="#1976D2" Style="{StaticResource ModernButtonStyle}" Click="UpdateButton_Click"/>
+            <Button Content="Bilgiler" Background="#3B4D61" Style="{StaticResource ModernButtonStyle}" Click="CustomerInfoButton_Click"/>
         </StackPanel>
     </Grid>
 </Page>

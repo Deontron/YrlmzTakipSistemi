@@ -28,6 +28,7 @@ namespace YrlmzTakipSistemi
         private PrintHelper printHelper;
         private InvoiceRepository _invoiceRepository;
         private TransactionRepository _transactionRepository;
+        private readonly CustomerRepository _customerRepository;
         private ObservableCollection<Invoice> _invoices = new ObservableCollection<Invoice>();
 
         public InvoicePage()
@@ -37,6 +38,7 @@ namespace YrlmzTakipSistemi
             printHelper = new PrintHelper();
             _invoiceRepository = new InvoiceRepository(_dbHelper.GetConnection());
             _transactionRepository = new TransactionRepository(_dbHelper.GetConnection());
+            _customerRepository = new CustomerRepository(_dbHelper.GetConnection());
             LoadInvoices();
         }
 
@@ -87,6 +89,7 @@ namespace YrlmzTakipSistemi
 
                 if (result == MessageBoxResult.Yes)
                 {
+                    _customerRepository.UpdateCustomerDebtById(-selectedInvoice.KDV, selectedInvoice.CustomerId);
                     _invoiceRepository.Delete(selectedInvoice.Id);
                     _transactionRepository.DeleteWithDoc(selectedInvoice.Id, "FaturaId");
 

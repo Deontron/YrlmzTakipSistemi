@@ -56,9 +56,9 @@
             </StackPanel>
 
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,10,0,0">
-                <TextBlock Text="Toplam:" Width="100" FontSize="20" Foreground="White" VerticalAlignment="Center" />
-                <TextBox Name="TotalTextBox" Width="250" Height="35" FontSize="18"
-                Background="#1E1E1E" Foreground="White" BorderBrush="#444444" BorderThickness="1"/>
+                <CheckBox x:Name="SaveKdvBox" Content="KDV değiştir" FontSize="18"
+                Foreground="White" VerticalAlignment="Center" VerticalContentAlignment="Center"
+                Margin="10,10,0,0"/>
             </StackPanel>
 
         </StackPanel>

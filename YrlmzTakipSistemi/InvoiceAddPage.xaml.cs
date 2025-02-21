@@ -35,6 +35,7 @@ namespace YrlmzTakipSistemi
             _transactionRepository = new TransactionRepository(_dbHelper.GetConnection());
             _customerRepository = new CustomerRepository(_dbHelper.GetConnection());
             InvoiceDatePicker.SelectedDate = DateTime.Today;
+            KdvTextBox.Text = Settings.Default.Kdv.ToString();
         }
 
         public void GetCustomer(Customer customer)
@@ -50,6 +51,7 @@ namespace YrlmzTakipSistemi
             double amount = 0;
             double Kdv = 0;
             double total = 0;
+            double kdvRate = 0;
             DateTime invoiceDate = InvoiceDatePicker.SelectedDate.HasValue
                 ? InvoiceDatePicker.SelectedDate.Value
                 : DateTime.Now;
@@ -68,23 +70,19 @@ namespace YrlmzTakipSistemi
                 return;
             }
 
-            if (!string.IsNullOrEmpty(KdvTextBox.Text))
+            if (!double.TryParse(KdvTextBox.Text, out kdvRate))
             {
-                if (!double.TryParse(KdvTextBox.Text, out Kdv))
-                {
-                    MessageBox.Show("Kdv değeri geçersiz.", "Hata", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return;
-                }
+                MessageBox.Show("Kdv değeri geçersiz.", "Hata", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
             }
 
-            if (!string.IsNullOrEmpty(TotalTextBox.Text))
+            if (SaveKdvBox.IsChecked == true)
             {
-                if (!double.TryParse(TotalTextBox.Text, out total))
-                {
-                    MessageBox.Show("Toplam değeri geçersiz.", "Hata", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return;
-                }
+                SaveKdvRate();
             }
+
+            Kdv = amount * (kdvRate / 100);
+            total = amount + Kdv;
 
             try
             {
@@ -120,6 +118,20 @@ namespace YrlmzTakipSistemi
                 MessageBox.Show($"Bir hata oluştu: {ex.Message}", "Hata", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+        private void SaveKdvRate()
+        {
+            if (double.TryParse(KdvTextBox.Text, out double newKdv))
+            {
+                Settings.Default.Kdv = newKdv;
+                Settings.Default.Save(); 
+                MessageBox.Show("KDV oranı güncellendi.");
+            }
+            else
+            {
+                MessageBox.Show("Geçerli bir KDV oranı girin.");
+            }
+        }
+
 
         private void BackButton_Click(object sender, RoutedEventArgs e)
         {

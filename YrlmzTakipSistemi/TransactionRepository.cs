@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
+using System.Windows;
 
 namespace YrlmzTakipSistemi.Repositories
 {
@@ -31,6 +32,36 @@ namespace YrlmzTakipSistemi.Repositories
             }
 
             return totalDebt;
+        }
+
+        public void DeleteWithDoc(int id, string doc)
+        {
+            var allowedColumns = new HashSet<string> { "FaturaId", "OdemeId" };
+
+            if (!allowedColumns.Contains(doc))
+            {
+                throw new ArgumentException("Geçersiz sütun adı!");
+            }
+
+            var query = $"DELETE FROM Transactions WHERE {doc} = @Id";
+
+            try
+            {
+                using (var command = new SQLiteCommand(query, _connection))
+                {
+                    _connection.Open();
+                    command.Parameters.AddWithValue("@Id", id);
+                    command.ExecuteNonQuery();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Veri silinirken bir hata oluştu.", ex);
+            }
+            finally
+            {
+                _connection.Close();
+            }
         }
     }
 }

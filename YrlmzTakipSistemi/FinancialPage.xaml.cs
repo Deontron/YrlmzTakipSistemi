@@ -28,6 +28,7 @@ namespace YrlmzTakipSistemi
         private FinancialRepository _financialRepository;
         private int pageId = 0;
         private string currentYear;
+        private string currentMonth;
         public FinancialPage()
         {
             InitializeComponent();
@@ -59,6 +60,7 @@ namespace YrlmzTakipSistemi
             else if (FinancialDataGrid.SelectedItem is MonthlySummary selectedMonth)
             {
                 pageId = 2;
+                currentMonth = selectedMonth.Ay;
                 TitleTextBox.Text = "Aylık İşlemler";
                 LoadFinancialTransactions(selectedMonth.Ay, selectedMonth.Yil);
             }
@@ -124,6 +126,59 @@ namespace YrlmzTakipSistemi
         {
             Back();
         }
+
+        private void DeleteButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (FinancialDataGrid.SelectedItem == null)
+            {
+                MessageBox.Show("Lütfen silmek için bir kayıt seçin.", "Uyarı", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            if (pageId == 0) 
+            {
+                if (FinancialDataGrid.SelectedItem is YearlySummary selectedYear)
+                {
+                    var result = MessageBox.Show($"{selectedYear.Yil} yılının tüm verilerini silmek istediğinize emin misiniz?",
+                                                 "Silme Onayı", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                    if (result == MessageBoxResult.Yes)
+                    {
+                        _financialRepository.DeleteYearlyData(selectedYear.Yil);
+                        MessageBox.Show($"{selectedYear.Yil} yılına ait tüm veriler silindi.", "Bilgi", MessageBoxButton.OK, MessageBoxImage.Information);
+                        LoadYearlySummaries();
+                    }
+                }
+            }
+            else if (pageId == 1) 
+            {
+                if (FinancialDataGrid.SelectedItem is MonthlySummary selectedMonth)
+                {
+                    var result = MessageBox.Show($"{selectedMonth.Ay}/{selectedMonth.Yil} tarihindeki tüm işlemleri silmek istediğinize emin misiniz?",
+                                                 "Silme Onayı", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                    if (result == MessageBoxResult.Yes)
+                    {
+                        _financialRepository.DeleteMonthlyData(selectedMonth.Ay, selectedMonth.Yil);
+                        MessageBox.Show($"{selectedMonth.Ay}/{selectedMonth.Yil} tarihindeki tüm işlemler silindi.", "Bilgi", MessageBoxButton.OK, MessageBoxImage.Information);
+                        LoadMonthlySummary(currentYear);
+                    }
+                }
+            }
+            else if (pageId == 2) 
+            {
+                if (FinancialDataGrid.SelectedItem is FinancialTransaction selectedTransaction)
+                {
+                    var result = MessageBox.Show("Bu işlemi silmek istediğinize emin misiniz?",
+                                                 "Silme Onayı", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                    if (result == MessageBoxResult.Yes)
+                    {
+                        _financialRepository.Delete(selectedTransaction.Id);
+                        MessageBox.Show("İşlem başarıyla silindi.", "Bilgi", MessageBoxButton.OK, MessageBoxImage.Information);
+                        LoadFinancialTransactions(currentMonth,currentYear);
+                    }
+                }
+            }
+        }
+
 
         private void PrintButton_Click(object sender, RoutedEventArgs e)
         {

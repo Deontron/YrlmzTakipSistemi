@@ -17,7 +17,7 @@ namespace YrlmzTakipSistemi.Repositories
             _tableName = tableName;
         }
 
-        public void Add(T entity)
+        public long Add(T entity)
         {
             var properties = typeof(T).GetProperties()
                 .Where(p => p.Name != "Id" && p.Name != "Tarih" && p.Name != "DocId" && p.Name != "AlacakDurumu" && p.Name != "KategoriDescription")
@@ -25,7 +25,7 @@ namespace YrlmzTakipSistemi.Repositories
             var columns = string.Join(", ", properties.Select(p => p.Name));
             var values = string.Join(", ", properties.Select(p => $"@{p.Name}"));
 
-            var query = $"INSERT INTO {_tableName} ({columns}) VALUES ({values})";
+            var query = $"INSERT INTO {_tableName} ({columns}) VALUES ({values}); SELECT last_insert_rowid();"; 
 
             try
             {
@@ -49,12 +49,12 @@ namespace YrlmzTakipSistemi.Repositories
                         }
                         command.Parameters.AddWithValue($"@{property.Name}", value ?? DBNull.Value);
                     }
-                    command.ExecuteNonQuery();
+                    return (long)command.ExecuteScalar(); 
                 }
             }
             catch (Exception ex)
             {
-                throw new Exception("Veri eklenirken bir hata oluştu." + ex.Message, ex);
+                throw new Exception("Veri eklenirken bir hata oluştu: " + ex.Message, ex);
             }
             finally
             {

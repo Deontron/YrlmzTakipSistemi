@@ -16,7 +16,6 @@ namespace YrlmzTakipSistemi
             {
                 FlowDocument doc = new FlowDocument();
 
-                // Belge başlığı ekleniyor
                 Paragraph title = new Paragraph(new Run(name))
                 {
                     FontSize = 18,

@@ -15,6 +15,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Data.SQLite;
 using Google.Apis.Drive.v3.Data;
+using YrlmzTakipSistemi.Repositories;
 
 namespace YrlmzTakipSistemi
 {
@@ -26,6 +27,7 @@ namespace YrlmzTakipSistemi
         private DatabaseHelper _dbHelper;
         private PrintHelper printHelper;
         private InvoiceRepository _invoiceRepository;
+        private TransactionRepository _transactionRepository;
         private ObservableCollection<Invoice> _invoices = new ObservableCollection<Invoice>();
 
         public InvoicePage()
@@ -34,6 +36,7 @@ namespace YrlmzTakipSistemi
             _dbHelper = new DatabaseHelper();
             printHelper = new PrintHelper();
             _invoiceRepository = new InvoiceRepository(_dbHelper.GetConnection());
+            _transactionRepository = new TransactionRepository(_dbHelper.GetConnection());
             LoadInvoices();
         }
 
@@ -85,6 +88,7 @@ namespace YrlmzTakipSistemi
                 if (result == MessageBoxResult.Yes)
                 {
                     _invoiceRepository.Delete(selectedInvoice.Id);
+                    _transactionRepository.DeleteWithDoc(selectedInvoice.Id, "FaturaId");
 
                     MessageBox.Show("Fatura başarıyla silindi.", "Hop!");
                     LoadInvoices();

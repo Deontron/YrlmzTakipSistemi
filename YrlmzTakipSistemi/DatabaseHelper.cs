@@ -72,7 +72,8 @@ namespace YrlmzTakipSistemi
                 CREATE TABLE IF NOT EXISTS Transactions (
                     Id INTEGER PRIMARY KEY AUTOINCREMENT,
                     CustomerId INTEGER NOT NULL,
-                    DocId INTEGER,  
+                    FaturaId INTEGER,  
+                    OdemeId INTEGER,  
                     Tarih DATETIME NOT NULL DEFAULT (CURRENT_TIMESTAMP),
                     Aciklama TEXT NOT NULL,
                     Notlar TEXT, 
@@ -81,7 +82,9 @@ namespace YrlmzTakipSistemi
                     Tutar DECIMAL(10,2) DEFAULT 0,
                     Odenen DECIMAL(10,2) DEFAULT 0,
                     AlacakDurumu DECIMAL(10,2) GENERATED ALWAYS AS (Tutar - Odenen) STORED,
-                    FOREIGN KEY (CustomerId) REFERENCES Customers(Id) ON DELETE CASCADE
+                    FOREIGN KEY (CustomerId) REFERENCES Customers(Id) ON DELETE CASCADE,
+                    FOREIGN KEY (FaturaId) REFERENCES Invoices(Id),
+                    FOREIGN KEY (OdemeId) REFERENCES Payments(Id)
                 )";
 
             string createPaymentsTable = @"

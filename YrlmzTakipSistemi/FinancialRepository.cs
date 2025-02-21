@@ -116,5 +116,32 @@ namespace YrlmzTakipSistemi.Repositories
 
             return transactions;
         }
+
+        public void DeleteYearlyData(string year)
+        {
+            var query = "DELETE FROM FinancialTransactions WHERE strftime('%Y', IslemTarihi) = @Year";
+
+            using (var command = new SQLiteCommand(query, _connection))
+            {
+                _connection.Open();
+                command.Parameters.AddWithValue("@Year", year);
+                command.ExecuteNonQuery();
+                _connection.Close();
+            }
+        }
+
+        public void DeleteMonthlyData(string month, string year)
+        {
+            var query = "DELETE FROM FinancialTransactions WHERE strftime('%Y', IslemTarihi) = @Year AND strftime('%m', IslemTarihi) = @Month";
+
+            using (var command = new SQLiteCommand(query, _connection))
+            {
+                _connection.Open();
+                command.Parameters.AddWithValue("@Year", year);
+                command.Parameters.AddWithValue("@Month", month.PadLeft(2, '0')); 
+                command.ExecuteNonQuery();
+                _connection.Close();
+            }
+        }
     }
 }

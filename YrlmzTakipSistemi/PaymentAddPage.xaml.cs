@@ -100,18 +100,25 @@ namespace YrlmzTakipSistemi
 
             try
             {
-                var payment = new Payment
+                int? paymentId = null; 
+
+                if (category != 3)
                 {
-                    Musteri = currentCustomer.Name,
-                    Borclu = debtor,
-                    KasideYeri = place,
-                    Kategori = category,
-                    Tutar = amount,
-                    OdemeTarihi = formattedDate.ToString("dd-MM-yyyy"),
-                    OdemeDurumu = paidState,
-                    OdemeDescription = paidDescription,
-                    CustomerId = currentCustomer.Id
-                };
+                    var payment = new Payment
+                    {
+                        Musteri = currentCustomer.Name,
+                        Borclu = debtor,
+                        KasideYeri = place,
+                        Kategori = category,
+                        Tutar = amount,
+                        OdemeTarihi = formattedDate.ToString("dd-MM-yyyy"),
+                        OdemeDurumu = paidState,
+                        OdemeDescription = paidDescription,
+                        CustomerId = currentCustomer.Id
+                    };
+                    paymentId = (int?)_paymentRepository.Add(payment);
+                }
+
                 var transaction = new Transaction
                 {
                     CustomerId = currentCustomer.Id,
@@ -119,6 +126,13 @@ namespace YrlmzTakipSistemi
                     Notlar = formattedDate.ToString("dd-MM-yyyy"),
                     Odenen = amount
                 };
+
+                if (paymentId.HasValue) 
+                {
+                    transaction.OdemeId = paymentId.Value;
+                }
+                _transactionRepository.Add(transaction);
+
                 var financial = new FinancialTransaction
                 {
                     Aciklama = description,
@@ -126,12 +140,7 @@ namespace YrlmzTakipSistemi
                     Tutar = amount
                 };
 
-                _transactionRepository.Add(transaction);
                 _financialRepository.Add(financial);
-                if (category != 3)
-                {
-                    _paymentRepository.Add(payment);
-                }
 
                 UpdateCustomerDebt(amount);
 

@@ -56,7 +56,7 @@
 
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="3" Margin="0,20,0,0">
-            <!--<Button Content="Seçili Faturayı Sil" Style="{StaticResource ModernButtonStyle}" Background="#D32F2F" Click="DeleteInvoiceButton_Click"/>-->
+            <Button Content="Sil" Style="{StaticResource ModernButtonStyle}" Background="#D32F2F" Click="DeleteButton_Click"/>
             <Button Content="Geri" Background="#3B4D61" Style="{StaticResource ModernButtonStyle}" Click="BackButton_Click"/>
             <Button Content="Ekle" Background="#388E3C" Style="{StaticResource ModernButtonStyle}" Click="AddButton_Click"/>
         </StackPanel>

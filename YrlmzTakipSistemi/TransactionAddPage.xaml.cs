@@ -49,6 +49,8 @@ namespace YrlmzTakipSistemi
                 var transaction = new Transaction
                 {
                     CustomerId = _currentCustomer.Id,
+                    FaturaId = 0,
+                    OdemeId = 0,
                     Aciklama = description,
                     Notlar = note,
                     Adet = quantity,

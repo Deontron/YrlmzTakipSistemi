@@ -27,6 +27,7 @@ namespace YrlmzTakipSistemi
     public partial class PaymentsPage : Page
     {
         private readonly PaymentRepository _paymentRepository;
+        private readonly TransactionRepository _transactionRepository;
         private DatabaseHelper _dbHelper;
         private PrintHelper printHelper;
         private ObservableCollection<Payment> _payments = new ObservableCollection<Payment>();
@@ -37,6 +38,7 @@ namespace YrlmzTakipSistemi
             _dbHelper = new DatabaseHelper();
             printHelper = new PrintHelper();
             _paymentRepository = new PaymentRepository(_dbHelper.GetConnection());
+            _transactionRepository = new TransactionRepository(_dbHelper.GetConnection());
             LoadPayments();
         }
 
@@ -91,6 +93,7 @@ namespace YrlmzTakipSistemi
                 if (result == MessageBoxResult.Yes)
                 {
                     _paymentRepository.Delete(selectedPayment.Id);
+                    _transactionRepository.DeleteWithDoc(selectedPayment.Id, "OdemeId");
 
                     MessageBox.Show("Ödeme başarıyla silindi.", "Hop!");
                     LoadPayments();

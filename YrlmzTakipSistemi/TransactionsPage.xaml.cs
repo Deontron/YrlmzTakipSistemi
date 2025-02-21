@@ -18,6 +18,8 @@ namespace YrlmzTakipSistemi
     public partial class TransactionsPage : Page
     {
         private readonly TransactionRepository _transactionRepository;
+        private readonly InvoiceRepository _invoiceRepository;
+        private readonly PaymentRepository _paymentRepository;
         private Customer _currentCustomer;
         private ObservableCollection<Transaction> _transactions = new ObservableCollection<Transaction>();
         private DatabaseHelper dbHelper;
@@ -29,6 +31,8 @@ namespace YrlmzTakipSistemi
             dbHelper = new DatabaseHelper();
             printHelper = new PrintHelper();
             _transactionRepository = new TransactionRepository(dbHelper.GetConnection());
+            _invoiceRepository = new InvoiceRepository(dbHelper.GetConnection());
+            _paymentRepository = new PaymentRepository(dbHelper.GetConnection());
         }
 
         public void LoadCustomerTransactions(Customer customer)
@@ -70,7 +74,14 @@ namespace YrlmzTakipSistemi
                 if (result == MessageBoxResult.Yes)
                 {
                     _transactionRepository.Delete(selectedTransaction.Id);
-                    MessageBox.Show("İşlem başarıyla silindi.", "Bilgi");
+                    if(selectedTransaction.FaturaId != 0)
+                    {
+                        _invoiceRepository.Delete((int)selectedTransaction.FaturaId);
+                    }else if(selectedTransaction.OdemeId != 0)
+                    {
+                        _paymentRepository.Delete((int)selectedTransaction.OdemeId);
+                    }
+                        MessageBox.Show("İşlem başarıyla silindi.", "Bilgi");
                     LoadCustomerTransactions(_currentCustomer);
                 }
             }

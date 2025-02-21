@@ -98,16 +98,16 @@ namespace YrlmzTakipSistemi
                     KDV = Kdv,
                     Toplam = total
                 };
-                _invoiceRepository.Add(invoice);
+                int invoiceId = (int)_invoiceRepository.Add(invoice);
 
                 var transaction = new Transaction
                 {
                     Aciklama = "Fatura Kesildi",
                     Notlar = invoiceNo,
                     Tutar = Kdv,
-                    CustomerId = currentCustomer.Id
+                    CustomerId = currentCustomer.Id,
+                    FaturaId = invoiceId
                 };
-
                 _transactionRepository.Add(transaction);
 
                 MessageBox.Show("Fatura başarıyla eklendi!", "Hop!");

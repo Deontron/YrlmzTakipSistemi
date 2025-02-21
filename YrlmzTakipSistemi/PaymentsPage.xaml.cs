@@ -16,6 +16,8 @@ using System.Data.SQLite;
 using System.Collections.ObjectModel;
 using Google.Apis.Drive.v3.Data;
 using System.Numerics;
+using YrlmzTakipSistemi.Repositories;
+
 
 namespace YrlmzTakipSistemi
 {
@@ -24,78 +26,61 @@ namespace YrlmzTakipSistemi
     /// </summary>
     public partial class PaymentsPage : Page
     {
-        private DatabaseHelper dbHelper;
-        private ObservableCollection<Payment> payments = new ObservableCollection<Payment>();
+        private readonly PaymentRepository _paymentRepository;
+        private DatabaseHelper _dbHelper;
+        private ObservableCollection<Payment> _payments = new ObservableCollection<Payment>();
 
         public PaymentsPage()
         {
             InitializeComponent();
-            dbHelper = new DatabaseHelper();
+            _dbHelper = new DatabaseHelper();
+            _paymentRepository = new PaymentRepository(_dbHelper.GetConnection());
             LoadPayments();
         }
 
         public void LoadPayments()
         {
-            payments.Clear();
+            _payments.Clear();
 
-            using (var connection = dbHelper.GetConnection())
+            var payments = _paymentRepository.GetAll();
+            foreach (var payment in payments)
             {
-                connection.Open();
-
-                string query = "SELECT * FROM Payments";
-                SQLiteCommand command = new SQLiteCommand(query, connection);
-
-                using (SQLiteDataReader reader = command.ExecuteReader())
+                DateTime parsedDate;
+                if (DateTime.TryParse(payment.Tarih, out parsedDate))
                 {
-                    while (reader.Read())
-                    {
-                        payments.Add(new Payment
-                        {
-                            Id = reader.GetInt32(0),
-                            CustomerId = reader.GetInt32(1),
-                            Tarih = reader.IsDBNull(2) ? string.Empty : reader.GetDateTime(2).ToString("dd-MM-yyyy"),
-                            Musteri = reader.IsDBNull(3) ? string.Empty : reader.GetString(3),
-                            Borclu = reader.IsDBNull(4) ? string.Empty : reader.GetString(4),
-                            KasideYeri = reader.IsDBNull(5) ? string.Empty : reader.GetString(5),
-                            Kategori = reader.IsDBNull(6) ? 0 : reader.GetInt32(6),
-                            Tutar = reader.IsDBNull(7) ? 0 : reader.GetDouble(7),
-                            OdemeTarihi = reader.IsDBNull(8) ? string.Empty : reader.GetDateTime(8).ToString("dd-MM-yyyy"),
-                            OdemeDurumu = reader.IsDBNull(9) ? 0 : reader.GetInt32(9),
-                            OdemeDescription = reader.IsDBNull(10) ? string.Empty : reader.GetString(10)
-                        });
-                    }
+                    payment.Tarih = parsedDate.ToString("dd.MM.yyyy");
                 }
-
-                foreach (var payment in payments)
+                if (DateTime.TryParse(payment.OdemeTarihi, out parsedDate))
                 {
-                    switch (payment.Kategori)
-                    {
-                        case 1:
-                            payment.KategoriDescription = "Çek";
-                            break;
-                        case 2:
-                            payment.KategoriDescription = "Senet";
-                            break;
-                        default:
-                            payment.KategoriDescription = "Bilinmeyen";
-                            break;
-                    }
+                    payment.OdemeTarihi = parsedDate.ToString("dd.MM.yyyy");
                 }
-
-                PaymentsDataGrid.ItemsSource = payments;
-                UpdateTotalAmount();
-
-                connection.Close();
+                _payments.Add(payment);
             }
-        }
 
+            foreach (var payment in _payments)
+            {
+                switch (payment.Kategori)
+                {
+                    case 1:
+                        payment.KategoriDescription = "Çek";
+                        break;
+                    case 2:
+                        payment.KategoriDescription = "Senet";
+                        break;
+                    default:
+                        payment.KategoriDescription = "Bilinmeyen";
+                        break;
+                }
+            }
+
+            PaymentsDataGrid.ItemsSource = _payments;
+            UpdateTotalAmount();
+        }
 
         private void DeletePaymentButton_Click(object sender, RoutedEventArgs e)
         {
-            if (PaymentsDataGrid.SelectedItem != null)
+            if (PaymentsDataGrid.SelectedItem is Payment selectedPayment)
             {
-                var selectedPayment = (Payment)PaymentsDataGrid.SelectedItem;
-
                 var result = MessageBox.Show(selectedPayment.Musteri + " Silmek istediğinize emin misiniz?",
                                  "Silme Onayı",
                                  MessageBoxButton.YesNo,
@@ -103,17 +88,10 @@ namespace YrlmzTakipSistemi
 
                 if (result == MessageBoxResult.Yes)
                 {
-                    bool success = DeletePaymentFromDatabase(selectedPayment.Id);
+                    _paymentRepository.Delete(selectedPayment.Id);
 
-                    if (success)
-                    {
-                        MessageBox.Show("Ödeme başarıyla silindi.", "Hop!");
-                        LoadPayments();
-                    }
-                    else
-                    {
-                        MessageBox.Show("Silme işlemi başarısız oldu.", "Hop!");
-                    }
+                    MessageBox.Show("Ödeme başarıyla silindi.", "Hop!");
+                    LoadPayments();
                 }
             }
             else
@@ -122,86 +100,13 @@ namespace YrlmzTakipSistemi
             }
         }
 
-        private bool DeletePaymentFromDatabase(int paymentId)
-        {
-            using (var connection = dbHelper.GetConnection())
-            {
-                connection.Open();
-
-                using (var transaction = connection.BeginTransaction())
-                {
-                    try
-                    {
-                        string deletePaymentsQuery = "DELETE FROM Payments WHERE Id = @Id";
-                        using (var deletePaymentsCommand = new SQLiteCommand(deletePaymentsQuery, connection, transaction))
-                        {
-                            deletePaymentsCommand.Parameters.AddWithValue("@Id", paymentId);
-
-                            int rowsAffected = deletePaymentsCommand.ExecuteNonQuery();
-
-                            transaction.Commit();
-                            return rowsAffected > 0;
-                        }
-                    }
-                    catch
-                    {
-                        transaction.Rollback();
-                        return false;
-                    }
-                }
-            }
-        }
-
         private void PaymentsDataGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             if (PaymentsDataGrid.SelectedItem is Payment selectedPayment)
             {
-                selectedPayment.OdemeDurumu++;
-
-                if (selectedPayment.OdemeDurumu > 4)
-                {
-                    selectedPayment.OdemeDurumu = 1;
-                }
-
-                selectedPayment.OdemeDescription = GetPaidDescription(selectedPayment.OdemeDurumu);
-
-                using (var connection = dbHelper.GetConnection())
-                {
-                    connection.Open();
-                    string updateQuery = "UPDATE Payments SET OdemeDurumu = @YeniDurum, OdemeDescription = @OdemeDescription WHERE Id = @PaymentId";
-                    SQLiteCommand command = new SQLiteCommand(updateQuery, connection);
-                    command.Parameters.AddWithValue("@YeniDurum", selectedPayment.OdemeDurumu);
-                    command.Parameters.AddWithValue("@OdemeDescription", selectedPayment.OdemeDescription);
-                    command.Parameters.AddWithValue("@PaymentId", selectedPayment.Id);
-                    command.ExecuteNonQuery();
-                    connection.Close();
-                }
+                _paymentRepository.ChangePaidState(selectedPayment);
 
                 LoadPayments();
-            }
-        }
-
-        private string GetPaidDescription(int state)
-        {
-            if (state == 1)
-            {
-                return "Ödenmedi";
-            }
-            else if (state == 2)
-            {
-                return "Bankada";
-            }
-            else if (state == 3)
-            {
-                return "Tahsil";
-            }
-            else if (state == 4)
-            {
-                return "Diğer";
-            }
-            else
-            {
-                return "Bilinmiyor";
             }
         }
 
@@ -209,46 +114,22 @@ namespace YrlmzTakipSistemi
         {
             string searchText = SearchTextBox.Text.ToLower();
 
-            var filteredCustomers = payments.Where(c => c.Musteri.ToLower().Contains(searchText)).ToList();
+            var filteredCustomers = _payments.Where(c => c.Musteri.ToLower().Contains(searchText)).ToList();
 
             PaymentsDataGrid.ItemsSource = filteredCustomers;
         }
 
         private void UpdateTotalAmount()
         {
-            double totalAmount = 0;
-
-            using (var connection = dbHelper.GetConnection())
-            {
-                connection.Open();
-
-                string query = "SELECT Tutar FROM Payments WHERE OdemeDurumu = 1 OR OdemeDurumu = 2";
-                using (SQLiteCommand command = new SQLiteCommand(query, connection))
-                using (SQLiteDataReader reader = command.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        if (!reader.IsDBNull(0))
-                        {
-                            totalAmount += reader.GetDouble(0);
-                        }
-                    }
-                }
-
-
-                connection.Close();
-            }
+            double totalAmount = _paymentRepository.GetTotalAmount();
 
             SumTextBlock.Text = $"Toplam Alacak: {totalAmount.ToString("N2")} TL";
-
         }
 
         private void UpdateButton_Click(object sender, RoutedEventArgs e)
         {
-            if (PaymentsDataGrid.SelectedItem != null)
+            if (PaymentsDataGrid.SelectedItem is Payment selectedPayment)
             {
-                var selectedPayment = (Payment)PaymentsDataGrid.SelectedItem;
-
                 var result = MessageBox.Show(selectedPayment.Musteri + " Güncellemek istediğinize emin misiniz?",
                                  "Güncelleme Onayı",
                                  MessageBoxButton.YesNo,
@@ -256,7 +137,7 @@ namespace YrlmzTakipSistemi
 
                 if (result == MessageBoxResult.Yes)
                 {
-                    UpdatePaymentInDatabase(selectedPayment);
+                    _paymentRepository.Update(selectedPayment);
                 }
             }
             else
@@ -264,81 +145,5 @@ namespace YrlmzTakipSistemi
                 MessageBox.Show("Lütfen güncellemek için bir müşteri seçin.", "Hop!");
             }
         }
-
-        private bool UpdatePaymentInDatabase(Payment payment)
-        {
-            using (var connection = dbHelper.GetConnection())
-            {
-                try
-                {
-                    connection.Open();
-                    if (connection.State != System.Data.ConnectionState.Open)
-                    {
-                        MessageBox.Show("Veritabanı bağlantısı başarısız!");
-                        return false;
-                    }
-
-                    using (var transaction = connection.BeginTransaction())
-                    {
-                        try
-                        {
-                            string updatePaymentQuery = @"
-                        UPDATE Payments 
-                        SET Musteri = @Musteri, 
-                            Borclu = @Borclu, 
-                            KasideYeri = @KasideYeri, 
-                            Kategori = @Kategori, 
-                            Tutar = @Tutar, 
-                            OdemeTarihi = @OdemeTarihi, 
-                            OdemeDurumu = @OdemeDurumu, 
-                            OdemeDescription = @OdemeDescription 
-                        WHERE Id = @Id";
-
-                            using (var updatePaymentCommand = new SQLiteCommand(updatePaymentQuery, connection, transaction))
-                            {
-                                updatePaymentCommand.Parameters.AddWithValue("@Musteri", payment.Musteri);
-                                updatePaymentCommand.Parameters.AddWithValue("@Borclu", payment.Borclu);
-                                updatePaymentCommand.Parameters.AddWithValue("@KasideYeri", payment.KasideYeri);
-                                updatePaymentCommand.Parameters.AddWithValue("@Kategori", payment.Kategori);
-                                updatePaymentCommand.Parameters.AddWithValue("@Tutar", payment.Tutar);
-                                updatePaymentCommand.Parameters.AddWithValue("@OdemeTarihi", payment.OdemeTarihi);
-                                updatePaymentCommand.Parameters.AddWithValue("@OdemeDurumu", payment.OdemeDurumu);
-                                updatePaymentCommand.Parameters.AddWithValue("@OdemeDescription", payment.OdemeDescription);
-                                updatePaymentCommand.Parameters.AddWithValue("@Id", payment.Id);
-
-                                int rowsAffected = updatePaymentCommand.ExecuteNonQuery();
-                                if (rowsAffected == 0)
-                                {
-                                    MessageBox.Show("Güncellenen ödeme bulunamadı. Id: " + payment.Id);
-                                    transaction.Rollback();
-                                    return false;
-                                }
-                            }
-
-                            transaction.Commit();
-
-                            MessageBox.Show("Ödeme başarıyla güncellendi.");
-
-                            LoadPayments();
-                            UpdateTotalAmount();
-
-                            return true;
-                        }
-                        catch (Exception ex)
-                        {
-                            transaction.Rollback();
-                            MessageBox.Show("Güncelleme hatası: " + ex.Message);
-                            return false;
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Bağlantı hatası: " + ex.Message);
-                    return false;
-                }
-            }
-        }
-
     }
 }

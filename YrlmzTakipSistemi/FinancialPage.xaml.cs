@@ -14,6 +14,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Data.SQLite;
 using System.Diagnostics;
+using YrlmzTakipSistemi.Repositories;
 
 namespace YrlmzTakipSistemi
 {
@@ -22,12 +23,15 @@ namespace YrlmzTakipSistemi
     /// </summary>
     public partial class FinancialPage : Page
     {
-        private DatabaseHelper dbHelper;
-
+        private DatabaseHelper _dbHelper;
+        private FinancialRepository _financialRepository;
+        private int pageId = 0;
+        private string currentYear;
         public FinancialPage()
         {
             InitializeComponent();
-            dbHelper = new DatabaseHelper();
+            _dbHelper = new DatabaseHelper();
+            _financialRepository = new FinancialRepository(_dbHelper.GetConnection());
             LoadYearlySummaries();
         }
         private void LoadFinancialData<T>(List<T> data)
@@ -38,133 +42,64 @@ namespace YrlmzTakipSistemi
 
         private void FinancialDataGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            if(FinancialDataGrid.SelectedItem == null)
+            if (FinancialDataGrid.SelectedItem == null)
             {
                 return;
             }
 
             if (FinancialDataGrid.SelectedItem is YearlySummary selectedYear)
             {
+                currentYear = selectedYear.Yil;
+                pageId = 1;
                 TitleTextBox.Text = "Aylık Gelir/Gider";
                 LoadMonthlySummary(selectedYear.Yil);
             }
             else if (FinancialDataGrid.SelectedItem is MonthlySummary selectedMonth)
             {
+                pageId = 2;
                 TitleTextBox.Text = "Aylık İşlemler";
                 LoadFinancialTransactions(selectedMonth.Ay, selectedMonth.Yil);
             }
         }
 
+        private void Back()
+        {
+            if (pageId == 0)
+            {
+                return;
+            }
+
+            if (pageId == 1)
+            {
+                pageId = 0;
+                TitleTextBox.Text = "Yıllık Gelir/Gider";
+                LoadYearlySummaries();
+            }
+            else if (pageId == 2)
+            {
+                pageId = 1;
+                TitleTextBox.Text = "Aylık Gelir/Gider";
+                LoadMonthlySummary(currentYear);
+            }
+        }
+
         public void LoadMonthlySummary(string year)
         {
-            List<MonthlySummary> summaries = new List<MonthlySummary>();
-
-            using (var connection = dbHelper.GetConnection())
-            {
-                connection.Open();
-                string query = @"
-                    SELECT 
-                    strftime('%m', Tarih) AS Ay, 
-                    SUM(CASE WHEN Tutar > 0 THEN Tutar ELSE 0 END) AS Gelir, 
-                    SUM(CASE WHEN Tutar < 0 THEN ABS(Tutar) ELSE 0 END) AS Gider,
-                    SUM(Tutar) AS Tutar
-                    FROM FinancialTransactions 
-                    WHERE strftime('%Y', Tarih) = @Year
-                    GROUP BY Ay
-                    ORDER BY Ay ASC;";
-
-                using (var command = new SQLiteCommand(query, connection))
-                {
-                    command.Parameters.AddWithValue("@Year", year);
-                    using (var reader = command.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            summaries.Add(new MonthlySummary
-                            {
-                                Ay = reader.GetString(0),
-                                Gelir = reader.GetDouble(1),
-                                Gider = reader.GetDouble(2),
-                                Tutar = reader.GetDouble(3),
-                                Yil = year 
-                            });
-
-                        }
-                    }
-                }
-            }
+            List<MonthlySummary> summaries = _financialRepository.GetMonthlySummaries(year);
 
             LoadFinancialData(summaries);
         }
 
         public void LoadFinancialTransactions(string month, string year)
         {
-            List<FinancialTransaction> transactions = new List<FinancialTransaction>();
+            List<FinancialTransaction> transactions = _financialRepository.GetFinancialTransactions(month, year);
 
-            using (var connection = dbHelper.GetConnection())
-            {
-                connection.Open();
-                string query = @"
-                    SELECT Id, strftime('%d-%m-%Y', Tarih) AS Tarih, Aciklama, Tutar
-                    FROM FinancialTransactions
-                    WHERE strftime('%Y', Tarih) = @Year
-                    AND strftime('%m', Tarih) = @Month
-                    ORDER BY Tarih ASC;";
-
-                using (var command = new SQLiteCommand(query, connection))
-                {
-                    command.Parameters.AddWithValue("@Year", year);
-                    command.Parameters.AddWithValue("@Month", month);
-                    using (var reader = command.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            transactions.Add(new FinancialTransaction
-                            {
-                                Id = reader.GetInt32(0),
-                                Tarih = reader.GetString(1),
-                                Aciklama = reader.GetString(2),
-                                Tutar = reader.GetDouble(3)
-                            });
-                        }
-                    }
-                }
-            }
             LoadFinancialData(transactions);
         }
 
         public void LoadYearlySummaries()
         {
-            List<YearlySummary> summaries = new List<YearlySummary>();
-
-            using (var connection = dbHelper.GetConnection())
-            {
-                connection.Open();
-                string query = @"
-                    SELECT 
-                    strftime('%Y', Tarih) AS Yil, 
-                    SUM(CASE WHEN Tutar > 0 THEN Tutar ELSE 0 END) AS Gelir, 
-                    SUM(CASE WHEN Tutar < 0 THEN ABS(Tutar) ELSE 0 END) AS Gider,
-                    SUM(Tutar) AS Tutar
-                    FROM FinancialTransactions 
-                    GROUP BY Yil 
-                    ORDER BY Yil ASC;";
-
-                using (var command = new SQLiteCommand(query, connection))
-                using (var reader = command.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        summaries.Add(new YearlySummary
-                        {
-                            Yil = reader.GetString(0),
-                            Gelir = reader.GetDouble(1),
-                            Gider = reader.GetDouble(2),
-                            Tutar = reader.GetDouble(3)
-                        });
-                    }
-                }
-            }
+            List<YearlySummary> summaries = _financialRepository.GetYearlySummaries();
 
             LoadFinancialData(summaries);
         }
@@ -179,8 +114,13 @@ namespace YrlmzTakipSistemi
         {
             if (e.PropertyName == "Id" || e.PropertyName == "CustomerId")
             {
-                e.Column.Visibility = Visibility.Collapsed; 
+                e.Column.Visibility = Visibility.Collapsed;
             }
+        }
+
+        private void BackButton_Click(object sender, RoutedEventArgs e)
+        {
+            Back();
         }
     }
 }

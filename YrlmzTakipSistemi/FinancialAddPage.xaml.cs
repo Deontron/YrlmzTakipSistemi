@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Data.SQLite;
+using YrlmzTakipSistemi.Repositories;
 
 namespace YrlmzTakipSistemi
 {
@@ -21,17 +22,20 @@ namespace YrlmzTakipSistemi
     /// </summary>
     public partial class FinancialAddPage : Page
     {
-        private DatabaseHelper dbHelper;
+        private DatabaseHelper _dbHelper;
+        private FinancialRepository _financialRepository;
+
         public FinancialAddPage()
         {
             InitializeComponent();
-            dbHelper = new DatabaseHelper();
+            _dbHelper = new DatabaseHelper();
+            _financialRepository = new FinancialRepository(_dbHelper.GetConnection());
             FinancialDatePicker.SelectedDate = DateTime.Today;
         }
 
         private void BackButton_Click(object sender, RoutedEventArgs e)
         {
-
+            Back();
         }
 
         private void SaveFinancialButton_Click(object sender, RoutedEventArgs e)
@@ -59,36 +63,23 @@ namespace YrlmzTakipSistemi
                     return;
                 }
             }
-
-            try
+            var financialTransaction = new FinancialTransaction
             {
-                using (var connection = dbHelper.GetConnection())
-                {
-                    connection.Open();
+                Aciklama = description,
+                IslemTarihi = formattedDate.ToString("dd-MM-yyyy"),
+                Tutar = income - expance
+            };
 
-                    string insertTransactionQuery = "INSERT INTO FinancialTransactions (Tarih, Aciklama, Tutar) VALUES (@Date, @Description, @Amount)";
-                    var transactionCommand = new SQLiteCommand(insertTransactionQuery, connection);
-                    transactionCommand.Parameters.AddWithValue("@Description", description);
-                    transactionCommand.Parameters.AddWithValue("@Date", formattedDate);
-                    transactionCommand.Parameters.AddWithValue("@Amount", income-expance);
-                    transactionCommand.ExecuteNonQuery();
+            _financialRepository.Add(financialTransaction);
+            MessageBox.Show($"{description} başarıyla eklendi!", "Hop!");
 
-                    connection.Close();
-                }
-
-                MessageBox.Show($"{description} başarıyla eklendi!", "Hop!");
-
-                Back();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Bir hata oluştu: {ex.Message}", "Hata", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+            Back();
         }
 
         private void Back()
         {
-
+            var mainWindow = (MainWindow)Application.Current.MainWindow;
+            mainWindow.MainFrame.Navigate(new FinancialPage());
         }
     }
 }

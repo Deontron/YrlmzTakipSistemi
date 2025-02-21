@@ -80,7 +80,7 @@ namespace YrlmzTakipSistemi
     public class FinancialTransaction
     {
         public int Id { get; set; }
-        public string Tarih { get; set; } = string.Empty;
+        public string IslemTarihi { get; set; } = string.Empty;
         public string Aciklama { get; set; } = string.Empty;
         public double Tutar { get; set; }
     }

@@ -5,15 +5,10 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Data.SQLite;
 using System.Collections.ObjectModel;
+using YrlmzTakipSistemi.Repositories;
 
 namespace YrlmzTakipSistemi
 {
@@ -22,126 +17,71 @@ namespace YrlmzTakipSistemi
     /// </summary>
     public partial class TransactionsPage : Page
     {
+        private readonly TransactionRepository _transactionRepository;
+        private Customer _currentCustomer;
+        private ObservableCollection<Transaction> _transactions = new ObservableCollection<Transaction>();
         private DatabaseHelper dbHelper;
-        private Customer currentCustomer;
-        private ObservableCollection<Transaction> transactions = new ObservableCollection<Transaction>();
 
         public TransactionsPage()
         {
             InitializeComponent();
             dbHelper = new DatabaseHelper();
+            _transactionRepository = new TransactionRepository(dbHelper.GetConnection());
         }
 
         public void LoadCustomerTransactions(Customer customer)
         {
-            transactions.Clear();
-
-            currentCustomer = customer;
+            _transactions.Clear();
+            _currentCustomer = customer;
 
             TitleTextBlock.Text = $"{customer.Name} - İşlemler";
-            using (var connection = dbHelper.GetConnection())
+
+            var transactions = _transactionRepository.GetByCustomerId(customer.Id);
+            foreach (var transaction in transactions)
             {
-                connection.Open();
-                string query = "SELECT * FROM Transactions WHERE CustomerId = @CustomerId";
-                SQLiteCommand command = new SQLiteCommand(query, connection);
-                command.Parameters.AddWithValue("@CustomerId", customer.Id);
-
-                using (SQLiteDataReader reader = command.ExecuteReader())
+                DateTime parsedDate;
+                if (DateTime.TryParse(transaction.Tarih, out parsedDate))
                 {
-                    while (reader.Read())
-                    {
-                        transactions.Add(new Transaction
-                        {
-                            Id = reader.GetInt32(0),
-                            CustomerId = reader.GetInt32(1),
-                            DocId = reader.IsDBNull(2) ? 0 : reader.GetInt32(2),
-                            Tarih = reader.IsDBNull(3) ? string.Empty : reader.GetDateTime(3).ToString("dd-MM-yyyy"),
-                            Aciklama = reader.IsDBNull(4) ? string.Empty : reader.GetString(4),
-                            Notlar = reader.IsDBNull(5) ? string.Empty : reader.GetString(5),
-                            Adet = reader.IsDBNull(6) ? 0 : reader.GetInt32(6),
-                            BirimFiyat = reader.IsDBNull(7) ? 0.0 : reader.GetDouble(7),
-                            Tutar = reader.IsDBNull(8) ? 0.0 : reader.GetDouble(8),
-                            Odenen = reader.IsDBNull(9) ? 0.0 : reader.GetDouble(9),
-                            AlacakDurumu = reader.IsDBNull(10) ? 0.0 : reader.GetDouble(10)
-                        });
-                    }
+                    transaction.Tarih = parsedDate.ToString("dd.MM.yyyy");
                 }
-
-                TransactionsDataGrid.ItemsSource = transactions;
-                UpdateTotalAmount();
-
-                connection.Close();
+                _transactions.Add(transaction);
             }
+
+            TransactionsDataGrid.ItemsSource = _transactions;
+            UpdateTotalAmount();
         }
 
         private void AddTransactionButton_Click(object sender, RoutedEventArgs e)
         {
             var mainWindow = (MainWindow)Application.Current.MainWindow;
             TransactionAddPage transactionAddPage = new TransactionAddPage();
-            transactionAddPage.GetCustomer(currentCustomer);
+            transactionAddPage.GetCustomer(_currentCustomer);
             mainWindow.MainFrame.Navigate(transactionAddPage);
         }
 
         private void DeleteTransactionButton_Click(object sender, RoutedEventArgs e)
         {
-            if (TransactionsDataGrid.SelectedItem != null)
+            if (TransactionsDataGrid.SelectedItem is Transaction selectedTransaction)
             {
-                var selectedTransaction = (Transaction)TransactionsDataGrid.SelectedItem;
-
-                var result = MessageBox.Show(selectedTransaction.Aciklama + " Silmek istediğinize emin misiniz?",
-                                 "Silme Onayı",
-                                 MessageBoxButton.YesNo,
-                                 MessageBoxImage.Question);
+                var result = MessageBox.Show($"{selectedTransaction.Aciklama} Silmek istediğinize emin misiniz?", "Silme Onayı", MessageBoxButton.YesNo, MessageBoxImage.Question);
 
                 if (result == MessageBoxResult.Yes)
                 {
-                    bool success = DeleteTransactionFromDatabase(selectedTransaction.Id);
-
-                    if (success)
-                    {
-                        MessageBox.Show("İşlem başarıyla silindi.", "Hop!");
-                        LoadCustomerTransactions(currentCustomer);
-                    }
-                    else
-                    {
-                        MessageBox.Show("Silme işlemi başarısız oldu.", "Hop!");
-                    }
+                    _transactionRepository.Delete(selectedTransaction.Id);
+                    MessageBox.Show("İşlem başarıyla silindi.", "Bilgi");
+                    LoadCustomerTransactions(_currentCustomer);
                 }
             }
             else
             {
-                MessageBox.Show("Lütfen silmek için bir işlem seçin.", "Hop!");
+                MessageBox.Show("Lütfen silmek için bir işlem seçin.", "Uyarı");
             }
         }
 
-        private bool DeleteTransactionFromDatabase(int transactionId)
+        private void UpdateTotalAmount()
         {
-            using (var connection = dbHelper.GetConnection())
-            {
-                connection.Open();
-
-                using (var transaction = connection.BeginTransaction())
-                {
-                    try
-                    {
-                        string deleteTransactionsQuery = "DELETE FROM Transactions WHERE Id = @Id";
-                        using (var deleteTransactionsCommand = new SQLiteCommand(deleteTransactionsQuery, connection, transaction))
-                        {
-                            deleteTransactionsCommand.Parameters.AddWithValue("@Id", transactionId);
-
-                            int rowsAffected = deleteTransactionsCommand.ExecuteNonQuery();
-
-                            transaction.Commit();
-                            return rowsAffected > 0;
-                        }
-                    }
-                    catch
-                    {
-                        transaction.Rollback();
-                        return false;
-                    }
-                }
-            }
+            double totalAmount = _transactionRepository.GetTotalDebtByCustomerId(_currentCustomer.Id);
+            SumTextBlock.Text = $"Toplam Alacak: {totalAmount:N2} TL";
         }
 
         private void BackButton_Click(object sender, RoutedEventArgs e)
@@ -153,7 +93,7 @@ namespace YrlmzTakipSistemi
         {
             var mainWindow = (MainWindow)Application.Current.MainWindow;
             PaymentAddPage pp = new PaymentAddPage();
-            pp.GetCustomer(currentCustomer);
+            pp.GetCustomer(_currentCustomer);
             mainWindow.MainFrame.Navigate(pp);
         }
 
@@ -161,37 +101,9 @@ namespace YrlmzTakipSistemi
         {
             string searchText = SearchTextBox.Text.ToLower();
 
-            var filteredCustomers = transactions.Where(c => c.Aciklama.ToLower().Contains(searchText)).ToList();
+            var filteredCustomers = _transactions.Where(c => c.Aciklama.ToLower().Contains(searchText)).ToList();
 
             TransactionsDataGrid.ItemsSource = filteredCustomers;
-        }
-
-        private double GetCustomerTotalDebt(int customerId)
-        {
-            double totalDebt = 0;
-
-            using (var connection = dbHelper.GetConnection())
-            {
-                connection.Open();
-                string query = "SELECT SUM(AlacakDurumu) FROM Transactions WHERE CustomerId = @CustomerId";
-                SQLiteCommand command = new SQLiteCommand(query, connection);
-                command.Parameters.AddWithValue("@CustomerId", customerId);
-
-                var result = command.ExecuteScalar();
-                if (result != DBNull.Value && result != null)
-                {
-                    totalDebt = Convert.ToDouble(result);
-                }
-
-                connection.Close();
-            }
-
-            return totalDebt;
-        }
-        private void UpdateTotalAmount()
-        {
-            double totalAmount = GetCustomerTotalDebt(currentCustomer.Id);
-            SumTextBlock.Text = $"Toplam Alacak: {totalAmount.ToString("N2")} TL";
         }
 
         private void TransactionsDataGrid_LoadingRow(object sender, DataGridRowEventArgs e)
@@ -207,11 +119,32 @@ namespace YrlmzTakipSistemi
             }
         }
 
+        private void UpdateButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (TransactionsDataGrid.SelectedItem is Transaction selectedTransaction)
+            {
+                var result = MessageBox.Show(selectedTransaction.Aciklama + " Güncellemek istediğinize emin misiniz?",
+                                 "Güncelleme Onayı",
+                                 MessageBoxButton.YesNo,
+                                 MessageBoxImage.Question);
+
+                if (result == MessageBoxResult.Yes)
+                {
+                    _transactionRepository.Update(selectedTransaction);
+                    LoadCustomerTransactions(_currentCustomer);
+                }
+            }
+            else
+            {
+                MessageBox.Show("Lütfen güncellemek için bir işlem seçin.", "Hop!");
+            }
+        }
+
         private void AddInvoiceButton_Click(object sender, RoutedEventArgs e)
         {
             var mainWindow = (MainWindow)Application.Current.MainWindow;
             InvoiceAddPage invoiceAddPage = new InvoiceAddPage();
-            invoiceAddPage.GetCustomer(currentCustomer);
+            invoiceAddPage.GetCustomer(_currentCustomer);
             mainWindow.MainFrame.Navigate(invoiceAddPage);
         }
 
@@ -219,7 +152,7 @@ namespace YrlmzTakipSistemi
         {
             var mainWindow = (MainWindow)Application.Current.MainWindow;
             InfoPage infoPage = new InfoPage();
-            infoPage.LoadCustomerInfo(currentCustomer);
+            infoPage.LoadCustomerInfo(_currentCustomer);
             mainWindow.MainFrame.Navigate(infoPage);
         }
     }

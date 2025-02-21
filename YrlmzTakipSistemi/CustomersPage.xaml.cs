@@ -14,6 +14,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Data.SQLite;
 using System.Collections.ObjectModel;
+using YrlmzTakipSistemi.Repositories;
 
 namespace YrlmzTakipSistemi
 {
@@ -22,15 +23,17 @@ namespace YrlmzTakipSistemi
     /// </summary>
     public partial class CustomersPage : Page
     {
-        private DatabaseHelper dbHelper;
-        private PrintHelper printHelper;
-        private ObservableCollection<Customer> customers = new ObservableCollection<Customer>();
+        private DatabaseHelper _dbHelper;
+        private PrintHelper _printHelper;
+        private CustomerRepository _customerRepository;
+        private ObservableCollection<Customer> _customers = new ObservableCollection<Customer>();
 
         public CustomersPage()
         {
             InitializeComponent();
-            dbHelper = new DatabaseHelper();
-            printHelper = new PrintHelper();
+            _dbHelper = new DatabaseHelper();
+            _printHelper = new PrintHelper();
+            _customerRepository = new CustomerRepository(_dbHelper.GetConnection());
             LoadCustomers();
             LoadTotalDebt();
         }
@@ -38,41 +41,19 @@ namespace YrlmzTakipSistemi
         private void LoadCustomers()
         {
             var customers = GetCustomersFromDatabase();
-            CustomersDataGrid.ItemsSource = customers;
+            CustomersDataGrid.ItemsSource = _customers;
         }
 
         private ObservableCollection<Customer> GetCustomersFromDatabase()
         {
-            customers.Clear();
+            _customers.Clear();
+            var customers = _customerRepository.GetAll();
 
-            using (var connection = dbHelper.GetConnection())
+            foreach (Customer customer in customers)
             {
-                connection.Open();
-                string query = "SELECT * FROM Customers";
-                SQLiteCommand command = new SQLiteCommand(query, connection);
-
-                using (SQLiteDataReader reader = command.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        customers.Add(new Customer
-                        {
-                            Id = reader.GetInt32(0),
-                            Name = reader.IsDBNull(1) ? string.Empty : reader.GetString(1),
-                            LongName = reader.IsDBNull(2) ? string.Empty : reader.GetString(2),
-                            Contact = reader.IsDBNull(3) ? string.Empty : reader.GetString(3),
-                            Address = reader.IsDBNull(4) ? string.Empty : reader.GetString(4),
-                            TaxNo = reader.IsDBNull(5) ? string.Empty : reader.GetString(5),
-                            TaxOffice = reader.IsDBNull(6) ? string.Empty : reader.GetString(6),
-                            Debt = reader.IsDBNull(7) ? 0 : reader.GetDouble(7)
-                        });
-                    }
-                }
-                connection.Close();
-
+                _customers.Add(customer);
             }
-
-            return customers;
+            return _customers;
         }
 
         private void CustomersDataGrid_MouseDoubleClick(object sender, RoutedEventArgs e)
@@ -96,10 +77,8 @@ namespace YrlmzTakipSistemi
 
         private void DeleteCustomerButton_Click(object sender, RoutedEventArgs e)
         {
-            if (CustomersDataGrid.SelectedItem != null)
+            if (CustomersDataGrid.SelectedItem is Customer selectedCustomer)
             {
-                var selectedCustomer = (Customer)CustomersDataGrid.SelectedItem;
-
                 var result = MessageBox.Show(selectedCustomer.Name + " Silmek istediğinize emin misiniz?",
                                  "Silme Onayı",
                                  MessageBoxButton.YesNo,
@@ -107,17 +86,10 @@ namespace YrlmzTakipSistemi
 
                 if (result == MessageBoxResult.Yes)
                 {
-                    bool success = DeleteCustomerFromDatabase(selectedCustomer.Id);
+                    _customerRepository.Delete(selectedCustomer.Id);
 
-                    if (success)
-                    {
-                        MessageBox.Show("Müşteri başarıyla silindi.", "Hop!");
-                        LoadCustomers();
-                    }
-                    else
-                    {
-                        MessageBox.Show("Silme işlemi başarısız oldu.", "Hop!");
-                    }
+                    MessageBox.Show("Müşteri başarıyla silindi.", "Hop!");
+                    LoadCustomers();
                 }
             }
             else
@@ -126,140 +98,26 @@ namespace YrlmzTakipSistemi
             }
         }
 
-        private bool DeleteCustomerFromDatabase(int customerId)
-        {
-            using (var connection = dbHelper.GetConnection())
-            {
-                connection.Open();
-
-                using (var transaction = connection.BeginTransaction())
-                {
-                    try
-                    {
-                        string deleteTransactionsQuery = "DELETE FROM Transactions WHERE CustomerId = @CustomerId";
-                        using (var deleteTransactionsCommand = new SQLiteCommand(deleteTransactionsQuery, connection, transaction))
-                        {
-                            deleteTransactionsCommand.Parameters.AddWithValue("@CustomerId", customerId);
-                            deleteTransactionsCommand.ExecuteNonQuery();
-                        }
-
-                        string deleteCustomerQuery = "DELETE FROM Customers WHERE Id = @Id";
-                        using (var deleteCustomerCommand = new SQLiteCommand(deleteCustomerQuery, connection, transaction))
-                        {
-                            deleteCustomerCommand.Parameters.AddWithValue("@Id", customerId);
-                            int rowsAffected = deleteCustomerCommand.ExecuteNonQuery();
-
-                            transaction.Commit();
-                            connection.Close();
-
-                            return rowsAffected > 0;
-                        }
-                    }
-                    catch
-                    {
-                        transaction.Rollback();
-                        return false;
-                    }
-                }
-            }
-        }
-
-        private bool UpdateCustomerInDatabase(Customer customer)
-        {
-            using (var connection = dbHelper.GetConnection())
-            {
-                try
-                {
-                    connection.Open();
-                    if (connection.State != System.Data.ConnectionState.Open)
-                    {
-                        MessageBox.Show("Veritabanı bağlantısı başarısız!");
-                        return false;
-                    }
-
-                    using (var transaction = connection.BeginTransaction())
-                    {
-                        try
-                        {
-                            string updateCustomerQuery = "UPDATE Customers SET Name = @Name, Contact = @Contact, Debt = @Debt WHERE Id = @Id";
-                            using (var updateCustomerCommand = new SQLiteCommand(updateCustomerQuery, connection, transaction))
-                            {
-                                updateCustomerCommand.Parameters.AddWithValue("@Name", customer.Name);
-                                updateCustomerCommand.Parameters.AddWithValue("@Contact", customer.Contact);
-                                updateCustomerCommand.Parameters.AddWithValue("@Debt", customer.Debt);
-                                updateCustomerCommand.Parameters.AddWithValue("@Id", customer.Id);
-
-                                int rowsAffected = updateCustomerCommand.ExecuteNonQuery();
-                                if (rowsAffected == 0)
-                                {
-                                    MessageBox.Show("Güncellenen müşteri bulunamadı. Id: " + customer.Id);
-                                    transaction.Rollback();
-                                    return false;
-                                }
-                            }
-
-                            transaction.Commit();
-                            MessageBox.Show("Müşteri başarıyla güncellendi.");
-                            LoadTotalDebt();
-                            connection.Close();
-
-                            return true;
-                        }
-                        catch (Exception ex)
-                        {
-                            transaction.Rollback();
-                            MessageBox.Show("Güncelleme hatası: " + ex.Message);
-                            return false;
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Bağlantı hatası: " + ex.Message);
-                    return false;
-                }
-            }
-        }
-
         private void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             string searchText = SearchTextBox.Text.ToLower();
 
-            var filteredCustomers = customers.Where(c => c.Name.ToLower().Contains(searchText)).ToList();
+            var filteredCustomers = _customers.Where(c => c.Name.ToLower().Contains(searchText)).ToList();
 
             CustomersDataGrid.ItemsSource = filteredCustomers;
         }
 
         private void LoadTotalDebt()
         {
-            double totalDebt = 0;
-
-            using (var connection = dbHelper.GetConnection())
-            {
-                connection.Open();
-
-                string query = "SELECT SUM(Debt) FROM Customers";
-
-                SQLiteCommand command = new SQLiteCommand(query, connection);
-
-                var result = command.ExecuteScalar();
-                if (result != DBNull.Value)
-                {
-                    totalDebt = Convert.ToDouble(result);
-                }
-                connection.Close();
-
-            }
+            double totalDebt = _customerRepository.GetTotalDebt();
 
             SumTextBlock.Text = $"Toplam Alacak: {totalDebt.ToString("N2")} TL";
         }
 
         private void UpdateButton_Click(object sender, RoutedEventArgs e)
         {
-            if (CustomersDataGrid.SelectedItem != null)
+            if (CustomersDataGrid.SelectedItem is Customer selectedCustomer)
             {
-                var selectedCustomer = (Customer)CustomersDataGrid.SelectedItem;
-
                 var result = MessageBox.Show(selectedCustomer.Name + " Güncellemek istediğinize emin misiniz?",
                                  "Güncelleme Onayı",
                                  MessageBoxButton.YesNo,
@@ -267,7 +125,8 @@ namespace YrlmzTakipSistemi
 
                 if (result == MessageBoxResult.Yes)
                 {
-                    UpdateCustomerInDatabase(selectedCustomer);
+                    _customerRepository.Update(selectedCustomer);
+                    LoadTotalDebt();
                 }
             }
             else
@@ -278,7 +137,7 @@ namespace YrlmzTakipSistemi
         }
         private void PrintButton_Click(object sender, RoutedEventArgs e)
         {
-            printHelper.PrintDataGrid(CustomersDataGrid);
+            _printHelper.PrintDataGrid(CustomersDataGrid);
         }
     }
 }

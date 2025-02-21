@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Data.SQLite;
+using YrlmzTakipSistemi.Repositories;
 
 namespace YrlmzTakipSistemi
 {
@@ -21,18 +22,20 @@ namespace YrlmzTakipSistemi
     /// </summary>
     public partial class ProductsAddPage : Page
     {
-        private DatabaseHelper dbHelper;
-        private Customer currentCustomer;
+        private readonly ProductRepository _productRepository;
+        private DatabaseHelper _dbHelper;
+        private Customer _currentCustomer;
         public ProductsAddPage()
         {
             InitializeComponent();
-            dbHelper = new DatabaseHelper();
+            _dbHelper = new DatabaseHelper();
+            _productRepository = new ProductRepository(_dbHelper.GetConnection());
         }
 
         public void GetCustomer(Customer customer)
         {
-            currentCustomer = customer;
-            TitleTextBlock.Text = $"{currentCustomer.Name} - Yeni Ürün Ekle";
+            _currentCustomer = customer;
+            TitleTextBlock.Text = $"{_currentCustomer.Name} - Yeni Ürün Ekle";
         }
 
         private void SaveProductButton_Click(object sender, RoutedEventArgs e)
@@ -58,24 +61,25 @@ namespace YrlmzTakipSistemi
                 return;
             }
 
-            using (var connection = dbHelper.GetConnection())
+            try
             {
-                connection.Open();
+                var product = new Product
+                {
+                    CustomerId = _currentCustomer.Id,
+                    Isim = name,
+                    Fiyat = amount
+                };
 
-                string insertQuery = "INSERT INTO Products (CustomerId, Isim, Fiyat) VALUES (@CustomerId, @Name, @Price)";
-                var command = new SQLiteCommand(insertQuery, connection);
-                command.Parameters.AddWithValue("@CustomerId", currentCustomer.Id);
-                command.Parameters.AddWithValue("@Name", name);
-                command.Parameters.AddWithValue("@Price", amount);
-
-
-                command.ExecuteNonQuery();
-                connection.Close();
-            }
+                _productRepository.Add(product);
 
             MessageBox.Show($"{name} başarıyla eklendi!", "Hop!");
-            ClearForm();
-            Back();
+                ClearForm();
+                Back();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ürün kaydedilirken bir hata oluştu: {ex.Message}", "Hata", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void ClearForm()
@@ -93,7 +97,7 @@ namespace YrlmzTakipSistemi
         {
             var mainWindow = (MainWindow)Application.Current.MainWindow;
             ProductsPage productsPage = new ProductsPage();
-            productsPage.LoadCustomerProducts(currentCustomer);
+            productsPage.LoadCustomerProducts(_currentCustomer);
             mainWindow.MainFrame.Navigate(productsPage);
         }
     }

@@ -117,7 +117,7 @@ namespace YrlmzTakipSistemi
             string createFinancialTransactionsTable = @"
                 CREATE TABLE IF NOT EXISTS FinancialTransactions (
                     Id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    Tarih DATETIME NOT NULL DEFAULT (CURRENT_TIMESTAMP),
+                    IslemTarihi DATETIME NOT NULL DEFAULT (CURRENT_TIMESTAMP),
                     Aciklama TEXT NOT NULL,
                     Tutar DECIMAL(10,2) NOT NULL
                 )";

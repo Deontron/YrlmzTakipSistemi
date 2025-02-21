@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Data.SQLite;
+using YrlmzTakipSistemi.Repositories;
 
 namespace YrlmzTakipSistemi
 {
@@ -21,11 +22,13 @@ namespace YrlmzTakipSistemi
     /// </summary>
     public partial class CustomerAddPage : Page
     {
-        private DatabaseHelper dbHelper;
+        private DatabaseHelper _dbHelper;
+        private CustomerRepository _customerRepository;
         public CustomerAddPage()
         {
             InitializeComponent();
-            dbHelper = new DatabaseHelper();
+            _dbHelper = new DatabaseHelper();
+            _customerRepository = new CustomerRepository(_dbHelper.GetConnection());
         }
 
         private void SaveCustomerButton_Click(object sender, RoutedEventArgs e)
@@ -53,25 +56,20 @@ namespace YrlmzTakipSistemi
                 return;
             }
 
-            MessageBox.Show($"Müşteri {name} başarıyla eklendi!", "Hop!");
-
-            using (var connection = dbHelper.GetConnection())
+            var customer = new Customer
             {
-                connection.Open();
+                Name = name,
+                LongName = longName,
+                Contact = contact,
+                Address = address,
+                TaxNo = taxNo,
+                TaxOffice = taxOffice,
+                Debt = amount
+            };
 
-                string insertQuery = "INSERT INTO Customers (Name, LongName, Contact, Address, TaxNo, TaxOffice, Debt) VALUES (@Name, @LongName, @Contact, @Address, @TaxNo, @TaxOffice, @Debt)";
-                var command = new SQLiteCommand(insertQuery, connection);
-                command.Parameters.AddWithValue("@Name", name);
-                command.Parameters.AddWithValue("@LongName", longName);
-                command.Parameters.AddWithValue("@Contact", contact);
-                command.Parameters.AddWithValue("@Address", address);
-                command.Parameters.AddWithValue("@TaxNo", taxNo);
-                command.Parameters.AddWithValue("@TaxOffice", taxOffice);
-                command.Parameters.AddWithValue("@Debt", amount);
+            _customerRepository.Add(customer);
 
-                command.ExecuteNonQuery();
-                connection.Close();
-            }
+            MessageBox.Show($"Müşteri {name} başarıyla eklendi!", "Hop!");
 
             ClearForm();
 

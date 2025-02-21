@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Data.SQLite;
+using YrlmzTakipSistemi.Repositories;
 
 namespace YrlmzTakipSistemi
 {
@@ -21,13 +22,18 @@ namespace YrlmzTakipSistemi
     /// </summary>
     public partial class InvoiceAddPage : Page
     {
-        private DatabaseHelper dbHelper;
+        private DatabaseHelper _dbHelper;
+        private InvoiceRepository _invoiceRepository;
+        private readonly TransactionRepository _transactionRepository;
+        private readonly CustomerRepository _customerRepository;
         private Customer currentCustomer;
         public InvoiceAddPage()
         {
             InitializeComponent();
-            dbHelper = new DatabaseHelper();
-
+            _dbHelper = new DatabaseHelper();
+            _invoiceRepository = new InvoiceRepository(_dbHelper.GetConnection());
+            _transactionRepository = new TransactionRepository(_dbHelper.GetConnection());
+            _customerRepository = new CustomerRepository(_dbHelper.GetConnection());
             InvoiceDatePicker.SelectedDate = DateTime.Today;
         }
 
@@ -82,31 +88,27 @@ namespace YrlmzTakipSistemi
 
             try
             {
-                using (var connection = dbHelper.GetConnection())
+                var invoice = new Invoice
                 {
-                    connection.Open();
+                    Musteri = customer,
+                    CustomerId = currentCustomer.Id,
+                    FaturaNo = invoiceNo,
+                    FaturaTarihi = invoiceDate.ToString("dd-MM-yyyy"),
+                    Tutar = amount,
+                    KDV = Kdv,
+                    Toplam = total
+                };
+                _invoiceRepository.Add(invoice);
 
-                    string insertTransactionQuery = "INSERT INTO Transactions (CustomerId, Aciklama, Notlar, Tutar) VALUES (@CustomerId, @Description, @Note, @Amount)";
-                    var transactionCommand = new SQLiteCommand(insertTransactionQuery, connection);
-                    transactionCommand.Parameters.AddWithValue("@Description", "Fatura Kesildi");
-                    transactionCommand.Parameters.AddWithValue("@Note", invoiceNo);
-                    transactionCommand.Parameters.AddWithValue("@Amount", Kdv);
-                    transactionCommand.Parameters.AddWithValue("@CustomerId", currentCustomer.Id);
-                    transactionCommand.ExecuteNonQuery();
+                var transaction = new Transaction
+                {
+                    Aciklama = "Fatura Kesildi",
+                    Notlar = invoiceNo,
+                    Tutar = Kdv,
+                    CustomerId = currentCustomer.Id
+                };
 
-                    string insertInvoiceQuery = "INSERT INTO Invoices (CustomerId, Musteri, FaturaNo, FaturaTarihi, Tutar, KDV, Toplam) VALUES (@CostumerId, @Musteri, @FaturaNo, @FaturaTarihi, @Tutar, @KDV, @Toplam)";
-                    var invoiceCommand = new SQLiteCommand(insertInvoiceQuery, connection);
-                    invoiceCommand.Parameters.AddWithValue("@Musteri", customer);
-                    invoiceCommand.Parameters.AddWithValue("@CostumerId", 0);
-                    invoiceCommand.Parameters.AddWithValue("@FaturaNo", invoiceNo);
-                    invoiceCommand.Parameters.AddWithValue("@FaturaTarihi", invoiceDate);
-                    invoiceCommand.Parameters.AddWithValue("@Tutar", amount);
-                    invoiceCommand.Parameters.AddWithValue("@KDV", Kdv);
-                    invoiceCommand.Parameters.AddWithValue("@Toplam", total);
-                    invoiceCommand.ExecuteNonQuery();
-
-                    connection.Close();
-                }
+                _transactionRepository.Add(transaction);
 
                 MessageBox.Show("Fatura başarıyla eklendi!", "Hop!");
 
@@ -134,39 +136,13 @@ namespace YrlmzTakipSistemi
 
         private void UpdateCustomerDebt(double amount)
         {
-            double totalDebt = 0;
-
-            using (var connection = dbHelper.GetConnection())
-            {
-                connection.Open();
-
-                string query = "SELECT Debt FROM Customers WHERE Id = @CustomerId";
-                SQLiteCommand command = new SQLiteCommand(query, connection);
-                command.Parameters.AddWithValue("@CustomerId", currentCustomer.Id);
-
-                var result = command.ExecuteScalar();
-                if (result != DBNull.Value)
-                {
-                    totalDebt = Convert.ToDouble(result);
-                }
-
-                connection.Close();
-            }
+            double totalDebt = _customerRepository.GetCustomerDebtById(currentCustomer.Id);
 
             totalDebt += amount;
 
-            using (var connection = dbHelper.GetConnection())
-            {
-                connection.Open();
-
-                string updateQuery = "UPDATE Customers SET Debt = @Debt WHERE Id = @CustomerId";
-                SQLiteCommand updateCommand = new SQLiteCommand(updateQuery, connection);
-                updateCommand.Parameters.AddWithValue("@Debt", totalDebt);
-                updateCommand.Parameters.AddWithValue("@CustomerId", currentCustomer.Id);
-                updateCommand.ExecuteNonQuery();
-
-                connection.Close();
-            }
+            Customer customer = _customerRepository.GetById(currentCustomer.Id);
+            customer.Debt = totalDebt;
+            _customerRepository.Update(customer);
         }
     }
 }

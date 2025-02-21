@@ -23,73 +23,58 @@ namespace YrlmzTakipSistemi
     /// </summary>
     public partial class InvoicePage : Page
     {
-        private DatabaseHelper dbHelper;
-        private ObservableCollection<Invoice> Invoices = new ObservableCollection<Invoice>();
+        private DatabaseHelper _dbHelper;
+        private InvoiceRepository _invoiceRepository;
+        private ObservableCollection<Invoice> _invoices = new ObservableCollection<Invoice>();
 
         public InvoicePage()
         {
             InitializeComponent();
-            dbHelper = new DatabaseHelper();
+            _dbHelper = new DatabaseHelper();
+            _invoiceRepository = new InvoiceRepository(_dbHelper.GetConnection());
             LoadInvoices();
         }
 
         private void LoadInvoices()
         {
-            var invoices = GetInvoicesFromDatabase();
-            InvoicesDataGrid.ItemsSource = invoices;
+            var _invoices = GetInvoicesFromDatabase();
+            InvoicesDataGrid.ItemsSource = _invoices;
             LoadTotalAmount();
         }
 
         private ObservableCollection<Invoice> GetInvoicesFromDatabase()
         {
-            Invoices.Clear();
-
-            using (var connection = dbHelper.GetConnection())
+            _invoices.Clear();
+            var invoices = _invoiceRepository.GetAll();
+            foreach (var invoice in invoices)
             {
-                connection.Open();
-                string query = "SELECT * FROM Invoices";
-                SQLiteCommand command = new SQLiteCommand(query, connection);
-
-                using (SQLiteDataReader reader = command.ExecuteReader())
+                DateTime parsedDate;
+                if (DateTime.TryParse(invoice.Tarih, out parsedDate))
                 {
-                    while (reader.Read())
-                    {
-                        Invoices.Add(new Invoice
-                        {
-                            Id = reader.GetInt32(0),
-                            CustomerId = reader.GetInt32(1),
-                            Tarih = reader.IsDBNull(2) ? string.Empty : reader.GetDateTime(2).ToString("dd-MM-yyyy"),
-                            Musteri = reader.IsDBNull(3) ? string.Empty : reader.GetString(3),
-                            FaturaNo = reader.IsDBNull(4) ? string.Empty : reader.GetString(4),
-                            FaturaTarihi = reader.IsDBNull(5) ? string.Empty : reader.GetDateTime(5).ToString("dd-MM-yyyy"),
-                            Tutar = reader.IsDBNull(6) ? 0 : reader.GetDouble(6),
-                            KDV = reader.IsDBNull(7) ? 0 : reader.GetDouble(7),
-                            Toplam = reader.IsDBNull(8) ? 0 : reader.GetDouble(8)
-                        });
-                    }
+                    invoice.Tarih = parsedDate.ToString("dd.MM.yyyy");
                 }
-                connection.Close();
-
+                if (DateTime.TryParse(invoice.FaturaTarihi, out parsedDate))
+                {
+                    invoice.FaturaTarihi = parsedDate.ToString("dd.MM.yyyy");
+                }
+                _invoices.Add(invoice);
             }
-
-            return Invoices;
+            return _invoices;
         }
 
         private void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             string searchText = SearchTextBox.Text.ToLower();
 
-            var filteredInvoices = Invoices.Where(c => c.Musteri.ToLower().Contains(searchText)).ToList();
+            var filteredInvoices = _invoices.Where(c => c.Musteri.ToLower().Contains(searchText)).ToList();
 
             InvoicesDataGrid.ItemsSource = filteredInvoices;
         }
 
         private void DeleteInvoiceButton_Click(object sender, RoutedEventArgs e)
         {
-            if (InvoicesDataGrid.SelectedItem != null)
+            if (InvoicesDataGrid.SelectedItem is Invoice selectedInvoice)
             {
-                var selectedInvoice = (Invoice)InvoicesDataGrid.SelectedItem;
-
                 var result = MessageBox.Show(selectedInvoice.Musteri + " Silmek istediğinize emin misiniz?",
                                  "Silme Onayı",
                                  MessageBoxButton.YesNo,
@@ -97,17 +82,10 @@ namespace YrlmzTakipSistemi
 
                 if (result == MessageBoxResult.Yes)
                 {
-                    bool success = DeleteInvoiceFromDatabase(selectedInvoice.Id);
+                    _invoiceRepository.Delete(selectedInvoice.Id);
 
-                    if (success)
-                    {
-                        MessageBox.Show("Fatura başarıyla silindi.", "Hop!");
-                        LoadInvoices();
-                    }
-                    else
-                    {
-                        MessageBox.Show("Silme işlemi başarısız oldu.", "Hop!");
-                    }
+                    MessageBox.Show("Fatura başarıyla silindi.", "Hop!");
+                    LoadInvoices();
                 }
             }
             else
@@ -116,42 +94,10 @@ namespace YrlmzTakipSistemi
             }
         }
 
-        private bool DeleteInvoiceFromDatabase(int invoiceId)
-        {
-            using (var connection = dbHelper.GetConnection())
-            {
-                connection.Open();
-
-                using (var transaction = connection.BeginTransaction())
-                {
-                    try
-                    {
-                        string deleteInvoiceQuery = "DELETE FROM Invoices WHERE Id = @Id";
-                        using (var deleteInvoiceCommand = new SQLiteCommand(deleteInvoiceQuery, connection, transaction))
-                        {
-                            deleteInvoiceCommand.Parameters.AddWithValue("@Id", invoiceId);
-                            int rowsAffected = deleteInvoiceCommand.ExecuteNonQuery();
-
-                            transaction.Commit();
-
-                            return rowsAffected > 0;
-                        }
-                    }
-                    catch
-                    {
-                        transaction.Rollback();
-                        return false;
-                    }
-                }
-            }
-        }
-
         private void UpdateButton_Click(object sender, RoutedEventArgs e)
         {
-            if (InvoicesDataGrid.SelectedItem != null)
+            if (InvoicesDataGrid.SelectedItem is Invoice selectedInvoice)
             {
-                var selectedInvoice = (Invoice)InvoicesDataGrid.SelectedItem;
-
                 var result = MessageBox.Show(selectedInvoice.Musteri + " Güncellemek istediğinize emin misiniz?",
                                  "Güncelleme Onayı",
                                  MessageBoxButton.YesNo,
@@ -159,7 +105,7 @@ namespace YrlmzTakipSistemi
 
                 if (result == MessageBoxResult.Yes)
                 {
-                    UpdateInvoiceInDatabase(selectedInvoice);
+                    _invoiceRepository.Update(selectedInvoice);
                 }
             }
             else
@@ -168,85 +114,9 @@ namespace YrlmzTakipSistemi
             }
         }
 
-        private bool UpdateInvoiceInDatabase(Invoice invoice)
-        {
-            using (var connection = dbHelper.GetConnection())
-            {
-                try
-                {
-                    connection.Open();
-                    if (connection.State != System.Data.ConnectionState.Open)
-                    {
-                        MessageBox.Show("Veritabanı bağlantısı başarısız!");
-                        return false;
-                    }
-
-                    using (var transaction = connection.BeginTransaction())
-                    {
-                        try
-                        {
-                            string updateInvoiceQuery = "UPDATE Invoices SET Musteri = @Musteri, FaturaNo = @FaturaNo, FaturaTarihi = @FaturaTarihi, Tutar = @Tutar, KDV = @KDV, Toplam = @Toplam WHERE Id = @Id";
-                            using (var updateInvoiceCommand = new SQLiteCommand(updateInvoiceQuery, connection, transaction))
-                            {
-                                updateInvoiceCommand.Parameters.AddWithValue("@Musteri", invoice.Musteri);
-                                updateInvoiceCommand.Parameters.AddWithValue("@FaturaNo", invoice.FaturaNo);
-                                updateInvoiceCommand.Parameters.AddWithValue("@FaturaTarihi", invoice.FaturaTarihi);
-                                updateInvoiceCommand.Parameters.AddWithValue("@Tutar", invoice.Tutar);
-                                updateInvoiceCommand.Parameters.AddWithValue("@KDV", invoice.KDV);
-                                updateInvoiceCommand.Parameters.AddWithValue("@Toplam", invoice.Toplam);
-                                updateInvoiceCommand.Parameters.AddWithValue("@Id", invoice.Id);
-
-                                int rowsAffected = updateInvoiceCommand.ExecuteNonQuery();
-                                if (rowsAffected == 0)
-                                {
-                                    MessageBox.Show("Güncellenen fatura bulunamadı. Id: " + invoice.Id);
-                                    transaction.Rollback();
-                                    return false;
-                                }
-                            }
-
-                            transaction.Commit();
-                            MessageBox.Show("Fatura başarıyla güncellendi.");
-                            LoadTotalAmount();
-                            return true;
-                        }
-                        catch (Exception ex)
-                        {
-                            transaction.Rollback();
-                            MessageBox.Show("Güncelleme hatası: " + ex.Message);
-                            return false;
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Bağlantı hatası: " + ex.Message);
-                    return false;
-                }
-            }
-        }
-
         private void LoadTotalAmount()
         {
-            double total = 0;
-
-            using (var connection = dbHelper.GetConnection())
-            {
-                connection.Open();
-
-                string query = "SELECT SUM(Toplam) FROM Invoices";
-
-                SQLiteCommand command = new SQLiteCommand(query, connection);
-
-                var result = command.ExecuteScalar();
-                if (result != DBNull.Value)
-                {
-                    total = Convert.ToDouble(result);
-                }
-                connection.Close();
-
-            }
-
+            double total = _invoiceRepository.GetTotalAmount();
             SumTextBlock.Text = $"Toplam Tutar: {total.ToString("N2")} TL";
         }
     }

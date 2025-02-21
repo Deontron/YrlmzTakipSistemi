@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Data.SQLite;
+using YrlmzTakipSistemi.Repositories;
 
 namespace YrlmzTakipSistemi
 {
@@ -21,64 +22,51 @@ namespace YrlmzTakipSistemi
     /// </summary>
     public partial class ProductsPage : Page
     {
-        private DatabaseHelper dbHelper;
-        private Customer currentCustomer;
+        private readonly ProductRepository _productRepository;
+        private DatabaseHelper _dbHelper;
+        private Customer _currentCustomer;
         private PrintHelper printHelper;
         public ProductsPage()
         {
             InitializeComponent();
-            dbHelper = new DatabaseHelper();
+            _dbHelper = new DatabaseHelper();
             printHelper = new PrintHelper();
+            _productRepository = new ProductRepository(_dbHelper.GetConnection());
         }
 
         public void LoadCustomerProducts(Customer customer)
         {
-            currentCustomer = customer;
+            _currentCustomer = customer;
 
             TitleTextBlock.Text = $"{customer.Name} - Ürünler";
-            using (var connection = dbHelper.GetConnection())
+
+            List<Product> _products = new List<Product>();
+            var products = _productRepository.GetByCustomerId(customer.Id);
+            foreach (var transaction in products)
             {
-                connection.Open();
-                string query = "SELECT * FROM Products WHERE CustomerId = @CustomerId";
-                SQLiteCommand command = new SQLiteCommand(query, connection);
-                command.Parameters.AddWithValue("@CustomerId", customer.Id);
-
-                List<Product> products = new List<Product>();
-
-                using (SQLiteDataReader reader = command.ExecuteReader())
+                DateTime parsedDate;
+                if (DateTime.TryParse(transaction.Tarih, out parsedDate))
                 {
-                    while (reader.Read())
-                    {
-                        products.Add(new Product
-                        {
-                            Id = reader.GetInt32(0),
-                            CustomerId = reader.GetInt32(1),
-                            Tarih = reader.IsDBNull(2) ? string.Empty : reader.GetDateTime(2).ToString("dd-MM-yyyy"),
-                            Isim = reader.IsDBNull(3) ? string.Empty : reader.GetString(3),
-                            Fiyat = reader.IsDBNull(4) ? 0.0 : reader.GetDouble(4),
-                        });
-                    }
+                    transaction.Tarih = parsedDate.ToString("dd.MM.yyyy");
                 }
-
-                ProductsDataGrid.ItemsSource = products;
-                connection.Close();
+                _products.Add(transaction);
             }
+
+            ProductsDataGrid.ItemsSource = _products;
         }
 
         private void BackButton_Click(object sender, RoutedEventArgs e)
         {
             var mainWindow = (MainWindow)Application.Current.MainWindow;
             TransactionAddPage transactionAddPage = new TransactionAddPage();
-            transactionAddPage.GetCustomer(currentCustomer);
+            transactionAddPage.GetCustomer(_currentCustomer);
             mainWindow.MainFrame.Navigate(transactionAddPage);
         }
 
         private void DeleteProductButton_Click(object sender, RoutedEventArgs e)
         {
-            if (ProductsDataGrid.SelectedItem != null)
+            if (ProductsDataGrid.SelectedItem is Product selectedProduct)
             {
-                var selectedProduct = (Product)ProductsDataGrid.SelectedItem;
-
                 var result = MessageBox.Show(selectedProduct.Isim + " Silmek istediğinize emin misiniz?",
                                  "Silme Onayı",
                                  MessageBoxButton.YesNo,
@@ -86,17 +74,9 @@ namespace YrlmzTakipSistemi
 
                 if (result == MessageBoxResult.Yes)
                 {
-                    bool success = DeleteProductFromDatabase(selectedProduct.Id);
-
-                    if (success)
-                    {
-                        MessageBox.Show("Ürün başarıyla silindi.", "Hop!");
-                        LoadCustomerProducts(currentCustomer);
-                    }
-                    else
-                    {
-                        MessageBox.Show("Silme işlemi başarısız oldu.", "Hop!");
-                    }
+                    _productRepository.Delete(selectedProduct.Id);
+                    MessageBox.Show("Ürün başarıyla silindi.", "Hop!");
+                    LoadCustomerProducts(_currentCustomer);
                 }
             }
             else
@@ -104,51 +84,19 @@ namespace YrlmzTakipSistemi
                 MessageBox.Show("Lütfen silmek için bir ürün seçin.", "Hop!");
             }
         }
-        private bool DeleteProductFromDatabase(int productId)
-        {
-            using (var connection = dbHelper.GetConnection())
-            {
-                connection.Open();
-
-                using (var transaction = connection.BeginTransaction())
-                {
-                    try
-                    {
-                        string deleteProductsQuery = "DELETE FROM Products WHERE Id = @Id";
-                        using (var deleteProductsCommand = new SQLiteCommand(deleteProductsQuery, connection, transaction))
-                        {
-                            deleteProductsCommand.Parameters.AddWithValue("@Id", productId);
-
-                            int rowsAffected = deleteProductsCommand.ExecuteNonQuery();
-
-                            transaction.Commit();
-                            return rowsAffected > 0;
-                        }
-                    }
-                    catch
-                    {
-                        transaction.Rollback();
-                        return false;
-                    }
-                }
-            }
-        }
-
 
         private void AddProductButton_Click(object sender, RoutedEventArgs e)
         {
             var mainWindow = (MainWindow)Application.Current.MainWindow;
             ProductsAddPage productAddPage = new ProductsAddPage();
-            productAddPage.GetCustomer(currentCustomer);
+            productAddPage.GetCustomer(_currentCustomer);
             mainWindow.MainFrame.Navigate(productAddPage);
         }
 
         private void UpdateProductButton_Click(object sender, RoutedEventArgs e)
         {
-            if (ProductsDataGrid.SelectedItem != null)
+            if (ProductsDataGrid.SelectedItem is Product selectedProduct)
             {
-                var selectedProduct = (Product)ProductsDataGrid.SelectedItem;
-
                 var result = MessageBox.Show(selectedProduct.Isim + " Güncellemek istediğinize emin misiniz?",
                                  "Güncelleme Onayı",
                                  MessageBoxButton.YesNo,
@@ -156,80 +104,12 @@ namespace YrlmzTakipSistemi
 
                 if (result == MessageBoxResult.Yes)
                 {
-                    UpdateProductInDatabase(selectedProduct);
+                    _productRepository.Update(selectedProduct);
                 }
             }
             else
             {
                 MessageBox.Show("Lütfen güncellemek için bir ürün seçin.", "Hop!");
-            }
-        }
-
-        private bool UpdateProductInDatabase(Product product)
-        {
-            using (var connection = dbHelper.GetConnection())
-            {
-                try
-                {
-                    connection.Open();
-                    if (connection.State != System.Data.ConnectionState.Open)
-                    {
-                        MessageBox.Show("Veritabanı bağlantısı başarısız!");
-                        return false;
-                    }
-
-                    using (var transaction = connection.BeginTransaction())
-                    {
-                        try
-                        {
-                            if (!DateTime.TryParse(product.Tarih, out DateTime parsedDate))
-                            {
-                                MessageBox.Show("Geçersiz tarih formatı: " + product.Tarih);
-                                return false;
-                            }
-
-                            string updateProductQuery = "UPDATE Products SET Isim = @Isim, Tarih = @Tarih, Fiyat = @Fiyat WHERE Id = @Id";
-                            using (var updateProductCommand = new SQLiteCommand(updateProductQuery, connection, transaction))
-                            {
-                                updateProductCommand.Parameters.AddWithValue("@Isim", product.Isim);
-                                updateProductCommand.Parameters.AddWithValue("@Tarih", parsedDate.ToString("yyyy-MM-dd HH:mm:ss"));
-                                updateProductCommand.Parameters.AddWithValue("@Fiyat", product.Fiyat);
-                                updateProductCommand.Parameters.AddWithValue("@Id", product.Id);
-
-                                int rowsAffected = updateProductCommand.ExecuteNonQuery();
-                                if (rowsAffected == 0)
-                                {
-                                    MessageBox.Show($"Güncellenen ürün bulunamadı. Id: {product.Id}");
-                                    transaction.Rollback();
-                                    return false;
-                                }
-                            }
-
-                            transaction.Commit();
-                            MessageBox.Show("Ürün başarıyla güncellendi.");
-                            return true;
-                        }
-                        catch (Exception ex)
-                        {
-                            try
-                            {
-                                transaction.Rollback();
-                            }
-                            catch (Exception rollbackEx)
-                            {
-                                MessageBox.Show("Rollback başarısız: " + rollbackEx.Message);
-                            }
-
-                            MessageBox.Show("Güncelleme hatası: " + ex.Message);
-                            return false;
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Bağlantı hatası: " + ex.Message);
-                    return false;
-                }
             }
         }
 

@@ -28,12 +28,14 @@ namespace YrlmzTakipSistemi
     {
         private readonly PaymentRepository _paymentRepository;
         private DatabaseHelper _dbHelper;
+        private PrintHelper printHelper;
         private ObservableCollection<Payment> _payments = new ObservableCollection<Payment>();
 
         public PaymentsPage()
         {
             InitializeComponent();
             _dbHelper = new DatabaseHelper();
+            printHelper = new PrintHelper();
             _paymentRepository = new PaymentRepository(_dbHelper.GetConnection());
             LoadPayments();
         }
@@ -144,6 +146,11 @@ namespace YrlmzTakipSistemi
             {
                 MessageBox.Show("Lütfen güncellemek için bir müşteri seçin.", "Hop!");
             }
+        }
+
+        private void PrintButton_Click(object sender, RoutedEventArgs e)
+        {
+            printHelper.PrintDataGrid(PaymentsDataGrid);
         }
     }
 }

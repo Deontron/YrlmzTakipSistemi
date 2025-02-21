@@ -21,11 +21,13 @@ namespace YrlmzTakipSistemi
         private Customer _currentCustomer;
         private ObservableCollection<Transaction> _transactions = new ObservableCollection<Transaction>();
         private DatabaseHelper dbHelper;
+        private PrintHelper printHelper;
 
         public TransactionsPage()
         {
             InitializeComponent();
             dbHelper = new DatabaseHelper();
+            printHelper = new PrintHelper();
             _transactionRepository = new TransactionRepository(dbHelper.GetConnection());
         }
 
@@ -154,6 +156,11 @@ namespace YrlmzTakipSistemi
             InfoPage infoPage = new InfoPage();
             infoPage.LoadCustomerInfo(_currentCustomer);
             mainWindow.MainFrame.Navigate(infoPage);
+        }
+
+        private void PrintButton_Click(object sender, RoutedEventArgs e)
+        {
+            printHelper.PrintDataGrid(TransactionsDataGrid);
         }
     }
 }

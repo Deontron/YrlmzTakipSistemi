@@ -16,15 +16,23 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <TextBlock x:Name="TitleTextBox"
-           Text="Yıllık Gelir/Gider" 
-           HorizontalAlignment="Center" 
-           VerticalAlignment="Center" 
-           FontSize="28" 
-           FontWeight="Bold" 
-           Foreground="#FFFFFF" 
-           Margin="0,0,0,20" 
-           Grid.Row="0" />
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+
+            <TextBlock Name="TitleTextBox" 
+       Text="Yıllık Gelir/Gider"
+       HorizontalAlignment="Center" 
+       VerticalAlignment="Center" 
+       FontSize="28" 
+       FontWeight="Bold" 
+       Foreground="#FFFFFF" 
+       Margin="0,0,0,20" 
+       Grid.Row="0" />
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+
+            <Button Content="Yazdır" Background="#3B4D61" Style="{StaticResource ModernButtonStyle}" Click="PrintButton_Click"/>
+        </StackPanel>
 
         <Border Grid.Row="1" Background="#1E1E1E" CornerRadius="10" BorderBrush="#444444" BorderThickness="1">
             <DataGrid Name="FinancialDataGrid" 

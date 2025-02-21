@@ -24,6 +24,7 @@ namespace YrlmzTakipSistemi
     public partial class InvoicePage : Page
     {
         private DatabaseHelper _dbHelper;
+        private PrintHelper printHelper;
         private InvoiceRepository _invoiceRepository;
         private ObservableCollection<Invoice> _invoices = new ObservableCollection<Invoice>();
 
@@ -31,6 +32,7 @@ namespace YrlmzTakipSistemi
         {
             InitializeComponent();
             _dbHelper = new DatabaseHelper();
+            printHelper = new PrintHelper();
             _invoiceRepository = new InvoiceRepository(_dbHelper.GetConnection());
             LoadInvoices();
         }
@@ -118,6 +120,11 @@ namespace YrlmzTakipSistemi
         {
             double total = _invoiceRepository.GetTotalAmount();
             SumTextBlock.Text = $"Toplam Tutar: {total.ToString("N2")} TL";
+        }
+
+        private void PrintButton_Click(object sender, RoutedEventArgs e)
+        {
+            printHelper.PrintDataGrid(InvoicesDataGrid);
         }
     }
 }

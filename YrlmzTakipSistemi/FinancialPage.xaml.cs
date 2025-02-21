@@ -24,6 +24,7 @@ namespace YrlmzTakipSistemi
     public partial class FinancialPage : Page
     {
         private DatabaseHelper _dbHelper;
+        private PrintHelper printHelper;
         private FinancialRepository _financialRepository;
         private int pageId = 0;
         private string currentYear;
@@ -31,6 +32,7 @@ namespace YrlmzTakipSistemi
         {
             InitializeComponent();
             _dbHelper = new DatabaseHelper();
+            printHelper = new PrintHelper();
             _financialRepository = new FinancialRepository(_dbHelper.GetConnection());
             LoadYearlySummaries();
         }
@@ -121,6 +123,11 @@ namespace YrlmzTakipSistemi
         private void BackButton_Click(object sender, RoutedEventArgs e)
         {
             Back();
+        }
+
+        private void PrintButton_Click(object sender, RoutedEventArgs e)
+        {
+            printHelper.PrintDataGrid(FinancialDataGrid);
         }
     }
 }

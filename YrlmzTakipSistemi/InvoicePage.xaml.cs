@@ -124,7 +124,7 @@ namespace YrlmzTakipSistemi
 
         private void PrintButton_Click(object sender, RoutedEventArgs e)
         {
-            printHelper.PrintDataGrid(InvoicesDataGrid);
+            printHelper.PrintDataGrid(InvoicesDataGrid, "Faturalar");
         }
     }
 }

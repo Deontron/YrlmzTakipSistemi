@@ -160,7 +160,7 @@ namespace YrlmzTakipSistemi
 
         private void PrintButton_Click(object sender, RoutedEventArgs e)
         {
-            printHelper.PrintDataGrid(TransactionsDataGrid);
+            printHelper.PrintDataGrid(TransactionsDataGrid, _currentCustomer.Name + " İşlemler");
         }
     }
 }

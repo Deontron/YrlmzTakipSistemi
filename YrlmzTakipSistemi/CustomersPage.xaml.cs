@@ -137,7 +137,7 @@ namespace YrlmzTakipSistemi
         }
         private void PrintButton_Click(object sender, RoutedEventArgs e)
         {
-            _printHelper.PrintDataGrid(CustomersDataGrid);
+            _printHelper.PrintDataGrid(CustomersDataGrid, "Müşteriler");
         }
     }
 }

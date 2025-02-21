@@ -115,7 +115,7 @@ namespace YrlmzTakipSistemi
 
         private void PrintButton_Click(object sender, RoutedEventArgs e)
         {
-            printHelper.PrintDataGrid(ProductsDataGrid);
+            printHelper.PrintDataGrid(ProductsDataGrid, "Ürünler");
         }
     }
 }

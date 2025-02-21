@@ -8,21 +8,38 @@ namespace YrlmzTakipSistemi
 {
     class PrintHelper
     {
-        public void PrintDataGrid(DataGrid dataGrid)
+        public void PrintDataGrid(DataGrid dataGrid, string name)
         {
             PrintDialog printDialog = new PrintDialog();
 
             if (printDialog.ShowDialog() == true)
             {
                 FlowDocument doc = new FlowDocument();
+
+                // Belge başlığı ekleniyor
+                Paragraph title = new Paragraph(new Run(name))
+                {
+                    FontSize = 18,
+                    FontWeight = FontWeights.Bold,
+                    TextAlignment = TextAlignment.Center,
+                    Margin = new Thickness(0, 0, 0, 10)
+                };
+                doc.Blocks.Add(title);
+
                 Table table = new Table();
                 doc.Blocks.Add(table);
+
+                table.CellSpacing = 0;
+                table.BorderThickness = new Thickness(1);
+                table.BorderBrush = Brushes.Black;
+
+                int visibleColumnCount = dataGrid.Columns.Count(c => c.Visibility == Visibility.Visible);
 
                 foreach (var column in dataGrid.Columns)
                 {
                     if (column.Visibility == Visibility.Visible)
                     {
-                        table.Columns.Add(new TableColumn());
+                        table.Columns.Add(new TableColumn() { Width = new GridLength(1, GridUnitType.Star) });
                     }
                 }
 
@@ -40,7 +57,8 @@ namespace YrlmzTakipSistemi
                             FontWeight = FontWeights.Bold,
                             Padding = new Thickness(4),
                             BorderBrush = Brushes.Black,
-                            BorderThickness = new Thickness(1)
+                            BorderThickness = new Thickness(1),
+                            TextAlignment = TextAlignment.Center
                         });
                     }
                 }
@@ -67,14 +85,19 @@ namespace YrlmzTakipSistemi
                             {
                                 Padding = new Thickness(4),
                                 BorderBrush = Brushes.Black,
-                                BorderThickness = new Thickness(1)
+                                BorderThickness = new Thickness(1),
+                                TextAlignment = TextAlignment.Center
                             });
                         }
                     }
                 }
 
+                doc.PageWidth = printDialog.PrintableAreaWidth;
+                doc.PagePadding = new Thickness(20);
+                doc.ColumnWidth = printDialog.PrintableAreaWidth;
+
                 IDocumentPaginatorSource paginator = doc;
-                printDialog.PrintDocument(paginator.DocumentPaginator, "DataGrid Yazdırma");
+                printDialog.PrintDocument(paginator.DocumentPaginator, "Yorulmaz Tablo");
             }
         }
     }

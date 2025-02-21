@@ -150,7 +150,7 @@ namespace YrlmzTakipSistemi
 
         private void PrintButton_Click(object sender, RoutedEventArgs e)
         {
-            printHelper.PrintDataGrid(PaymentsDataGrid);
+            printHelper.PrintDataGrid(PaymentsDataGrid, "Ödemeler");
         }
     }
 }

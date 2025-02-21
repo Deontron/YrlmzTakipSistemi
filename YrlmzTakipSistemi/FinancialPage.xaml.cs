@@ -127,7 +127,7 @@ namespace YrlmzTakipSistemi
 
         private void PrintButton_Click(object sender, RoutedEventArgs e)
         {
-            printHelper.PrintDataGrid(FinancialDataGrid);
+            printHelper.PrintDataGrid(FinancialDataGrid, "Gelir/Gider");
         }
     }
 }

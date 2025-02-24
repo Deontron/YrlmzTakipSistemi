@@ -16,6 +16,28 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
+        <StackPanel Orientation="Horizontal" Margin="10">
+            <ComboBox Name="YearComboBox" Width="100" SelectionChanged="FilterTransactions">
+            </ComboBox>
+
+            <ComboBox Name="MonthComboBox" Width="100" SelectionChanged="FilterTransactions">
+                <ComboBoxItem Content="Ocak" Tag="1"/>
+                <ComboBoxItem Content="Şubat" Tag="2"/>
+                <ComboBoxItem Content="Mart" Tag="3"/>
+                <ComboBoxItem Content="Nisan" Tag="4"/>
+                <ComboBoxItem Content="Mayıs" Tag="5"/>
+                <ComboBoxItem Content="Haziran" Tag="6"/>
+                <ComboBoxItem Content="Temmuz" Tag="7"/>
+                <ComboBoxItem Content="Ağustos" Tag="8"/>
+                <ComboBoxItem Content="Eylül" Tag="9"/>
+                <ComboBoxItem Content="Ekim" Tag="10"/>
+                <ComboBoxItem Content="Kasım" Tag="11"/>
+                <ComboBoxItem Content="Aralık" Tag="12"/>
+            </ComboBox>
+
+            <Button Content="Filtrele" Click="FilterTransactions"/>
+        </StackPanel>
+
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
 
             <TextBlock Name="TitleTextBlock" 
@@ -64,7 +86,7 @@
                 <TextBox Name="SearchTextBox" Width="250" Height="35" FontSize="18" Background="#1E1E1E" Foreground="#FFFFFF" BorderBrush="#444444" BorderThickness="1" TextChanged="SearchTextBox_TextChanged"/>
             </StackPanel>
 
-            <TextBlock Name="SumTextBlock" Text="Toplam Alacak: 10000" Width="250" FontSize="20" TextAlignment="Center"
+            <TextBlock Name="SumTextBlock" Text="Toplam Alacak: 10000" Width="300" FontSize="20" TextAlignment="Center"
                Foreground="#FFFFFF" VerticalAlignment="Center" Grid.Column="1" HorizontalAlignment="Center"/>
 
             <Button Content="Bilgiler" Background="#3B4D61" Style="{StaticResource ModernButtonStyle}"

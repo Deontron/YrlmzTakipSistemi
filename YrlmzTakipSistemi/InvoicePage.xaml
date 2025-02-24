@@ -60,7 +60,7 @@
                 <TextBox Name="SearchTextBox" Width="250" Height="35" FontSize="18" Background="#1E1E1E" Foreground="#FFFFFF" BorderBrush="#444444" BorderThickness="1" TextChanged="SearchTextBox_TextChanged"/>
             </StackPanel>
 
-            <TextBlock Name="SumTextBlock" Text="Toplam Alacak: 10000" Width="250" FontSize="20" TextAlignment="Right"
+            <TextBlock Name="SumTextBlock" Text="Toplam: 10000" Width="300" FontSize="20" TextAlignment="Right"
            Foreground="#FFFFFF" VerticalAlignment="Center" Margin="0,5,0,0"/>
         </StackPanel>
 

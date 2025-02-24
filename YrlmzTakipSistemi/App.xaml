@@ -43,7 +43,7 @@
             <Setter Property="BorderThickness" Value="0" />
             <Setter Property="Cursor" Value="Hand" />
             <Setter Property="Height" Value="50" />
-            <Setter Property="MinWidth" Value="200" />
+            <Setter Property="MinWidth" Value="175" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">

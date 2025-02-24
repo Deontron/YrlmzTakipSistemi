@@ -36,7 +36,7 @@ namespace YrlmzTakipSistemi.Repositories
 
         public void DeleteWithDoc(int id, string doc)
         {
-            var allowedColumns = new HashSet<string> { "FaturaId", "OdemeId" };
+            var allowedColumns = new HashSet<string> { "FaturaId", "OdemeId", "FinansalId" };
 
             if (!allowedColumns.Contains(doc))
             {

@@ -24,7 +24,6 @@ namespace YrlmzTakipSistemi
     public partial class PaymentAddPage : Page
     {
         private readonly PaymentRepository _paymentRepository;
-        private readonly FinancialRepository _financialRepository;
         private readonly TransactionRepository _transactionRepository;
         private readonly CustomerRepository _customerRepository;
         private DatabaseHelper _dbHelper;
@@ -34,7 +33,6 @@ namespace YrlmzTakipSistemi
             InitializeComponent();
             _dbHelper = new DatabaseHelper();
             _paymentRepository = new PaymentRepository(_dbHelper.GetConnection());
-            _financialRepository = new FinancialRepository(_dbHelper.GetConnection());
             _transactionRepository = new TransactionRepository(_dbHelper.GetConnection());
             _customerRepository = new CustomerRepository(_dbHelper.GetConnection());
 
@@ -132,15 +130,6 @@ namespace YrlmzTakipSistemi
                     transaction.OdemeId = paymentId.Value;
                 }
                 _transactionRepository.Add(transaction);
-
-                var financial = new FinancialTransaction
-                {
-                    Aciklama = description,
-                    IslemTarihi = formattedDate.ToString("dd-MM-yyyy"),
-                    Tutar = amount
-                };
-
-                _financialRepository.Add(financial);
 
                 UpdateCustomerDebt(amount);
 

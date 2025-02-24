@@ -20,7 +20,7 @@ namespace YrlmzTakipSistemi.Repositories
         public long Add(T entity)
         {
             var properties = typeof(T).GetProperties()
-                .Where(p => p.Name != "Id" && p.Name != "Tarih" && p.Name != "DocId" && p.Name != "AlacakDurumu" && p.Name != "KategoriDescription")
+                .Where(p => p.Name != "Id" && p.Name != "Tarih" && p.Name != "IslemTarihi" && p.Name != "DocId" && p.Name != "AlacakDurumu" && p.Name != "KategoriDescription")
                 .ToList();
             var columns = string.Join(", ", properties.Select(p => p.Name));
             var values = string.Join(", ", properties.Select(p => $"@{p.Name}"));
@@ -36,7 +36,7 @@ namespace YrlmzTakipSistemi.Repositories
                     {
                         object value = property.GetValue(entity);
 
-                        if (property.PropertyType == typeof(string) && (property.Name == "OdemeTarihi" || property.Name == "FaturaTarihi" || property.Name == "IslemTarihi"))
+                        if (property.PropertyType == typeof(string) && (property.Name == "OdemeTarihi" || property.Name == "FaturaTarihi"))
                         {
                             if (DateTime.TryParse((string)value, out DateTime parsedDate))
                             {

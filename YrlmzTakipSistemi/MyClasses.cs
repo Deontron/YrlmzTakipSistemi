@@ -30,6 +30,7 @@ namespace YrlmzTakipSistemi
         public int CustomerId { get; set; }
         public int FaturaId { get; set; }
         public int OdemeId { get; set; }
+        public int FinansalId { get; set; }
         public string Tarih { get; set; } = string.Empty;
         public string Aciklama { get; set; } = String.Empty;
         public string Notlar { get; set; } = String.Empty;

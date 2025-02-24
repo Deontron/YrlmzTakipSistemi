@@ -140,11 +140,11 @@ namespace YrlmzTakipSistemi
                 if (FinancialDataGrid.SelectedItem is YearlySummary selectedYear)
                 {
                     var result = MessageBox.Show($"{selectedYear.Yil} yılının tüm verilerini silmek istediğinize emin misiniz?",
-                                                 "Silme Onayı", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                                                 "Silme Onayı", MessageBoxButton.YesNo, MessageBoxImage.Question);
                     if (result == MessageBoxResult.Yes)
                     {
                         _financialRepository.DeleteYearlyData(selectedYear.Yil);
-                        MessageBox.Show($"{selectedYear.Yil} yılına ait tüm veriler silindi.", "Bilgi", MessageBoxButton.OK, MessageBoxImage.Information);
+                        MessageBox.Show($"{selectedYear.Yil} yılına ait tüm veriler silindi.", "Bilgi");
                         LoadYearlySummaries();
                     }
                 }
@@ -178,7 +178,6 @@ namespace YrlmzTakipSistemi
                 }
             }
         }
-
 
         private void PrintButton_Click(object sender, RoutedEventArgs e)
         {

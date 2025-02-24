@@ -74,6 +74,7 @@ namespace YrlmzTakipSistemi
                     CustomerId INTEGER NOT NULL,
                     FaturaId INTEGER,  
                     OdemeId INTEGER,  
+                    FinansalId INTEGER,  
                     Tarih DATETIME NOT NULL DEFAULT (CURRENT_TIMESTAMP),
                     Aciklama TEXT NOT NULL,
                     Notlar TEXT, 
@@ -84,7 +85,8 @@ namespace YrlmzTakipSistemi
                     AlacakDurumu DECIMAL(10,2) GENERATED ALWAYS AS (Tutar - Odenen) STORED,
                     FOREIGN KEY (CustomerId) REFERENCES Customers(Id) ON DELETE CASCADE,
                     FOREIGN KEY (FaturaId) REFERENCES Invoices(Id),
-                    FOREIGN KEY (OdemeId) REFERENCES Payments(Id)
+                    FOREIGN KEY (OdemeId) REFERENCES Payments(Id),
+                    FOREIGN KEY (FinansalId) REFERENCES FinancialTransactions(Id)
                 )";
 
             string createPaymentsTable = @"

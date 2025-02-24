@@ -18,23 +18,25 @@ namespace YrlmzTakipSistemi
     public partial class TransactionsPage : Page
     {
         private readonly TransactionRepository _transactionRepository;
+        private readonly FinancialRepository _financialRepository;
         private readonly InvoiceRepository _invoiceRepository;
         private readonly PaymentRepository _paymentRepository;
         private readonly CustomerRepository _customerRepository;
         private Customer _currentCustomer;
         private ObservableCollection<Transaction> _transactions = new ObservableCollection<Transaction>();
-        private DatabaseHelper dbHelper;
+        private DatabaseHelper _dbHelper;
         private PrintHelper printHelper;
 
         public TransactionsPage()
         {
             InitializeComponent();
-            dbHelper = new DatabaseHelper();
+            _dbHelper = new DatabaseHelper();
             printHelper = new PrintHelper();
-            _transactionRepository = new TransactionRepository(dbHelper.GetConnection());
-            _invoiceRepository = new InvoiceRepository(dbHelper.GetConnection());
-            _paymentRepository = new PaymentRepository(dbHelper.GetConnection());
-            _customerRepository = new CustomerRepository(dbHelper.GetConnection());
+            _transactionRepository = new TransactionRepository(_dbHelper.GetConnection());
+            _invoiceRepository = new InvoiceRepository(_dbHelper.GetConnection());
+            _paymentRepository = new PaymentRepository(_dbHelper.GetConnection());
+            _customerRepository = new CustomerRepository(_dbHelper.GetConnection());
+            _financialRepository = new FinancialRepository(_dbHelper.GetConnection());
         }
 
         public void LoadCustomerTransactions(Customer customer)
@@ -85,6 +87,10 @@ namespace YrlmzTakipSistemi
                     {
                         _paymentRepository.Delete((int)selectedTransaction.OdemeId);
                     }
+                    else if (selectedTransaction.FinansalId != 0)
+                    {
+                        _financialRepository.Delete((int)selectedTransaction.FinansalId);
+                    }
                     MessageBox.Show("İşlem başarıyla silindi.", "Bilgi");
                     LoadCustomerTransactions(_currentCustomer);
                 }
@@ -98,7 +104,7 @@ namespace YrlmzTakipSistemi
         private void UpdateTotalAmount()
         {
             double totalAmount = _transactionRepository.GetTotalDebtByCustomerId(_currentCustomer.Id);
-            SumTextBlock.Text = $"Toplam Alacak: {totalAmount:N2} TL";
+            SumTextBlock.Text = $"Bakiye: {totalAmount:N2} TL";
         }
 
         private void BackButton_Click(object sender, RoutedEventArgs e)
@@ -177,5 +183,34 @@ namespace YrlmzTakipSistemi
         {
             printHelper.PrintDataGrid(TransactionsDataGrid, _currentCustomer.Name + " İşlemler");
         }
+
+        private List<Transaction> filteredTransactions = new List<Transaction>();
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            //var years = _transactions.Select(t => t.Tarih.Year).Distinct().OrderByDescending(y => y).ToList();
+            //foreach (var year in years)
+            //{
+            //    YearComboBox.Items.Add(year.ToString());
+            //}
+
+            //if (YearComboBox.Items.Count > 0)
+            //    YearComboBox.SelectedIndex = 0;
+        }
+
+        private void FilterTransactions(object sender, RoutedEventArgs e)
+        {
+            //int selectedYear = YearComboBox.SelectedItem != null ? int.Parse(YearComboBox.SelectedItem.ToString()) : DateTime.Now.Year;
+            //int selectedMonth = MonthComboBox.SelectedItem != null ? int.Parse((MonthComboBox.SelectedItem as ComboBoxItem).Tag.ToString()) : 0;
+
+            //if (selectedMonth == 0)
+            //    filteredTransactions = _transactions.Where(t => t.Tarih.Year == selectedYear).ToList();
+            //else
+            //    filteredTransactions = _transactions.Where(t => t.Tarih.Year == selectedYear && t.Tarih.Month == selectedMonth).ToList();
+
+            //TransactionsDataGrid.ItemsSource = filteredTransactions;
+        }
+
+
     }
 }

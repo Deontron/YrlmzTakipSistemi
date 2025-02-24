@@ -9,6 +9,7 @@ namespace YrlmzTakipSistemi
     public partial class TransactionAddPage : Page
     {
         private readonly TransactionRepository _transactionRepository;
+        private readonly FinancialRepository _financialRepository;
         private readonly ProductRepository _productRepository;
         private readonly CustomerRepository _customerRepository;
         private Customer _currentCustomer;
@@ -17,10 +18,11 @@ namespace YrlmzTakipSistemi
         public TransactionAddPage()
         {
             InitializeComponent();
-            var dbHelper = new DatabaseHelper();
-            _transactionRepository = new TransactionRepository(dbHelper.GetConnection());
-            _productRepository = new ProductRepository(dbHelper.GetConnection());
-            _customerRepository = new CustomerRepository(dbHelper.GetConnection());
+            var _dbHelper = new DatabaseHelper();
+            _transactionRepository = new TransactionRepository(_dbHelper.GetConnection());
+            _financialRepository = new FinancialRepository(_dbHelper.GetConnection());
+            _productRepository = new ProductRepository(_dbHelper.GetConnection());
+            _customerRepository = new CustomerRepository(_dbHelper.GetConnection());
             DataContext = this;
             Products = new ObservableCollection<Product>();
         }
@@ -46,6 +48,8 @@ namespace YrlmzTakipSistemi
 
             try
             {
+                amount = amount != 0 ? amount : price * quantity;
+
                 var transaction = new Transaction
                 {
                     CustomerId = _currentCustomer.Id,
@@ -55,13 +59,29 @@ namespace YrlmzTakipSistemi
                     Notlar = note,
                     Adet = quantity,
                     BirimFiyat = price,
-                    Tutar = amount != 0 ? amount : price * quantity,
+                    Tutar = amount,
                     Odenen = paid
                 };
 
+                int? financialId = null;
+                if(amount != 0)
+                {
+                    var financial = new FinancialTransaction
+                    {
+                        Aciklama = description,
+                        Tutar = amount
+                    };
+
+                   financialId = (int?) _financialRepository.Add(financial);
+                }
+
+                if (financialId.HasValue)
+                {
+                    transaction.FinansalId = financialId.Value;
+                }
                 _transactionRepository.Add(transaction);
 
-                UpdateCustomerDebt(amount != 0 ? amount : price * quantity);
+                UpdateCustomerDebt(amount);
 
                 if (SaveProductBox.IsChecked == true)
                 {

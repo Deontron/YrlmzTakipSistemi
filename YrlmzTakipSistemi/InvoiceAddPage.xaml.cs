@@ -46,7 +46,6 @@ namespace YrlmzTakipSistemi
 
         private void SaveInvoiceButton_Click(object sender, RoutedEventArgs e)
         {
-            string customer = CostumerTextBox.Text;
             string invoiceNo = InvoiceNoTextBox.Text;
             double amount = 0;
             double Kdv = 0;
@@ -88,10 +87,10 @@ namespace YrlmzTakipSistemi
             {
                 var invoice = new Invoice
                 {
-                    Musteri = customer,
+                    Musteri = currentCustomer.Name,
                     CustomerId = currentCustomer.Id,
                     FaturaNo = invoiceNo,
-                    FaturaTarihi = invoiceDate.ToString("dd-MM-yyyy"),
+                    FaturaTarihi = invoiceDate,
                     Tutar = amount,
                     KDV = Kdv,
                     Toplam = total

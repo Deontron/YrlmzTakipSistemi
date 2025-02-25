@@ -24,6 +24,7 @@ namespace YrlmzTakipSistemi
         private readonly CustomerRepository _customerRepository;
         private Customer _currentCustomer;
         private ObservableCollection<Transaction> _transactions = new ObservableCollection<Transaction>();
+        private List<Transaction> filteredTransactions = new List<Transaction>();
         private DatabaseHelper _dbHelper;
         private PrintHelper printHelper;
 
@@ -49,11 +50,6 @@ namespace YrlmzTakipSistemi
             var transactions = _transactionRepository.GetByCustomerId(customer.Id);
             foreach (var transaction in transactions)
             {
-                DateTime parsedDate;
-                if (DateTime.TryParse(transaction.Tarih, out parsedDate))
-                {
-                    transaction.Tarih = parsedDate.ToString("dd.MM.yyyy");
-                }
                 _transactions.Add(transaction);
             }
 
@@ -184,33 +180,73 @@ namespace YrlmzTakipSistemi
             printHelper.PrintDataGrid(TransactionsDataGrid, _currentCustomer.Name + " İşlemler");
         }
 
-        private List<Transaction> filteredTransactions = new List<Transaction>();
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            //var years = _transactions.Select(t => t.Tarih.Year).Distinct().OrderByDescending(y => y).ToList();
-            //foreach (var year in years)
-            //{
-            //    YearComboBox.Items.Add(year.ToString());
-            //}
+            if (_transactions == null || !_transactions.Any())
+            {
+                return;
+            }
 
-            //if (YearComboBox.Items.Count > 0)
-            //    YearComboBox.SelectedIndex = 0;
+            int currentYear = DateTime.Now.Year;
+            int currentMonth = DateTime.Now.Month;
+
+            var years = _transactions
+                .Where(t => t.Tarih != null)
+                .Select(t => t.Tarih.Year)
+                .Distinct()
+                .OrderByDescending(y => y)
+                .ToList();
+
+            if (years.Count == 0)
+            {
+                return;
+            }
+
+            YearComboBox.Items.Clear();
+            foreach (var year in years)
+            {
+                YearComboBox.Items.Add(year.ToString());
+            }
+
+            int yearIndex = years.IndexOf(currentYear);
+            YearComboBox.SelectedIndex = yearIndex >= 0 ? yearIndex : 0;
+
+            foreach (ComboBoxItem item in MonthComboBox.Items)
+            {
+                if (item.Tag != null && int.TryParse(item.Tag.ToString(), out int month) && month == currentMonth)
+                {
+                    MonthComboBox.SelectedItem = item;
+                    break;
+                }
+            }
         }
 
         private void FilterTransactions(object sender, RoutedEventArgs e)
         {
-            //int selectedYear = YearComboBox.SelectedItem != null ? int.Parse(YearComboBox.SelectedItem.ToString()) : DateTime.Now.Year;
-            //int selectedMonth = MonthComboBox.SelectedItem != null ? int.Parse((MonthComboBox.SelectedItem as ComboBoxItem).Tag.ToString()) : 0;
+            int selectedYear = DateTime.Now.Year;
+            if (YearComboBox.SelectedItem != null && int.TryParse(YearComboBox.SelectedItem.ToString(), out int year))
+            {
+                selectedYear = year;
+            }
 
-            //if (selectedMonth == 0)
-            //    filteredTransactions = _transactions.Where(t => t.Tarih.Year == selectedYear).ToList();
-            //else
-            //    filteredTransactions = _transactions.Where(t => t.Tarih.Year == selectedYear && t.Tarih.Month == selectedMonth).ToList();
+            int selectedMonth = 0;
+            if (MonthComboBox.SelectedItem is ComboBoxItem selectedItem && selectedItem.Tag != null && int.TryParse(selectedItem.Tag.ToString(), out int month))
+            {
+                selectedMonth = month;
+            }
 
-            //TransactionsDataGrid.ItemsSource = filteredTransactions;
+            if (_transactions == null)
+            {
+                TransactionsDataGrid.ItemsSource = null;
+                return;
+            }
+
+            filteredTransactions = _transactions
+                .Where(t => t.Tarih.Year == selectedYear && (selectedMonth == 0 || t.Tarih.Month == selectedMonth))
+                .ToList();
+
+            TransactionsDataGrid.ItemsSource = filteredTransactions;
         }
-
-
     }
 }

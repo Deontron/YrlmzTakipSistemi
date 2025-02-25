@@ -32,6 +32,7 @@ namespace YrlmzTakipSistemi
         private DatabaseHelper _dbHelper;
         private PrintHelper printHelper;
         private ObservableCollection<Payment> _payments = new ObservableCollection<Payment>();
+        private List<Payment> filteredPayments = new List<Payment>();
 
         public PaymentsPage()
         {
@@ -51,15 +52,6 @@ namespace YrlmzTakipSistemi
             var payments = _paymentRepository.GetAll();
             foreach (var payment in payments)
             {
-                DateTime parsedDate;
-                if (DateTime.TryParse(payment.Tarih, out parsedDate))
-                {
-                    payment.Tarih = parsedDate.ToString("dd.MM.yyyy");
-                }
-                if (DateTime.TryParse(payment.OdemeTarihi, out parsedDate))
-                {
-                    payment.OdemeTarihi = parsedDate.ToString("dd.MM.yyyy");
-                }
                 _payments.Add(payment);
             }
 
@@ -157,6 +149,74 @@ namespace YrlmzTakipSistemi
         private void PrintButton_Click(object sender, RoutedEventArgs e)
         {
             printHelper.PrintDataGrid(PaymentsDataGrid, "Ödemeler");
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (_payments == null || !_payments.Any())
+            {
+                return;
+            }
+
+            int currentYear = DateTime.Now.Year;
+            int currentMonth = DateTime.Now.Month;
+
+            var years = _payments
+                .Where(t => t.Tarih != null)
+                .Select(t => t.Tarih.Year)
+                .Distinct()
+                .OrderByDescending(y => y)
+                .ToList();
+
+            if (years.Count == 0)
+            {
+                return;
+            }
+
+            YearComboBox.Items.Clear();
+            foreach (var year in years)
+            {
+                YearComboBox.Items.Add(year.ToString());
+            }
+
+            int yearIndex = years.IndexOf(currentYear);
+            YearComboBox.SelectedIndex = yearIndex >= 0 ? yearIndex : 0;
+
+            foreach (ComboBoxItem item in MonthComboBox.Items)
+            {
+                if (item.Tag != null && int.TryParse(item.Tag.ToString(), out int month) && month == currentMonth)
+                {
+                    MonthComboBox.SelectedItem = item;
+                    break;
+                }
+            }
+        }
+
+        private void FilterTransactions(object sender, RoutedEventArgs e)
+        {
+            int selectedYear = DateTime.Now.Year;
+            if (YearComboBox.SelectedItem != null && int.TryParse(YearComboBox.SelectedItem.ToString(), out int year))
+            {
+                selectedYear = year;
+            }
+
+            int selectedMonth = 0;
+            if (MonthComboBox.SelectedItem is ComboBoxItem selectedItem && selectedItem.Tag != null && int.TryParse(selectedItem.Tag.ToString(), out int month))
+            {
+                selectedMonth = month;
+            }
+
+            if (_payments == null)
+            {
+                PaymentsDataGrid.ItemsSource = null;
+                return;
+            }
+
+            filteredPayments = _payments
+                .Where(t => t.Tarih.Year == selectedYear && (selectedMonth == 0 || t.Tarih.Month == selectedMonth))
+                .ToList();
+
+            PaymentsDataGrid.ItemsSource = filteredPayments;
         }
     }
 }

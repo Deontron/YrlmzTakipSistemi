@@ -109,7 +109,7 @@ namespace YrlmzTakipSistemi
                         KasideYeri = place,
                         Kategori = category,
                         Tutar = amount,
-                        OdemeTarihi = formattedDate.ToString("dd-MM-yyyy"),
+                        OdemeTarihi = formattedDate,
                         OdemeDurumu = paidState,
                         OdemeDescription = paidDescription,
                         CustomerId = currentCustomer.Id
@@ -120,12 +120,24 @@ namespace YrlmzTakipSistemi
                 var transaction = new Transaction
                 {
                     CustomerId = currentCustomer.Id,
-                    Aciklama = description,
                     Notlar = formattedDate.ToString("dd-MM-yyyy"),
                     Odenen = amount
                 };
 
-                if (paymentId.HasValue) 
+                if(category == 1)
+                {
+                    transaction.Aciklama = "Çek Alındı";
+                }
+                else if (category == 2)
+                {
+                    transaction.Aciklama = "Senet Alındı";
+                }
+                else if (category == 3)
+                {
+                    transaction.Aciklama = "Ödeme Alındı";
+                }
+
+                if (paymentId.HasValue)
                 {
                     transaction.OdemeId = paymentId.Value;
                 }

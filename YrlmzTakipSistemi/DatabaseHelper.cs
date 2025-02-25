@@ -135,16 +135,16 @@ namespace YrlmzTakipSistemi
                 command.CommandText = createProductsTable;
                 command.ExecuteNonQuery();
 
-                command.CommandText = createTransactionsTable;
-                command.ExecuteNonQuery();
-
                 command.CommandText = createPaymentsTable;
                 command.ExecuteNonQuery();
 
                 command.CommandText = createInvoicesTable;
                 command.ExecuteNonQuery();
-
+                
                 command.CommandText = createFinancialTransactionsTable;
+                command.ExecuteNonQuery();
+
+                command.CommandText = createTransactionsTable;
                 command.ExecuteNonQuery();
             }
         }

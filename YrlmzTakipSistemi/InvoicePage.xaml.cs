@@ -30,6 +30,7 @@ namespace YrlmzTakipSistemi
         private TransactionRepository _transactionRepository;
         private readonly CustomerRepository _customerRepository;
         private ObservableCollection<Invoice> _invoices = new ObservableCollection<Invoice>();
+        private List<Invoice> filteredInvoices = new List<Invoice>();
 
         public InvoicePage()
         {
@@ -55,15 +56,6 @@ namespace YrlmzTakipSistemi
             var invoices = _invoiceRepository.GetAll();
             foreach (var invoice in invoices)
             {
-                DateTime parsedDate;
-                if (DateTime.TryParse(invoice.Tarih, out parsedDate))
-                {
-                    invoice.Tarih = parsedDate.ToString("dd.MM.yyyy");
-                }
-                if (DateTime.TryParse(invoice.FaturaTarihi, out parsedDate))
-                {
-                    invoice.FaturaTarihi = parsedDate.ToString("dd.MM.yyyy");
-                }
                 _invoices.Add(invoice);
             }
             return _invoices;
@@ -132,6 +124,74 @@ namespace YrlmzTakipSistemi
         private void PrintButton_Click(object sender, RoutedEventArgs e)
         {
             printHelper.PrintDataGrid(InvoicesDataGrid, "Faturalar");
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (_invoices == null || !_invoices.Any())
+            {
+                return;
+            }
+
+            int currentYear = DateTime.Now.Year;
+            int currentMonth = DateTime.Now.Month;
+
+            var years = _invoices
+                .Where(t => t.Tarih != null)
+                .Select(t => t.Tarih.Year)
+                .Distinct()
+                .OrderByDescending(y => y)
+                .ToList();
+
+            if (years.Count == 0)
+            {
+                return;
+            }
+
+            YearComboBox.Items.Clear();
+            foreach (var year in years)
+            {
+                YearComboBox.Items.Add(year.ToString());
+            }
+
+            int yearIndex = years.IndexOf(currentYear);
+            YearComboBox.SelectedIndex = yearIndex >= 0 ? yearIndex : 0;
+
+            foreach (ComboBoxItem item in MonthComboBox.Items)
+            {
+                if (item.Tag != null && int.TryParse(item.Tag.ToString(), out int month) && month == currentMonth)
+                {
+                    MonthComboBox.SelectedItem = item;
+                    break;
+                }
+            }
+        }
+
+        private void FilterTransactions(object sender, RoutedEventArgs e)
+        {
+            int selectedYear = DateTime.Now.Year;
+            if (YearComboBox.SelectedItem != null && int.TryParse(YearComboBox.SelectedItem.ToString(), out int year))
+            {
+                selectedYear = year;
+            }
+
+            int selectedMonth = 0;
+            if (MonthComboBox.SelectedItem is ComboBoxItem selectedItem && selectedItem.Tag != null && int.TryParse(selectedItem.Tag.ToString(), out int month))
+            {
+                selectedMonth = month;
+            }
+
+            if (_invoices == null)
+            {
+                InvoicesDataGrid.ItemsSource = null;
+                return;
+            }
+
+            filteredInvoices = _invoices
+                .Where(t => t.Tarih.Year == selectedYear && (selectedMonth == 0 || t.Tarih.Month == selectedMonth))
+                .ToList();
+
+            InvoicesDataGrid.ItemsSource = filteredInvoices;
         }
     }
 }

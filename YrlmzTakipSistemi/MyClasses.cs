@@ -31,7 +31,7 @@ namespace YrlmzTakipSistemi
         public int FaturaId { get; set; }
         public int OdemeId { get; set; }
         public int FinansalId { get; set; }
-        public string Tarih { get; set; } = string.Empty;
+        public DateTime Tarih { get; set; }
         public string Aciklama { get; set; } = String.Empty;
         public string Notlar { get; set; } = String.Empty;
         public int Adet { get; set; }
@@ -54,14 +54,14 @@ namespace YrlmzTakipSistemi
     {
         public int Id { get; set; }
         public int CustomerId { get; set; }
-        public string Tarih { get; set; } = string.Empty;
+        public DateTime Tarih { get; set; }
         public string Musteri { get; set; } = string.Empty;
         public string Borclu { get; set; } = string.Empty;
         public string KasideYeri { get; set; } = string.Empty;
         public int Kategori { get; set; }
         public string KategoriDescription { get; set; } = string.Empty;
         public double Tutar { get; set; }
-        public string OdemeTarihi { get; set; } = string.Empty;
+        public DateTime OdemeTarihi { get; set; }
         public int OdemeDurumu { get; set; }
         public string OdemeDescription { get; set; } = string.Empty;
     }
@@ -70,10 +70,10 @@ namespace YrlmzTakipSistemi
     {
         public int Id { get; set; }
         public int CustomerId { get; set; }
-        public string Tarih { get; set; } = string.Empty;
+        public DateTime Tarih { get; set; } 
         public string Musteri { get; set; } = string.Empty;
         public string FaturaNo { get; set; } = string.Empty;
-        public string FaturaTarihi { get; set; } = string.Empty;
+        public DateTime FaturaTarihi { get; set; } 
         public double Tutar { get; set; }
         public double KDV { get; set; }
         public double Toplam { get; set; }

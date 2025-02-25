@@ -16,12 +16,7 @@
             </Grid.ColumnDefinitions>
 
             <StackPanel Background="#2D3E50" Grid.Column="0" Width="200" VerticalAlignment="Stretch">
-                <TextBlock Text="Yrlmz Takip Sistemi" 
-                           FontSize="18" 
-                           FontWeight="Bold" 
-                           Foreground="White" 
-                           Margin="10,20,10,20" 
-                           HorizontalAlignment="Center" />
+                <Image Height="42" Source="yorulmazInduksiyon.png" Stretch="Fill" Width="184" Margin="0,30,0,30"/>
                 <Button Content="Müşteriler" Style="{StaticResource ModernMenuButton}" Click="CustomersButton_Click" />
                 <Button Content="Gelir/Gider" Style="{StaticResource ModernMenuButton}" Click="IncomeExpenseButton_Click" />
                 <Button Content="Faturalar" Style="{StaticResource ModernMenuButton}" Click="InvoiceButton_Click" />

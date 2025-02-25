@@ -6,12 +6,28 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
+    <ApplicationIcon>favicon.ico</ApplicationIcon>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="yorulmazInduksiyon.jpg" />
+    <None Remove="yorulmazInduksiyon.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="favicon.ico" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Google.Apis.Drive.v3" Version="1.68.0.3627" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.1" />
     <PackageReference Include="System.Data.SQLite" Version="1.0.119" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="yorulmazInduksiyon.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>
 
   <ItemGroup>

@@ -12,9 +12,14 @@ namespace YrlmzTakipSistemi.Repositories
         {
             try
             {
-                object result = GetById(customerId).Debt;
+                var customer = GetById(customerId); 
 
-                return result != null ? Convert.ToDouble(result) : 0;
+                if (customer == null)
+                {
+                    return 0; 
+                }
+
+                return Convert.ToDouble(customer.Debt);
             }
             catch (Exception ex)
             {
@@ -47,11 +52,16 @@ namespace YrlmzTakipSistemi.Repositories
 
         public void UpdateCustomerDebtById(double amount, int customerId)
         {
-            double totalDebt = GetCustomerDebtById(customerId);
+            Customer customer = GetById(customerId);
 
+            if (customer == null)
+            {
+                return; 
+            }
+
+            double totalDebt = GetCustomerDebtById(customerId);
             totalDebt += amount;
 
-            Customer customer = GetById(customerId);
             customer.Debt = totalDebt;
             Update(customer);
         }

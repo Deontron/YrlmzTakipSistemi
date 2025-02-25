@@ -48,6 +48,7 @@ namespace YrlmzTakipSistemi
             var _invoices = GetInvoicesFromDatabase();
             InvoicesDataGrid.ItemsSource = _invoices;
             LoadTotalAmount();
+            SetDateFilter();
         }
 
         private ObservableCollection<Invoice> GetInvoicesFromDatabase()
@@ -126,7 +127,7 @@ namespace YrlmzTakipSistemi
             printHelper.PrintDataGrid(InvoicesDataGrid, "Faturalar");
         }
 
-        private void Window_Loaded(object sender, RoutedEventArgs e)
+        private void SetDateFilter()
         {
             if (_invoices == null || !_invoices.Any())
             {
@@ -166,6 +167,10 @@ namespace YrlmzTakipSistemi
                 }
             }
         }
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            SetDateFilter();
+        }
 
         private void FilterTransactions(object sender, RoutedEventArgs e)
         {
@@ -192,6 +197,11 @@ namespace YrlmzTakipSistemi
                 .ToList();
 
             InvoicesDataGrid.ItemsSource = filteredInvoices;
+        }
+
+        private void LoadAllButton_Click(object sender, RoutedEventArgs e)
+        {
+            InvoicesDataGrid.ItemsSource = _invoices;
         }
     }
 }

@@ -43,6 +43,7 @@
                 <ComboBoxItem Content="Kasım" Tag="11"/>
                 <ComboBoxItem Content="Aralık" Tag="12"/>
             </ComboBox>
+            <Button Content="Tümü" Background="#3B4D61" Style="{StaticResource ModernButtonStyle}" Click="LoadAllButton_Click"/>
         </StackPanel>
         
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">

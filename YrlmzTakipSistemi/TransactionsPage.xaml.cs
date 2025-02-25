@@ -55,6 +55,7 @@ namespace YrlmzTakipSistemi
 
             TransactionsDataGrid.ItemsSource = _transactions;
             UpdateTotalAmount();
+            SetDateFilter();
         }
 
         private void AddTransactionButton_Click(object sender, RoutedEventArgs e)
@@ -180,8 +181,7 @@ namespace YrlmzTakipSistemi
             printHelper.PrintDataGrid(TransactionsDataGrid, _currentCustomer.Name + " İşlemler");
         }
 
-
-        private void Window_Loaded(object sender, RoutedEventArgs e)
+        private void SetDateFilter()
         {
             if (_transactions == null || !_transactions.Any())
             {
@@ -221,6 +221,10 @@ namespace YrlmzTakipSistemi
                 }
             }
         }
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            SetDateFilter();
+        }
 
         private void FilterTransactions(object sender, RoutedEventArgs e)
         {
@@ -247,6 +251,11 @@ namespace YrlmzTakipSistemi
                 .ToList();
 
             TransactionsDataGrid.ItemsSource = filteredTransactions;
+        }
+
+        private void LoadAllButton_Click(object sender, RoutedEventArgs e)
+        {
+            TransactionsDataGrid.ItemsSource = _transactions;
         }
     }
 }

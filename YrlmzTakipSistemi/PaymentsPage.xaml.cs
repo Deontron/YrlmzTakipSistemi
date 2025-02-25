@@ -73,6 +73,7 @@ namespace YrlmzTakipSistemi
 
             PaymentsDataGrid.ItemsSource = _payments;
             UpdateTotalAmount();
+            SetDateFilter();
         }
 
         private void DeletePaymentButton_Click(object sender, RoutedEventArgs e)
@@ -151,7 +152,7 @@ namespace YrlmzTakipSistemi
             printHelper.PrintDataGrid(PaymentsDataGrid, "Ödemeler");
         }
 
-        private void Window_Loaded(object sender, RoutedEventArgs e)
+        private void SetDateFilter()
         {
             if (_payments == null || !_payments.Any())
             {
@@ -191,6 +192,10 @@ namespace YrlmzTakipSistemi
                 }
             }
         }
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            SetDateFilter();
+        }
 
         private void FilterTransactions(object sender, RoutedEventArgs e)
         {
@@ -217,6 +222,11 @@ namespace YrlmzTakipSistemi
                 .ToList();
 
             PaymentsDataGrid.ItemsSource = filteredPayments;
+        }
+
+        private void LoadAllButton_Click(object sender, RoutedEventArgs e)
+        {
+            PaymentsDataGrid.ItemsSource = _payments;
         }
     }
 }

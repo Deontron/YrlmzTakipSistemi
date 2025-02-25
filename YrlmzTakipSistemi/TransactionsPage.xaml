@@ -43,23 +43,22 @@
                 <ComboBoxItem Content="Kasım" Tag="11"/>
                 <ComboBoxItem Content="Aralık" Tag="12"/>
             </ComboBox>
+            <Button Content="Tümü" Background="#3B4D61" Style="{StaticResource ModernButtonStyle}" Click="LoadAllButton_Click"/>
         </StackPanel>
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-
             <TextBlock Name="TitleTextBlock" 
-       Text="İşlemler"
-       HorizontalAlignment="Center" 
-       VerticalAlignment="Center" 
-       FontSize="28" 
-       FontWeight="Bold" 
-       Foreground="#FFFFFF" 
-       Margin="0,0,0,20" 
-       Grid.Row="0" />
+                Text="İşlemler"
+                HorizontalAlignment="Center" 
+                VerticalAlignment="Center" 
+                FontSize="28" 
+                FontWeight="Bold" 
+                Foreground="#FFFFFF" 
+                Margin="0,0,0,20" 
+                Grid.Row="0" />
         </StackPanel>
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-
             <Button Content="Yazdır" Background="#3B4D61" Style="{StaticResource ModernButtonStyle}" Click="PrintButton_Click"/>
         </StackPanel>
 

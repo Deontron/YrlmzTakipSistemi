@@ -44,11 +44,6 @@ namespace YrlmzTakipSistemi
             var products = _productRepository.GetByCustomerId(customer.Id);
             foreach (var transaction in products)
             {
-                DateTime parsedDate;
-                if (DateTime.TryParse(transaction.Tarih, out parsedDate))
-                {
-                    transaction.Tarih = parsedDate.ToString("dd.MM.yyyy");
-                }
                 _products.Add(transaction);
             }
 

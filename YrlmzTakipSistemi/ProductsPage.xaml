@@ -38,7 +38,7 @@
             <DataGrid Name="ProductsDataGrid" 
           Style="{StaticResource ModernDataGridStyle}">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Tarih" Binding="{Binding Tarih}" Width="*" />
+                    <DataGridTextColumn Header="Tarih" Binding="{Binding Tarih, StringFormat=\{0:dd-MM-yyyy\}}" Width="*" />
                     <DataGridTextColumn Header="İsim" Binding="{Binding Isim}" Width="*" />
                     <DataGridTextColumn Header="Fiyat" Binding="{Binding Fiyat}" Width="*" />
                     <DataGridTextColumn Header="Id" Binding="{Binding Id}" Width="0" Visibility="Collapsed" />

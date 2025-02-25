@@ -76,7 +76,7 @@
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text="{Binding Tarih}" FontSize="16" Padding="5" Width="150" Foreground="White"/>
+                                        <TextBlock Text="{Binding Tarih, StringFormat=\{0:dd-MM-yyyy\}}" FontSize="16" Padding="5" Width="150" Foreground="White"/>
                                         <TextBlock Text="{Binding Isim}" FontSize="16" Padding="5" Width="150" Foreground="White"/>
                                         <TextBlock Text="{Binding Fiyat}" FontSize="16" Padding="5" Width="100" Foreground="White"/>
                                     </StackPanel>

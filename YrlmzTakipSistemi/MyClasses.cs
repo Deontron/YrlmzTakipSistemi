@@ -45,7 +45,7 @@ namespace YrlmzTakipSistemi
     {
         public int Id { get; set; }
         public int CustomerId { get; set; }
-        public string Tarih { get; set; } = string.Empty;
+        public DateTime Tarih { get; set; }
         public string Isim { get; set; } = string.Empty;
         public double Fiyat { get; set; }
     }

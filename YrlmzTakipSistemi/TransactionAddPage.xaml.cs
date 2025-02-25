@@ -160,11 +160,6 @@ namespace YrlmzTakipSistemi
 
                 foreach (var product in products)
                 {
-                    DateTime parsedDate;
-                    if (DateTime.TryParse(product.Tarih, out parsedDate))
-                    {
-                        product.Tarih = parsedDate.ToString("dd.MM.yyyy");
-                    }
                     Products.Add(product);
                 }
             }

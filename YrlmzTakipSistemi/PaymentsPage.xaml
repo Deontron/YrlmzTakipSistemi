@@ -69,7 +69,7 @@
                       MouseDoubleClick="PaymentsDataGrid_MouseDoubleClick"
                 Style="{StaticResource ModernDataGridStyle}">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Tarih" Binding="{Binding Tarih}" Width="*" />
+                    <DataGridTextColumn Header="Tarih" Binding="{Binding Tarih, StringFormat=\{0:dd-MM-yyyy\}}" Width="*" />
                     <DataGridTextColumn Header="Müşteri" Binding="{Binding Musteri}" Width="*" />
                     <DataGridTextColumn Header="Borçlu" Binding="{Binding Borclu}" Width="*" />
                     <DataGridTextColumn Header="KaşideYeri" Binding="{Binding KasideYeri}" Width="*" />
@@ -90,7 +90,7 @@
                         </DataGridTextColumn.ElementStyle>
                     </DataGridTextColumn>
                     <DataGridTextColumn Header="Tutar" Binding="{Binding Tutar}" Width="*" />
-                    <DataGridTextColumn Header="ÖdemeTarihi" Binding="{Binding OdemeTarihi}" Width="*" />
+                    <DataGridTextColumn Header="ÖdemeTarihi" Binding="{Binding OdemeTarihi, StringFormat=\{0:dd-MM-yyyy\}}" Width="*" />
                     <DataGridTextColumn Header="Durum" Binding="{Binding OdemeDescription}" Width="*">
                         <DataGridTextColumn.ElementStyle>
                             <Style TargetType="TextBlock">

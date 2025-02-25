@@ -69,10 +69,10 @@
       Style="{StaticResource ModernDataGridStyle}">
 
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Tarih" Binding="{Binding Tarih}" Width="*" />
+                    <DataGridTextColumn Header="Tarih" Binding="{Binding Tarih, StringFormat=\{0:dd-MM-yyyy\}}" Width="*" />
                     <DataGridTextColumn Header="Müşteri" Binding="{Binding Musteri}" Width="*" />
                     <DataGridTextColumn Header="FaturaNo" Binding="{Binding FaturaNo}" Width="*" />
-                    <DataGridTextColumn Header="FaturaTarihi" Binding="{Binding FaturaTarihi}" Width="*" />
+                    <DataGridTextColumn Header="FaturaTarihi" Binding="{Binding FaturaTarihi, StringFormat=\{0:dd-MM-yyyy\}}" Width="*" />
                     <DataGridTextColumn Header="Tutar" Binding="{Binding Tutar}" Width="*" />
                     <DataGridTextColumn Header="KDV" Binding="{Binding KDV}" Width="*" />
                     <DataGridTextColumn Header="Toplam" Binding="{Binding Toplam}" Width="*" />

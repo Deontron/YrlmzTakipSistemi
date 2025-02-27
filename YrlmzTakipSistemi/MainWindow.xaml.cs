@@ -22,8 +22,9 @@ namespace YrlmzTakipSistemi
         {
             InitializeComponent();
             dbHelper = new DatabaseHelper();
-            dbHelper.CheckDatabaseExists(); 
+            dbHelper.CheckDatabaseExists();
             MainFrame.Navigate(new CustomersPage());
+            this.Closing += MainWindow_Closing;
         }
 
         private void CustomersButton_Click(object sender, RoutedEventArgs e)
@@ -43,20 +44,54 @@ namespace YrlmzTakipSistemi
 
         private void ExitButton_Click(object sender, RoutedEventArgs e)
         {
-            var result = MessageBox.Show("Uygulamadan çıkmak istediğinize emin misiniz?",
-                                 "Çıkış Onayı",
-                                 MessageBoxButton.YesNo,
-                                 MessageBoxImage.Question);
 
-            if (result == MessageBoxResult.Yes)
-            {
-                Application.Current.Shutdown();
-            }
+            Application.Current.Shutdown();
         }
 
         private void CheckBillButton_Click(object sender, RoutedEventArgs e)
         {
             MainFrame.Navigate(new PaymentsPage());
+        }
+
+        private void BackupButton_Click(object sender, RoutedEventArgs e)
+        {
+            GoogleDriveBackup.UploadBackup();
+        }
+
+        private async void MainWindow_Closing(object? sender, System.ComponentModel.CancelEventArgs e)
+        {
+            MessageBoxResult result = MessageBox.Show(
+                "Yedeklensin ve çıkılsın mı?",
+                "Onay",
+                MessageBoxButton.YesNoCancel,
+                MessageBoxImage.Question,
+                MessageBoxResult.Cancel
+            );
+
+            if (result == MessageBoxResult.Cancel)
+            {
+                e.Cancel = true;
+                return;
+            }
+
+            if (result == MessageBoxResult.Yes)
+            {
+                try
+                {
+                    await BackupToGoogleDrive();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Yedekleme sırasında hata oluştu:\n" + ex.Message, "Hata", MessageBoxButton.OK, MessageBoxImage.Error);
+                    e.Cancel = true;
+                }
+            }
+        }
+
+        private async Task BackupToGoogleDrive()
+        {
+            GoogleDriveBackup.UploadBackup();
+            await Task.Delay(1000);
         }
     }
 }

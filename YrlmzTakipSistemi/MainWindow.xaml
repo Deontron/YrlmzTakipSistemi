@@ -21,7 +21,8 @@
                 <Button Content="Gelir/Gider" Style="{StaticResource ModernMenuButton}" Click="IncomeExpenseButton_Click" />
                 <Button Content="Faturalar" Style="{StaticResource ModernMenuButton}" Click="InvoiceButton_Click" />
                 <Button Content="Çek/Senet" Style="{StaticResource ModernMenuButton}" Click="CheckBillButton_Click" />
-                <Button Content="Çıkış" Style="{StaticResource ModernMenuButton}" Click="ExitButton_Click" Margin="10,30,10,10" />
+                <Button Content="Çıkış" Style="{StaticResource ModernMenuButton}" Click="ExitButton_Click" Margin="10,30,10,10"/>
+                <Button Content="Yedekle" Style="{StaticResource ModernMenuButton}" Click="BackupButton_Click" Margin="10,30,10,10"/>
             </StackPanel>
 
             <Border Grid.Column="1" Background="Black" CornerRadius="10" Margin="10">

@@ -66,7 +66,7 @@ namespace YrlmzTakipSistemi
             var financialTransaction = new FinancialTransaction
             {
                 Aciklama = description,
-                IslemTarihi = formattedDate.ToString("dd-MM-yyyy"),
+                IslemTarihi = formattedDate,
                 Tutar = income - expance
             };
 

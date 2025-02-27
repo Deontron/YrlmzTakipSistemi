@@ -120,6 +120,16 @@ namespace YrlmzTakipSistemi
             {
                 e.Column.Visibility = Visibility.Collapsed;
             }
+
+            if (e.PropertyType == typeof(DateTime))
+            {
+                var column = new DataGridTextColumn
+                {
+                    Header = e.Column.Header,
+                    Binding = new Binding(e.PropertyName) { StringFormat = "dd-MM-yyyy" }
+                };
+                e.Column = column;
+            }
         }
 
         private void BackButton_Click(object sender, RoutedEventArgs e)
@@ -135,7 +145,7 @@ namespace YrlmzTakipSistemi
                 return;
             }
 
-            if (pageId == 0) 
+            if (pageId == 0)
             {
                 if (FinancialDataGrid.SelectedItem is YearlySummary selectedYear)
                 {
@@ -149,7 +159,7 @@ namespace YrlmzTakipSistemi
                     }
                 }
             }
-            else if (pageId == 1) 
+            else if (pageId == 1)
             {
                 if (FinancialDataGrid.SelectedItem is MonthlySummary selectedMonth)
                 {
@@ -163,7 +173,7 @@ namespace YrlmzTakipSistemi
                     }
                 }
             }
-            else if (pageId == 2) 
+            else if (pageId == 2)
             {
                 if (FinancialDataGrid.SelectedItem is FinancialTransaction selectedTransaction)
                 {
@@ -173,7 +183,7 @@ namespace YrlmzTakipSistemi
                     {
                         _financialRepository.Delete(selectedTransaction.Id);
                         MessageBox.Show("İşlem başarıyla silindi.", "Bilgi", MessageBoxButton.OK, MessageBoxImage.Information);
-                        LoadFinancialTransactions(currentMonth,currentYear);
+                        LoadFinancialTransactions(currentMonth, currentYear);
                     }
                 }
             }

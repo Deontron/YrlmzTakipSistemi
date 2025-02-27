@@ -88,7 +88,7 @@ namespace YrlmzTakipSistemi.Repositories
 
             _connection.Open();
             string query = @"
-                SELECT Id, strftime('%d-%m-%Y', IslemTarihi) AS IslemTarihi, Aciklama, Tutar
+                SELECT Id, strftime('%Y-%m-%d', IslemTarihi) AS IslemTarihi, Aciklama, Tutar
                 FROM FinancialTransactions
                 WHERE strftime('%Y', IslemTarihi) = @Year
                 AND strftime('%m', IslemTarihi) = @Month
@@ -105,7 +105,7 @@ namespace YrlmzTakipSistemi.Repositories
                         transactions.Add(new FinancialTransaction
                         {
                             Id = reader.GetInt32(0),
-                            IslemTarihi = reader.GetString(1),
+                            IslemTarihi = reader.GetDateTime(1),
                             Aciklama = reader.GetString(2),
                             Tutar = reader.GetDouble(3)
                         });

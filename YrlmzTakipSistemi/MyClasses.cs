@@ -70,10 +70,10 @@ namespace YrlmzTakipSistemi
     {
         public int Id { get; set; }
         public int CustomerId { get; set; }
-        public DateTime Tarih { get; set; } 
+        public DateTime Tarih { get; set; }
         public string Musteri { get; set; } = string.Empty;
         public string FaturaNo { get; set; } = string.Empty;
-        public DateTime FaturaTarihi { get; set; } 
+        public DateTime FaturaTarihi { get; set; }
         public double Tutar { get; set; }
         public double KDV { get; set; }
         public double Toplam { get; set; }
@@ -82,7 +82,7 @@ namespace YrlmzTakipSistemi
     public class FinancialTransaction
     {
         public int Id { get; set; }
-        public string IslemTarihi { get; set; } = string.Empty;
+        public DateTime IslemTarihi { get; set; }
         public string Aciklama { get; set; } = string.Empty;
         public double Tutar { get; set; }
     }

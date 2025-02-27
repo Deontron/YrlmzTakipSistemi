@@ -20,13 +20,15 @@ namespace YrlmzTakipSistemi
             {
                 UserCredential credential;
                 using (var stream = new FileStream("client_secret.json", FileMode.Open, FileAccess.Read))
+                using (var reader = new StreamReader(stream))
                 {
                     credential = GoogleWebAuthorizationBroker.AuthorizeAsync(
-                        GoogleClientSecrets.Load(stream).Secrets,
+                        GoogleClientSecrets.FromStream(reader.BaseStream).Secrets, 
                         Scopes,
                         "user",
                         CancellationToken.None).Result;
                 }
+
 
                 var service = new DriveService(new BaseClientService.Initializer()
                 {
@@ -34,10 +36,10 @@ namespace YrlmzTakipSistemi
                     ApplicationName = ApplicationName,
                 });
 
-                string databasePath = "company_tracking_system.db"; 
+                string databasePath = "company_tracking_system.db";
                 var fileMetadata = new Google.Apis.Drive.v3.Data.File()
                 {
-                    Name = "backup_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".sqlite",
+                    Name = "backup_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".db",
                     MimeType = "application/x-sqlite3"
                 };
 

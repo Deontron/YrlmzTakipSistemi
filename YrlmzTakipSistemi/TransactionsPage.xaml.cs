@@ -109,7 +109,7 @@ namespace YrlmzTakipSistemi
         private void UpdateTotalAmount()
         {
             double totalAmount = _transactionRepository.GetTotalDebtByCustomerId(_currentCustomer.Id);
-            SumTextBlock.Text = $"Bakiye: {totalAmount:N2} TL";
+            SumTextBlock.Text = $"Bakiye: {totalAmount:C}";
         }
 
         private void BackButton_Click(object sender, RoutedEventArgs e)

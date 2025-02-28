@@ -119,7 +119,7 @@ namespace YrlmzTakipSistemi
         private void LoadTotalAmount()
         {
             double total = _invoiceRepository.GetTotalAmount();
-            SumTextBlock.Text = $"Toplam Tutar: {total.ToString("N2")} TL";
+            SumTextBlock.Text = $"Toplam Tutar: {total:C}";
         }
 
         private void PrintButton_Click(object sender, RoutedEventArgs e)

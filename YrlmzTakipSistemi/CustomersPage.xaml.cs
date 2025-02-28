@@ -111,7 +111,7 @@ namespace YrlmzTakipSistemi
         {
             double totalDebt = _customerRepository.GetTotalDebt();
 
-            SumTextBlock.Text = $"Toplam Alacak: {totalDebt.ToString("N2")} TL";
+            SumTextBlock.Text = $"Toplam Alacak: {totalDebt:C}";
         }
 
         private void UpdateButton_Click(object sender, RoutedEventArgs e)

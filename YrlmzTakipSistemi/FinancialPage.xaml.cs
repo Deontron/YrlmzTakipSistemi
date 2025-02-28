@@ -89,24 +89,28 @@ namespace YrlmzTakipSistemi
 
         public void LoadMonthlySummary(string year)
         {
-            List<MonthlySummary> summaries = _financialRepository.GetMonthlySummaries(year);
+            var (summaries, total) = _financialRepository.GetMonthlySummaries(year);
 
             LoadFinancialData(summaries);
+            DisplayTotal(total); 
         }
 
         public void LoadFinancialTransactions(string month, string year)
         {
-            List<FinancialTransaction> transactions = _financialRepository.GetFinancialTransactions(month, year);
+            var (transactions, total) = _financialRepository.GetFinancialTransactions(month, year);
 
             LoadFinancialData(transactions);
+            DisplayTotal(total);
         }
 
         public void LoadYearlySummaries()
         {
-            List<YearlySummary> summaries = _financialRepository.GetYearlySummaries();
+            var (summaries, total) = _financialRepository.GetYearlySummaries();
 
             LoadFinancialData(summaries);
+            DisplayTotal(total);
         }
+
 
         private void AddButton_Click(object sender, RoutedEventArgs e)
         {
@@ -192,6 +196,11 @@ namespace YrlmzTakipSistemi
         private void PrintButton_Click(object sender, RoutedEventArgs e)
         {
             printHelper.PrintDataGrid(FinancialDataGrid, "Gelir/Gider");
+        }
+
+        private void DisplayTotal(double total)
+        {
+            SumTextBlock.Text = $"Toplam: {total:C}"; 
         }
     }
 }

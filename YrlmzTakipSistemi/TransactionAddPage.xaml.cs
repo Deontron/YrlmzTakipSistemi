@@ -69,7 +69,8 @@ namespace YrlmzTakipSistemi
                     var financial = new FinancialTransaction
                     {
                         Aciklama = description,
-                        Tutar = amount
+                        Tutar = amount,
+                        IslemTarihi = DateTime.Now
                     };
 
                    financialId = (int?) _financialRepository.Add(financial);

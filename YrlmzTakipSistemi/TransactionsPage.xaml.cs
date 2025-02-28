@@ -48,8 +48,14 @@ namespace YrlmzTakipSistemi
             TitleTextBlock.Text = $"{customer.Name} - İşlemler";
 
             var transactions = _transactionRepository.GetByCustomerId(customer.Id);
+
+            double cumulativeTotal = 0; 
+
             foreach (var transaction in transactions)
             {
+                cumulativeTotal += (transaction.Tutar - transaction.Odenen); 
+                transaction.KumulatifAlacak = cumulativeTotal; 
+
                 _transactions.Add(transaction);
             }
 
@@ -57,6 +63,7 @@ namespace YrlmzTakipSistemi
             UpdateTotalAmount();
             SetDateFilter();
         }
+
 
         private void AddTransactionButton_Click(object sender, RoutedEventArgs e)
         {
@@ -84,7 +91,8 @@ namespace YrlmzTakipSistemi
                     {
                         _paymentRepository.Delete((int)selectedTransaction.OdemeId);
                     }
-                    else if (selectedTransaction.FinansalId != 0)
+                    
+                    if (selectedTransaction.FinansalId != 0)
                     {
                         _financialRepository.Delete((int)selectedTransaction.FinansalId);
                     }

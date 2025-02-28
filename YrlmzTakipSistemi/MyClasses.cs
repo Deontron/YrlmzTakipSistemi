@@ -39,6 +39,7 @@ namespace YrlmzTakipSistemi
         public double Tutar { get; set; }
         public double Odenen { get; set; }
         public double AlacakDurumu { get; set; }
+        public double KumulatifAlacak { get; set; }
     }
 
     public class Product

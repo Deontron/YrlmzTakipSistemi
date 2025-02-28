@@ -14,6 +14,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Data.SQLite;
 using YrlmzTakipSistemi.Repositories;
+using Microsoft.VisualBasic;
 
 namespace YrlmzTakipSistemi
 {
@@ -26,6 +27,7 @@ namespace YrlmzTakipSistemi
         private InvoiceRepository _invoiceRepository;
         private readonly TransactionRepository _transactionRepository;
         private readonly CustomerRepository _customerRepository;
+        private readonly FinancialRepository _financialRepository;
         private Customer currentCustomer;
         public InvoiceAddPage()
         {
@@ -34,6 +36,7 @@ namespace YrlmzTakipSistemi
             _invoiceRepository = new InvoiceRepository(_dbHelper.GetConnection());
             _transactionRepository = new TransactionRepository(_dbHelper.GetConnection());
             _customerRepository = new CustomerRepository(_dbHelper.GetConnection());
+            _financialRepository = new FinancialRepository(_dbHelper.GetConnection());
             InvoiceDatePicker.SelectedDate = DateTime.Today;
             KdvTextBox.Text = Settings.Default.Kdv.ToString();
         }
@@ -97,13 +100,23 @@ namespace YrlmzTakipSistemi
                 };
                 int invoiceId = (int)_invoiceRepository.Add(invoice);
 
+                var financial = new FinancialTransaction
+                {
+                    Aciklama = "Fatura " + invoiceNo,
+                    Tutar = Kdv,
+                    IslemTarihi = invoiceDate
+                };
+
+                int financialId = (int)_financialRepository.Add(financial);
+
                 var transaction = new Transaction
                 {
                     Aciklama = "Fatura Kesildi",
                     Notlar = invoiceNo,
                     Tutar = Kdv,
                     CustomerId = currentCustomer.Id,
-                    FaturaId = invoiceId
+                    FaturaId = invoiceId,
+                    FinansalId = financialId
                 };
                 _transactionRepository.Add(transaction);
 
@@ -122,7 +135,7 @@ namespace YrlmzTakipSistemi
             if (double.TryParse(KdvTextBox.Text, out double newKdv))
             {
                 Settings.Default.Kdv = newKdv;
-                Settings.Default.Save(); 
+                Settings.Default.Save();
                 MessageBox.Show("KDV oranı güncellendi.");
             }
             else

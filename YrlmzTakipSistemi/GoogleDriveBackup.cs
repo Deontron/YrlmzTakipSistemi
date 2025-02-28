@@ -39,7 +39,7 @@ namespace YrlmzTakipSistemi
                 string databasePath = "company_tracking_system.db";
                 var fileMetadata = new Google.Apis.Drive.v3.Data.File()
                 {
-                    Name = "backup_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".db",
+                    Name = "yedek_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".db",
                     MimeType = "application/x-sqlite3"
                 };
 

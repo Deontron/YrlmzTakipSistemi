@@ -73,7 +73,8 @@
                     <DataGridTextColumn Header="Fiyat" Binding="{Binding BirimFiyat}" Width="*" />
                     <DataGridTextColumn Header="Tutar" Binding="{Binding Tutar}" Width="*" />
                     <DataGridTextColumn Header="Ödenen" Binding="{Binding Odenen}" Width="*" />
-                    <DataGridTextColumn Header="AlacakDurumu" Binding="{Binding AlacakDurumu}" Width="*" />
+                    <!--<DataGridTextColumn Header="AlacakDurumu" Binding="{Binding AlacakDurumu}" Width="*" />-->
+                    <DataGridTextColumn Header="Bakiye" Binding="{Binding KumulatifAlacak}" Width="*" />
                     <DataGridTextColumn Header="Id" Binding="{Binding Id}" Width="0" Visibility="Collapsed" />
                     <DataGridTextColumn Header="CustomerId" Binding="{Binding CustomerId}" Width="0" Visibility="Collapsed" />
                 </DataGrid.Columns>

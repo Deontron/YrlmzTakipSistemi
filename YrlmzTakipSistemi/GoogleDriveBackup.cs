@@ -1,10 +1,11 @@
 ﻿using Google.Apis.Auth.OAuth2;
 using Google.Apis.Drive.v3;
 using Google.Apis.Services;
-using Google.Apis.Upload;
 using System;
 using System.IO;
+using System.Linq;
 using System.Threading;
+using System.Collections.Generic;
 using System.Windows;
 
 namespace YrlmzTakipSistemi
@@ -23,12 +24,11 @@ namespace YrlmzTakipSistemi
                 using (var reader = new StreamReader(stream))
                 {
                     credential = GoogleWebAuthorizationBroker.AuthorizeAsync(
-                        GoogleClientSecrets.FromStream(reader.BaseStream).Secrets, 
+                        GoogleClientSecrets.FromStream(reader.BaseStream).Secrets,
                         Scopes,
                         "user",
                         CancellationToken.None).Result;
                 }
-
 
                 var service = new DriveService(new BaseClientService.Initializer()
                 {
@@ -36,10 +36,14 @@ namespace YrlmzTakipSistemi
                     ApplicationName = ApplicationName,
                 });
 
+                DeleteOldBackups(service);
+
                 string databasePath = "company_tracking_system.db";
+                string backupFileName = "yedek_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".db";
+
                 var fileMetadata = new Google.Apis.Drive.v3.Data.File()
                 {
-                    Name = "yedek_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".db",
+                    Name = backupFileName,
                     MimeType = "application/x-sqlite3"
                 };
 
@@ -50,12 +54,42 @@ namespace YrlmzTakipSistemi
                     request.Upload();
                 }
 
-                MessageBox.Show("Yedekleme tamamlandı!");
+                MessageBox.Show("Yedekleme tamamlandı!", "Bilgi", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Hata: " + ex.Message);
+                MessageBox.Show("Hata: " + ex.Message, "Hata", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+
+        private static void DeleteOldBackups(DriveService service)
+        {
+            try
+            {
+                var request = service.Files.List();
+                request.Q = "name contains 'yedek_' and mimeType = 'application/x-sqlite3'";
+                request.Fields = "files(id, name, modifiedTime)";
+                var result = request.Execute();
+                List<Google.Apis.Drive.v3.Data.File> files = result.Files.ToList();
+
+                DateTime now = DateTime.UtcNow;
+                foreach (var file in files)
+                {
+                    if (file.ModifiedTimeDateTimeOffset != null)
+                    {
+                        DateTime fileDate = file.ModifiedTimeDateTimeOffset.Value.UtcDateTime;
+                        if ((now - fileDate).TotalDays > 7)
+                        {
+                            service.Files.Delete(file.Id).Execute();
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Eski yedekleri silerken hata oluştu:\n" + ex.Message, "Hata", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
     }
 }

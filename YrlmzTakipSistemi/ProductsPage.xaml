@@ -6,7 +6,7 @@
       xmlns:local="clr-namespace:YrlmzTakipSistemi"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
-      Title="ProductsPage">
+      Title="Ürünler Sayfası">
 
     <Grid Background="#2B2B2B">
         <Grid.RowDefinitions>

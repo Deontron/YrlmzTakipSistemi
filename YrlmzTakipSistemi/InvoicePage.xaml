@@ -18,14 +18,14 @@
         </Grid.RowDefinitions>
 
         <StackPanel Orientation="Horizontal" Margin="10">
-            <ComboBox Name="YearComboBox" Width="120" Height="40"
+            <ComboBox Name="YearComboBox" Width="100" Height="40"
                 Background="#3B3B3B" Foreground="Black"
                 BorderBrush="#555555" BorderThickness="1"
                 FontSize="18" Padding="5"
                 SelectionChanged="FilterTransactions">
             </ComboBox>
 
-            <ComboBox Name="MonthComboBox" Width="140" Height="40"
+            <ComboBox Name="MonthComboBox" Width="110" Height="40"
                 Background="#3B3B3B" Foreground="Black"
                 BorderBrush="#555555" BorderThickness="1"
                 FontSize="18" Padding="5"
@@ -43,7 +43,7 @@
                 <ComboBoxItem Content="Kasım" Tag="11"/>
                 <ComboBoxItem Content="Aralık" Tag="12"/>
             </ComboBox>
-            <Button Content="Tümü" Background="#3B4D61" Style="{StaticResource ModernButtonStyle}" Click="LoadAllButton_Click"/>
+            <Button Content="Tümü" MinWidth="100" Background="#3B4D61" Style="{StaticResource ModernButtonStyle}" Click="LoadAllButton_Click"/>
         </StackPanel>
         
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
@@ -73,9 +73,9 @@
                     <DataGridTextColumn Header="Müşteri" Binding="{Binding Musteri}" Width="*" />
                     <DataGridTextColumn Header="FaturaNo" Binding="{Binding FaturaNo}" Width="*" />
                     <DataGridTextColumn Header="FaturaTarihi" Binding="{Binding FaturaTarihi, StringFormat=\{0:dd-MM-yyyy\}}" Width="*" />
-                    <DataGridTextColumn Header="Tutar" Binding="{Binding Tutar}" Width="*" />
-                    <DataGridTextColumn Header="KDV" Binding="{Binding KDV}" Width="*" />
-                    <DataGridTextColumn Header="Toplam" Binding="{Binding Toplam}" Width="*" />
+                    <DataGridTextColumn Header="Tutar" Binding="{Binding Tutar, StringFormat=N2}" Width="*" />
+                    <DataGridTextColumn Header="KDV" Binding="{Binding KDV,StringFormat=N2}" Width="*" />
+                    <DataGridTextColumn Header="Toplam" Binding="{Binding Toplam, StringFormat=N2}" Width="*" />
                     <DataGridTextColumn Header="Id" Binding="{Binding Id}" Width="0" Visibility="Collapsed" />
                     <DataGridTextColumn Header="CustomerId" Binding="{Binding CustomerId}" Width="0" Visibility="Collapsed" />
                 </DataGrid.Columns>

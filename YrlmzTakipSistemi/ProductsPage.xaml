@@ -40,7 +40,7 @@
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Tarih" Binding="{Binding Tarih, StringFormat=\{0:dd-MM-yyyy\}}" Width="*" />
                     <DataGridTextColumn Header="İsim" Binding="{Binding Isim}" Width="*" />
-                    <DataGridTextColumn Header="Fiyat" Binding="{Binding Fiyat}" Width="*" />
+                    <DataGridTextColumn Header="Fiyat" Binding="{Binding Fiyat, StringFormat=N2}" Width="*" />
                     <DataGridTextColumn Header="Id" Binding="{Binding Id}" Width="0" Visibility="Collapsed" />
                     <DataGridTextColumn Header="CustomerId" Binding="{Binding CustomerId}" Width="0" Visibility="Collapsed" />
                 </DataGrid.Columns>

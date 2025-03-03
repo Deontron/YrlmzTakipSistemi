@@ -45,7 +45,7 @@ namespace YrlmzTakipSistemi
             _transactions.Clear();
             _currentCustomer = customer;
 
-            TitleTextBlock.Text = $"{customer.Name} - İşlemler";
+            TitleTextBlock.Text = $"{customer.Name}";
 
             var transactions = _transactionRepository.GetByCustomerId(customer.Id);
 

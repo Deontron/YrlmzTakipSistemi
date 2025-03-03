@@ -15,6 +15,7 @@ using System.Windows.Shapes;
 using System.Data.SQLite;
 using System.Diagnostics;
 using YrlmzTakipSistemi.Repositories;
+using System.Globalization;
 
 namespace YrlmzTakipSistemi
 {
@@ -133,6 +134,19 @@ namespace YrlmzTakipSistemi
                     Binding = new Binding(e.PropertyName) { StringFormat = "dd-MM-yyyy" }
                 };
                 e.Column = column;
+            }
+
+            if (e.PropertyType == typeof(double) || e.PropertyType == typeof(decimal))
+            {
+                var column = e.Column as DataGridTextColumn;
+                if (column != null)
+                {
+                    column.Binding = new Binding(e.PropertyName)
+                    {
+                        StringFormat = "C2",
+                        ConverterCulture = new CultureInfo("tr-TR")
+                    };
+                }
             }
         }
 

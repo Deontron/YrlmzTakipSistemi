@@ -18,14 +18,14 @@
         </Grid.RowDefinitions>
 
         <StackPanel Orientation="Horizontal" Margin="10">
-            <ComboBox Name="YearComboBox" Width="120" Height="40"
+            <ComboBox Name="YearComboBox" Width="100" Height="40"
                 Background="#3B3B3B" Foreground="Black"
                 BorderBrush="#555555" BorderThickness="1"
                 FontSize="18" Padding="5"
                 SelectionChanged="FilterTransactions">
             </ComboBox>
 
-            <ComboBox Name="MonthComboBox" Width="140" Height="40"
+            <ComboBox Name="MonthComboBox" Width="110" Height="40"
                 Background="#3B3B3B" Foreground="Black"
                 BorderBrush="#555555" BorderThickness="1"
                 FontSize="18" Padding="5"
@@ -43,21 +43,26 @@
                 <ComboBoxItem Content="Kasım" Tag="11"/>
                 <ComboBoxItem Content="Aralık" Tag="12"/>
             </ComboBox>
-            <Button Content="Tümü" Background="#3B4D61" Style="{StaticResource ModernButtonStyle}" Click="LoadAllButton_Click"/>
+            <Button Content="Tümü" MinWidth="100" Background="#3B4D61" Style="{StaticResource ModernButtonStyle}" Click="LoadAllButton_Click"/>
+            <CheckBox Name="ShowUnpaidOnlyCheckBox" Content="Ödenmemişleri Göster" 
+                      Foreground="White" VerticalAlignment="Center" FontSize="18" VerticalContentAlignment="Center"
+                      IsChecked="False" Checked="FilterTransactions" Unchecked="FilterTransactions"/>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+
+                <TextBlock Name="TitleTextBlock" 
+Text="Ödemeler"
+HorizontalAlignment="Center" 
+VerticalAlignment="Center" 
+FontSize="28" 
+FontWeight="Bold" 
+Foreground="#FFFFFF" 
+Margin="20,0,0,20" 
+Grid.Row="0" />
+            </StackPanel>
         </StackPanel>
         
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-
-            <TextBlock Name="TitleTextBlock" 
-       Text="Ödemeler"
-       HorizontalAlignment="Center" 
-       VerticalAlignment="Center" 
-       FontSize="28" 
-       FontWeight="Bold" 
-       Foreground="#FFFFFF" 
-       Margin="0,0,0,20" 
-       Grid.Row="0" />
-        </StackPanel>
+        
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
 
@@ -66,8 +71,22 @@
 
         <Border Grid.Row="1" Background="#1E1E1E" CornerRadius="10" BorderBrush="#444444" BorderThickness="1">
             <DataGrid Name="PaymentsDataGrid" 
-                      MouseDoubleClick="PaymentsDataGrid_MouseDoubleClick"
-                Style="{StaticResource ModernDataGridStyle}">
+          MouseDoubleClick="PaymentsDataGrid_MouseDoubleClick"
+          Style="{StaticResource ModernDataGridStyle}">
+
+                <DataGrid.RowStyle>
+                    <Style TargetType="DataGridRow">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding OdemeDurumu}" Value="3">
+                                <Setter Property="Opacity" Value="0.3"/>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding OdemeDurumu}" Value="4">
+                                <Setter Property="Opacity" Value="0.3"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </DataGrid.RowStyle>
+
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Tarih" Binding="{Binding Tarih, StringFormat=\{0:dd-MM-yyyy\}}" Width="*" />
                     <DataGridTextColumn Header="Müşteri" Binding="{Binding Musteri}" Width="*" />
@@ -89,7 +108,7 @@
                             </Style>
                         </DataGridTextColumn.ElementStyle>
                     </DataGridTextColumn>
-                    <DataGridTextColumn Header="Tutar" Binding="{Binding Tutar}" Width="*" />
+                    <DataGridTextColumn Header="Tutar" Binding="{Binding Tutar, StringFormat=N2}" Width="*" />
                     <DataGridTextColumn Header="ÖdemeTarihi" Binding="{Binding OdemeTarihi, StringFormat=\{0:dd-MM-yyyy\}}" Width="*" />
                     <DataGridTextColumn Header="Durum" Binding="{Binding OdemeDescription}" Width="*">
                         <DataGridTextColumn.ElementStyle>
@@ -117,6 +136,7 @@
                     <DataGridTextColumn Header="CustomerId" Binding="{Binding CustomerId}" Width="0" Visibility="Collapsed" />
                 </DataGrid.Columns>
             </DataGrid>
+
 
         </Border>
 

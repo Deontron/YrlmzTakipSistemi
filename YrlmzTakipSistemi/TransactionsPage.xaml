@@ -18,14 +18,14 @@
         </Grid.RowDefinitions>
 
         <StackPanel Orientation="Horizontal" Margin="10">
-            <ComboBox Name="YearComboBox" Width="120" Height="40"
+            <ComboBox Name="YearComboBox" Width="100" Height="40"
                 Background="#3B3B3B" Foreground="Black"
                 BorderBrush="#555555" BorderThickness="1"
                 FontSize="18" Padding="5"
                 SelectionChanged="FilterTransactions">
             </ComboBox>
 
-            <ComboBox Name="MonthComboBox" Width="140" Height="40"
+            <ComboBox Name="MonthComboBox" Width="110" Height="40"
                 Background="#3B3B3B" Foreground="Black"
                 BorderBrush="#555555" BorderThickness="1"
                 FontSize="18" Padding="5"
@@ -43,20 +43,21 @@
                 <ComboBoxItem Content="Kasım" Tag="11"/>
                 <ComboBoxItem Content="Aralık" Tag="12"/>
             </ComboBox>
-            <Button Content="Tümü" Background="#3B4D61" Style="{StaticResource ModernButtonStyle}" Click="LoadAllButton_Click"/>
+            <Button Content="Tümü" MinWidth="100" Background="#3B4D61" Style="{StaticResource ModernButtonStyle}" Click="LoadAllButton_Click"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <TextBlock Name="TitleTextBlock" 
+        Text="İşlemler"
+        HorizontalAlignment="Center" 
+        VerticalAlignment="Center" 
+        FontSize="28" 
+        FontWeight="Bold" 
+        Foreground="#FFFFFF" 
+        Margin="20,0,0,20" 
+        Grid.Row="0" />
+            </StackPanel>
         </StackPanel>
 
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-            <TextBlock Name="TitleTextBlock" 
-                Text="İşlemler"
-                HorizontalAlignment="Center" 
-                VerticalAlignment="Center" 
-                FontSize="28" 
-                FontWeight="Bold" 
-                Foreground="#FFFFFF" 
-                Margin="0,0,0,20" 
-                Grid.Row="0" />
-        </StackPanel>
+        
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
             <Button Content="Yazdır" Background="#3B4D61" Style="{StaticResource ModernButtonStyle}" Click="PrintButton_Click"/>
@@ -70,11 +71,11 @@
                     <DataGridTextColumn Header="Açıklama" Binding="{Binding Aciklama}" Width="*" />
                     <DataGridTextColumn Header="Not" Binding="{Binding Notlar}" Width="*" />
                     <DataGridTextColumn Header="Adet" Binding="{Binding Adet}" Width="*" />
-                    <DataGridTextColumn Header="Fiyat" Binding="{Binding BirimFiyat}" Width="*" />
-                    <DataGridTextColumn Header="Tutar" Binding="{Binding Tutar}" Width="*" />
-                    <DataGridTextColumn Header="Ödenen" Binding="{Binding Odenen}" Width="*" />
+                    <DataGridTextColumn Header="Fiyat" Binding="{Binding BirimFiyat, StringFormat=N2}" Width="*" />
+                    <DataGridTextColumn Header="Tutar" Binding="{Binding Tutar, StringFormat=N2}" Width="*" />
+                    <DataGridTextColumn Header="Ödenen" Binding="{Binding Odenen, StringFormat=N2}" Width="*" />
                     <!--<DataGridTextColumn Header="AlacakDurumu" Binding="{Binding AlacakDurumu}" Width="*" />-->
-                    <DataGridTextColumn Header="Bakiye" Binding="{Binding KumulatifAlacak}" Width="*" />
+                    <DataGridTextColumn Header="Bakiye" Binding="{Binding KumulatifAlacak, StringFormat=N2}" Width="*" />
                     <DataGridTextColumn Header="Id" Binding="{Binding Id}" Width="0" Visibility="Collapsed" />
                     <DataGridTextColumn Header="CustomerId" Binding="{Binding CustomerId}" Width="0" Visibility="Collapsed" />
                 </DataGrid.Columns>

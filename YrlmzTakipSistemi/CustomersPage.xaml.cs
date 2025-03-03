@@ -26,6 +26,8 @@ namespace YrlmzTakipSistemi
         private DatabaseHelper _dbHelper;
         private PrintHelper _printHelper;
         private CustomerRepository _customerRepository;
+        private TransactionRepository _transactionRepository;
+        private ProductRepository _productRepository;
         private ObservableCollection<Customer> _customers = new ObservableCollection<Customer>();
 
         public CustomersPage()
@@ -34,6 +36,8 @@ namespace YrlmzTakipSistemi
             _dbHelper = new DatabaseHelper();
             _printHelper = new PrintHelper();
             _customerRepository = new CustomerRepository(_dbHelper.GetConnection());
+            _transactionRepository = new TransactionRepository(_dbHelper.GetConnection());
+            _productRepository = new ProductRepository(_dbHelper.GetConnection());
             LoadCustomers();
             LoadTotalDebt();
         }
@@ -87,7 +91,8 @@ namespace YrlmzTakipSistemi
                 if (result == MessageBoxResult.Yes)
                 {
                     _customerRepository.Delete(selectedCustomer.Id);
-
+                    _transactionRepository.DeleteByCustomerId(selectedCustomer.Id);
+                    _productRepository.DeleteByCustomerId(selectedCustomer.Id);
                     MessageBox.Show("Müşteri başarıyla silindi.", "Hop!");
                     LoadCustomers();
                 }

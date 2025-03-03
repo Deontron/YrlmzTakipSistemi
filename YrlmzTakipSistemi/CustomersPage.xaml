@@ -37,7 +37,7 @@
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="İsim" Binding="{Binding Name}" Width="*" />
                     <DataGridTextColumn Header="İletişim" Binding="{Binding Contact}" Width="*" />
-                    <DataGridTextColumn Header="Alacak" Binding="{Binding Debt}" Width="*" />
+                    <DataGridTextColumn Header="Alacak" Binding="{Binding Debt, StringFormat=N2}" Width="*" />
                     <DataGridTextColumn Header="Id" Binding="{Binding Id}" Width="0" Visibility="Collapsed" />
                 </DataGrid.Columns>
 

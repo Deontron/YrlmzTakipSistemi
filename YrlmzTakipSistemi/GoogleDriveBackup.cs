@@ -78,7 +78,7 @@ namespace YrlmzTakipSistemi
                     if (file.ModifiedTimeDateTimeOffset != null)
                     {
                         DateTime fileDate = file.ModifiedTimeDateTimeOffset.Value.UtcDateTime;
-                        if ((now - fileDate).TotalDays > 7)
+                        if ((now - fileDate).TotalDays > 10)
                         {
                             service.Files.Delete(file.Id).Execute();
                         }

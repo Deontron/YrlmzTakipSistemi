@@ -17,6 +17,7 @@ using System.Collections.ObjectModel;
 using Google.Apis.Drive.v3.Data;
 using System.Numerics;
 using YrlmzTakipSistemi.Repositories;
+using System.Globalization;
 
 
 namespace YrlmzTakipSistemi
@@ -43,6 +44,7 @@ namespace YrlmzTakipSistemi
             _transactionRepository = new TransactionRepository(_dbHelper.GetConnection());
             _customerRepository = new CustomerRepository(_dbHelper.GetConnection());
             LoadPayments();
+            ShowUnpaidOnlyCheckBox.IsChecked = true;
         }
 
         public void LoadPayments()
@@ -211,6 +213,8 @@ namespace YrlmzTakipSistemi
                 selectedMonth = month;
             }
 
+            bool showUnpaidOnly = ShowUnpaidOnlyCheckBox.IsChecked == true;
+
             if (_payments == null)
             {
                 PaymentsDataGrid.ItemsSource = null;
@@ -218,7 +222,40 @@ namespace YrlmzTakipSistemi
             }
 
             filteredPayments = _payments
-                .Where(t => t.Tarih.Year == selectedYear && (selectedMonth == 0 || t.Tarih.Month == selectedMonth))
+                .Where(t => t.Tarih.Year == selectedYear &&
+                            (selectedMonth == 0 || t.Tarih.Month == selectedMonth) &&
+                            (!showUnpaidOnly || t.OdemeDurumu == 1 || t.OdemeDurumu == 2))
+                .ToList();
+
+            PaymentsDataGrid.ItemsSource = filteredPayments;
+        }
+
+        void FilterByPaid(object sender, RoutedEventArgs e)
+        {
+            int selectedYear = DateTime.Now.Year;
+            if (YearComboBox.SelectedItem != null && int.TryParse(YearComboBox.SelectedItem.ToString(), out int year))
+            {
+                selectedYear = year;
+            }
+
+            int selectedMonth = 0;
+            if (MonthComboBox.SelectedItem is ComboBoxItem selectedItem && selectedItem.Tag != null && int.TryParse(selectedItem.Tag.ToString(), out int month))
+            {
+                selectedMonth = month;
+            }
+
+            bool showUnpaidOnly = ShowUnpaidOnlyCheckBox.IsChecked == true;
+
+            if (_payments == null)
+            {
+                PaymentsDataGrid.ItemsSource = null;
+                return;
+            }
+
+            filteredPayments = _payments
+                .Where(t => t.Tarih.Year == selectedYear &&
+                            (selectedMonth == 0 || t.Tarih.Month == selectedMonth) &&
+                            (!showUnpaidOnly || t.OdemeDurumu == 1 || t.OdemeDurumu == 2))
                 .ToList();
 
             PaymentsDataGrid.ItemsSource = filteredPayments;
@@ -226,7 +263,47 @@ namespace YrlmzTakipSistemi
 
         private void LoadAllButton_Click(object sender, RoutedEventArgs e)
         {
-            PaymentsDataGrid.ItemsSource = _payments;
+            bool showUnpaidOnly = ShowUnpaidOnlyCheckBox.IsChecked == true;
+
+            if (_payments == null)
+            {
+                PaymentsDataGrid.ItemsSource = null;
+                return;
+            }
+
+            filteredPayments = _payments.Where(t => (!showUnpaidOnly || t.OdemeDurumu == 1 || t.OdemeDurumu == 2)).ToList();
+            PaymentsDataGrid.ItemsSource = filteredPayments;
+        }
+
+        private void DataGrid_AutoGeneratingColumn(object sender, DataGridAutoGeneratingColumnEventArgs e)
+        {
+            if (e.PropertyName == "Id" || e.PropertyName == "CustomerId")
+            {
+                e.Column.Visibility = Visibility.Collapsed;
+            }
+
+            if (e.PropertyType == typeof(DateTime))
+            {
+                var column = new DataGridTextColumn
+                {
+                    Header = e.Column.Header,
+                    Binding = new Binding(e.PropertyName) { StringFormat = "dd-MM-yyyy" }
+                };
+                e.Column = column;
+            }
+
+            if (e.PropertyType == typeof(double) || e.PropertyType == typeof(decimal))
+            {
+                var column = e.Column as DataGridTextColumn;
+                if (column != null)
+                {
+                    column.Binding = new Binding(e.PropertyName)
+                    {
+                        StringFormat = "C2",
+                        ConverterCulture = new CultureInfo("tr-TR")
+                    };
+                }
+            }
         }
     }
 }

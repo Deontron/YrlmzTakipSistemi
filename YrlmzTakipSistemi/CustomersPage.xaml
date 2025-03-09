@@ -34,14 +34,24 @@
           Style="{StaticResource ModernDataGridStyle}"
           MouseDoubleClick="CustomersDataGrid_MouseDoubleClick">
 
-                <DataGrid.Columns>
-                    <DataGridTextColumn Header="İsim" Binding="{Binding Name}" Width="*" />
-                    <DataGridTextColumn Header="İletişim" Binding="{Binding Contact}" Width="*" />
-                    <DataGridTextColumn Header="Alacak" Binding="{Binding Debt, StringFormat=N2}" Width="*" />
-                    <DataGridTextColumn Header="Id" Binding="{Binding Id}" Width="0" Visibility="Collapsed" />
-                </DataGrid.Columns>
+    <DataGrid.Columns>
+        <!-- Sıra No Sütunu -->
+        <DataGridTemplateColumn Header="#" Width="40">
+            <DataGridTemplateColumn.CellTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding RowNumber}" HorizontalAlignment="Center"/>
+                </DataTemplate>
+            </DataGridTemplateColumn.CellTemplate>
+        </DataGridTemplateColumn>
 
-            </DataGrid>
+        <DataGridTextColumn Header="İsim" Binding="{Binding Name}" Width="*" />
+        <DataGridTextColumn Header="İletişim" Binding="{Binding Contact}" Width="*" />
+        <DataGridTextColumn Header="Alacak" Binding="{Binding Debt, StringFormat=N2}" Width="*" />
+        <DataGridTextColumn Header="Id" Binding="{Binding Id}" Width="0" Visibility="Collapsed" />
+    </DataGrid.Columns>
+
+</DataGrid>
+
 
         </Border>
 

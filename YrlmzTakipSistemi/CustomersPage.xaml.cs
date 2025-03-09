@@ -51,14 +51,21 @@ namespace YrlmzTakipSistemi
         private ObservableCollection<Customer> GetCustomersFromDatabase()
         {
             _customers.Clear();
-            var customers = _customerRepository.GetAll();
+            var customers = _customerRepository.GetAll().ToList();
+
+            for (int i = 0; i < customers.Count; i++)
+            {
+                customers[i].RowNumber = i + 1; 
+            }
 
             foreach (Customer customer in customers)
             {
                 _customers.Add(customer);
             }
+
             return _customers;
         }
+
 
         private void CustomersDataGrid_MouseDoubleClick(object sender, RoutedEventArgs e)
         {

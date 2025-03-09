@@ -20,12 +20,12 @@ namespace YrlmzTakipSistemi.Repositories
         public long Add(T entity)
         {
             var properties = typeof(T).GetProperties()
-                .Where(p => p.Name != "Id" && p.Name != "Tarih" && p.Name != "AlacakDurumu" && p.Name != "KumulatifAlacak" && p.Name != "KategoriDescription")
+                .Where(p => p.Name != "Id" && p.Name != "Tarih" && p.Name != "AlacakDurumu" && p.Name != "KumulatifAlacak" && p.Name != "KategoriDescription" && p.Name != "RowNumber")
                 .ToList();
             var columns = string.Join(", ", properties.Select(p => p.Name));
             var values = string.Join(", ", properties.Select(p => $"@{p.Name}"));
 
-            var query = $"INSERT INTO {_tableName} ({columns}) VALUES ({values}); SELECT last_insert_rowid();"; 
+            var query = $"INSERT INTO {_tableName} ({columns}) VALUES ({values}); SELECT last_insert_rowid();";
 
             try
             {
@@ -38,7 +38,7 @@ namespace YrlmzTakipSistemi.Repositories
 
                         command.Parameters.AddWithValue($"@{property.Name}", value ?? DBNull.Value);
                     }
-                    return (long)command.ExecuteScalar(); 
+                    return (long)command.ExecuteScalar();
                 }
             }
             catch (Exception ex)
@@ -54,7 +54,7 @@ namespace YrlmzTakipSistemi.Repositories
         public void Update(T entity)
         {
             var properties = typeof(T).GetProperties()
-                .Where(p => p.Name != "AlacakDurumu" && p.Name != "KategoriDescription" && p.Name != "KumulatifAlacak")
+                .Where(p => p.Name != "AlacakDurumu" && p.Name != "KategoriDescription" && p.Name != "KumulatifAlacak" && p.Name != "RowNumber")
                 .ToList();
             var setValues = string.Join(", ", properties.Select(p => $"{p.Name} = @{p.Name}"));
 

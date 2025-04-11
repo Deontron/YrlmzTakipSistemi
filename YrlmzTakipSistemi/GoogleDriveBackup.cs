@@ -1,11 +1,7 @@
 ﻿using Google.Apis.Auth.OAuth2;
 using Google.Apis.Drive.v3;
 using Google.Apis.Services;
-using System;
 using System.IO;
-using System.Linq;
-using System.Threading;
-using System.Collections.Generic;
 using System.Windows;
 
 namespace YrlmzTakipSistemi

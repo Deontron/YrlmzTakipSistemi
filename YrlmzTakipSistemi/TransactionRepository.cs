@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.SQLite;
-using System.Windows;
+﻿using System.Data.SQLite;
 
 namespace YrlmzTakipSistemi.Repositories
 {

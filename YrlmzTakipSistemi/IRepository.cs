@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq.Expressions;
-
-namespace YrlmzTakipSistemi.Repositories
+﻿namespace YrlmzTakipSistemi.Repositories
 {
     public interface IRepository<T> where T : class
     {

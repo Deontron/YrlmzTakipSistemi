@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using System.Data.SQLite;
 using System.Collections.ObjectModel;
 using YrlmzTakipSistemi.Repositories;
 
@@ -49,12 +43,12 @@ namespace YrlmzTakipSistemi
 
             var transactions = _transactionRepository.GetByCustomerId(customer.Id);
 
-            double cumulativeTotal = 0; 
+            double cumulativeTotal = 0;
 
             foreach (var transaction in transactions)
             {
-                cumulativeTotal += (transaction.Tutar - transaction.Odenen); 
-                transaction.KumulatifAlacak = cumulativeTotal; 
+                cumulativeTotal += (transaction.Tutar - transaction.Odenen);
+                transaction.KumulatifAlacak = cumulativeTotal;
 
                 _transactions.Add(transaction);
             }
@@ -91,7 +85,7 @@ namespace YrlmzTakipSistemi
                     {
                         _paymentRepository.Delete((int)selectedTransaction.OdemeId);
                     }
-                    
+
                     if (selectedTransaction.FinansalId != 0)
                     {
                         _financialRepository.Delete((int)selectedTransaction.FinansalId);
@@ -159,6 +153,14 @@ namespace YrlmzTakipSistemi
                 if (result == MessageBoxResult.Yes)
                 {
                     _transactionRepository.Update(selectedTransaction);
+                    if (selectedTransaction.FinansalId != 0)
+                    {
+                        FinancialTransaction financialTransaction = _financialRepository.GetById((int)selectedTransaction.FinansalId);
+                        financialTransaction.Tutar = selectedTransaction.Tutar;
+                        _financialRepository.Update(financialTransaction);
+                    }
+
+                    _customerRepository.UpdateCustomerDebtById(_currentCustomer.Debt, _currentCustomer.Id);
                     LoadCustomerTransactions(_currentCustomer);
                 }
             }

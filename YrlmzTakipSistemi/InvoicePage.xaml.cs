@@ -31,6 +31,10 @@ namespace YrlmzTakipSistemi
         private readonly CustomerRepository _customerRepository;
         private ObservableCollection<Invoice> _invoices = new ObservableCollection<Invoice>();
         private List<Invoice> filteredInvoices = new List<Invoice>();
+        private bool showAllInvoices = false;
+
+        int selectedYear = DateTime.Now.Year;
+        int selectedMonth = 0;
 
         public InvoicePage()
         {
@@ -118,8 +122,21 @@ namespace YrlmzTakipSistemi
 
         private void LoadTotalAmount()
         {
-            double total = _invoiceRepository.GetTotalAmount();
-            SumTextBlock.Text = $"Toplam Tutar: {total:C}";
+            double total;
+
+            if (showAllInvoices)
+            {
+                total = _invoiceRepository.GetTotalAmount();
+
+                SumTextBlock.Text = $"Toplam Tutar: {total:C}";
+            }
+            else
+            {
+                total = _invoices
+                    .Where(i => i.Tarih.Year == selectedYear && i.Tarih.Month == selectedMonth)
+                    .Sum(i => i.Toplam);
+                SumTextBlock.Text = $"Aylık Toplam Tutar: {total:C}";
+            }
         }
 
         private void PrintButton_Click(object sender, RoutedEventArgs e)
@@ -174,13 +191,12 @@ namespace YrlmzTakipSistemi
 
         private void FilterTransactions(object sender, RoutedEventArgs e)
         {
-            int selectedYear = DateTime.Now.Year;
+            showAllInvoices = false;
             if (YearComboBox.SelectedItem != null && int.TryParse(YearComboBox.SelectedItem.ToString(), out int year))
             {
                 selectedYear = year;
             }
 
-            int selectedMonth = 0;
             if (MonthComboBox.SelectedItem is ComboBoxItem selectedItem && selectedItem.Tag != null && int.TryParse(selectedItem.Tag.ToString(), out int month))
             {
                 selectedMonth = month;
@@ -197,11 +213,14 @@ namespace YrlmzTakipSistemi
                 .ToList();
 
             InvoicesDataGrid.ItemsSource = filteredInvoices;
+            LoadTotalAmount();
         }
 
         private void LoadAllButton_Click(object sender, RoutedEventArgs e)
         {
+            showAllInvoices = true;
             InvoicesDataGrid.ItemsSource = _invoices;
+            LoadTotalAmount();
         }
     }
 }

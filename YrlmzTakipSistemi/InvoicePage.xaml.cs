@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using YrlmzTakipSistemi.Repositories;
 
 namespace YrlmzTakipSistemi
@@ -175,6 +176,10 @@ namespace YrlmzTakipSistemi
             SetDateFilter();
         }
 
+        private void ComboBox_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            FilterTransactions(sender, null);
+        }
         private void FilterTransactions(object sender, RoutedEventArgs e)
         {
             showAllInvoices = false;
@@ -193,7 +198,6 @@ namespace YrlmzTakipSistemi
                 InvoicesDataGrid.ItemsSource = null;
                 return;
             }
-
             filteredInvoices = _invoices
                 .Where(t => t.Tarih.Year == selectedYear && (selectedMonth == 0 || t.Tarih.Month == selectedMonth))
                 .ToList();

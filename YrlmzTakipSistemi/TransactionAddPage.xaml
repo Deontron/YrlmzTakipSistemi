@@ -37,6 +37,18 @@
                  Background="#1E1E1E" Foreground="White" BorderBrush="#444444" BorderThickness="1"/>
                 </StackPanel>
 
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,10,0,0">
+                    <TextBlock Text="İşlemTarihi:" Width="100" FontSize="20" Foreground="White" VerticalAlignment="Center" />
+                    <DatePicker Name="TransactionDatePicker" Margin="20,0,0,0">
+                        <DatePicker.Resources>
+                            <Style TargetType="TextBox">
+                                <Setter Property="Background" Value="#2B2B2B"/>
+                                <Setter Property="Foreground" Value="White"/>
+                            </Style>
+                        </DatePicker.Resources>
+                    </DatePicker>
+                </StackPanel>
+
                 <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
                     <TextBlock Text="Adet:" Width="100" FontSize="18" Foreground="White"/>
                     <TextBox Name="QuantityTextBox" Width="250" Height="35" FontSize="14"

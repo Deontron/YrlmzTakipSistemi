@@ -186,6 +186,11 @@ namespace YrlmzTakipSistemi
             SetDateFilter();
         }
 
+        private void ComboBox_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            FilterTransactions(sender, null);
+        }
+
         private void FilterTransactions(object sender, RoutedEventArgs e)
         {
             int selectedYear = DateTime.Now.Year;

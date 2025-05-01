@@ -54,7 +54,8 @@ namespace YrlmzTakipSistemi
                 {
                     CustomerId = _currentCustomer.Id,
                     Isim = name,
-                    Fiyat = amount
+                    Fiyat = amount,
+                    Tarih = DateTime.Today
                 };
 
                 _productRepository.Add(product);

@@ -98,7 +98,8 @@ namespace YrlmzTakipSistemi
                         OdemeTarihi = formattedDate,
                         OdemeDurumu = paidState,
                         OdemeDescription = paidDescription,
-                        CustomerId = currentCustomer.Id
+                        CustomerId = currentCustomer.Id,
+                        Tarih = DateTime.Today
                     };
                     paymentId = (int?)_paymentRepository.Add(payment);
                 }
@@ -107,7 +108,8 @@ namespace YrlmzTakipSistemi
                 {
                     CustomerId = currentCustomer.Id,
                     Notlar = formattedDate.ToString("dd-MM-yyyy"),
-                    Odenen = amount
+                    Odenen = amount,
+                    Tarih = DateTime.Today
                 };
 
                 if(category == 1)

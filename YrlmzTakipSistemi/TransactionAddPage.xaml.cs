@@ -24,6 +24,7 @@ namespace YrlmzTakipSistemi
             _customerRepository = new CustomerRepository(_dbHelper.GetConnection());
             DataContext = this;
             Products = new ObservableCollection<Product>();
+            TransactionDatePicker.SelectedDate = DateTime.Today;
         }
 
         public void GetCustomer(Customer customer)
@@ -40,7 +41,7 @@ namespace YrlmzTakipSistemi
 
         private void SaveTransactionButton_Click(object sender, RoutedEventArgs e)
         {
-            if (!ValidateInputs(out string description, out string note, out double price, out int quantity, out double amount, out double paid))
+            if (!ValidateInputs(out string description, out string note, out double price, out int quantity, out double amount, out double paid, out DateTime transactionDate))
             {
                 return;
             }
@@ -59,20 +60,21 @@ namespace YrlmzTakipSistemi
                     Adet = quantity,
                     BirimFiyat = price,
                     Tutar = amount,
-                    Odenen = paid
+                    Odenen = paid,
+                    Tarih = transactionDate
                 };
 
                 int? financialId = null;
-                if(amount != 0)
+                if (amount != 0)
                 {
                     var financial = new FinancialTransaction
                     {
                         Aciklama = description,
                         Tutar = amount,
-                        IslemTarihi = DateTime.Now
+                        IslemTarihi = transactionDate
                     };
 
-                   financialId = (int?) _financialRepository.Add(financial);
+                    financialId = (int?)_financialRepository.Add(financial);
                 }
 
                 if (financialId.HasValue)
@@ -85,7 +87,7 @@ namespace YrlmzTakipSistemi
 
                 if (SaveProductBox.IsChecked == true)
                 {
-                    SaveProduct(description, price);
+                    SaveProduct(description, price, transactionDate);
                 }
 
                 MessageBox.Show($"İşlem {description} başarıyla eklendi!", "Başarılı");
@@ -98,7 +100,7 @@ namespace YrlmzTakipSistemi
             }
         }
 
-        private bool ValidateInputs(out string description, out string note, out double price, out int quantity, out double amount, out double paid)
+        private bool ValidateInputs(out string description, out string note, out double price, out int quantity, out double amount, out double paid, out DateTime transactionDate)
         {
             description = DescriptionTextBox.Text;
             note = NoteTextBox.Text;
@@ -107,6 +109,9 @@ namespace YrlmzTakipSistemi
             quantity = string.IsNullOrEmpty(QuantityTextBox.Text) ? 0 : int.TryParse(QuantityTextBox.Text, out int parsedQuantity) ? parsedQuantity : -1;
             amount = string.IsNullOrEmpty(AmountTextBox.Text) ? 0 : double.TryParse(AmountTextBox.Text, out double parsedAmount) ? parsedAmount : -1;
             paid = string.IsNullOrEmpty(PaidTextBox.Text) ? 0 : double.TryParse(PaidTextBox.Text, out double parsedPaid) ? parsedPaid : -1;
+            transactionDate = TransactionDatePicker.SelectedDate.HasValue
+                ? TransactionDatePicker.SelectedDate.Value
+                : DateTime.Today;
 
             if (string.IsNullOrEmpty(description))
             {
@@ -178,7 +183,7 @@ namespace YrlmzTakipSistemi
             }
         }
 
-        private void SaveProduct(string name, double price)
+        private void SaveProduct(string name, double price, DateTime transactionDate)
         {
             try
             {
@@ -186,7 +191,8 @@ namespace YrlmzTakipSistemi
                 {
                     CustomerId = _currentCustomer.Id,
                     Isim = name,
-                    Fiyat = price
+                    Fiyat = price,
+                    Tarih = transactionDate
                 };
 
                 _productRepository.Add(product);

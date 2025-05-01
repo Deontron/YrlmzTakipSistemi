@@ -82,7 +82,8 @@ namespace YrlmzTakipSistemi
                     FaturaTarihi = invoiceDate,
                     Tutar = amount,
                     KDV = Kdv,
-                    Toplam = total
+                    Toplam = total,
+                    Tarih = DateTime.Now
                 };
                 int invoiceId = (int)_invoiceRepository.Add(invoice);
 
@@ -102,7 +103,8 @@ namespace YrlmzTakipSistemi
                     Tutar = Kdv,
                     CustomerId = currentCustomer.Id,
                     FaturaId = invoiceId,
-                    FinansalId = financialId
+                    FinansalId = financialId,
+                    Tarih = invoiceDate
                 };
                 _transactionRepository.Add(transaction);
 

@@ -22,14 +22,16 @@
                 Background="#3B3B3B" Foreground="Black"
                 BorderBrush="#555555" BorderThickness="1"
                 FontSize="18" Padding="5"
-                SelectionChanged="FilterTransactions">
+                SelectionChanged="FilterTransactions"
+                PreviewMouseDown="ComboBox_PreviewMouseDown">
             </ComboBox>
 
             <ComboBox Name="MonthComboBox" Width="110" Height="40"
                 Background="#3B3B3B" Foreground="Black"
                 BorderBrush="#555555" BorderThickness="1"
                 FontSize="18" Padding="5"
-                SelectionChanged="FilterTransactions">
+                SelectionChanged="FilterTransactions"
+                PreviewMouseDown="ComboBox_PreviewMouseDown">
                 <ComboBoxItem Content="Ocak" Tag="1"/>
                 <ComboBoxItem Content="Şubat" Tag="2"/>
                 <ComboBoxItem Content="Mart" Tag="3"/>

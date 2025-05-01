@@ -3,6 +3,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Collections.ObjectModel;
 using YrlmzTakipSistemi.Repositories;
+using System.Windows.Input;
 
 namespace YrlmzTakipSistemi
 {
@@ -234,6 +235,11 @@ namespace YrlmzTakipSistemi
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             SetDateFilter();
+        }
+
+        private void ComboBox_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            FilterTransactions(sender, null);
         }
 
         private void FilterTransactions(object sender, RoutedEventArgs e)
